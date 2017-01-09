@@ -1,7 +1,7 @@
 var webdriverio = require('webdriverio');
 var options = {
     desiredCapabilities: {
-        browserName: 'firefox',
+        browserName: 'chrome',
         version: '27.0'
     }
 };
