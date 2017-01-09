@@ -1,0 +1,19 @@
+{
+  "name": "compat-db",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "wdio index.js",
+    "spec": "mocha some.js --timeout 15000"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "mocha": "^3.2.0",
+    "wdio-mocha-framework": "^0.5.8",
+    "wdio-selenium-standalone-service": "^0.0.7",
+    "webdriverio": "^4.6.1"
+  }
+}
