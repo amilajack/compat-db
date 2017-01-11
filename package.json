@@ -13,7 +13,13 @@
     "compat",
     "database"
   ],
-  "author": "",
+  "contributors": [{
+    "name" : "Amila Welihinda",
+    "email" : "amilajack@gmail.com",
+    "url" : "http://amilajack.com",
+  }, {
+    "name" : "Andrew Jong"
+  }],
   "license": "MIT",
   "dependencies": {
     "mocha": "^3.2.0",
