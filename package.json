@@ -6,7 +6,7 @@
   "scripts": {
     "test": "wdio index.js",
     "lint": "eslint --cache --ignore-path .gitignore --format=node_modules/eslint-formatter-pretty .",
-    "spec": "mocha some.js --timeout 15000"
+    "spec": "mocha index.js --timeout 15000"
   },
   "keywords": [
     "api",
