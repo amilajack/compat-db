@@ -1,19 +1,31 @@
 {
   "name": "compat-db",
   "version": "1.0.0",
-  "description": "",
+  "description": "A central and scalable browser API compatability database",
   "main": "index.js",
   "scripts": {
     "test": "wdio index.js",
+    "lint": "eslint --cache --ignore-path .gitignore --format=node_modules/eslint-formatter-pretty .",
     "spec": "mocha some.js --timeout 15000"
   },
-  "keywords": [],
+  "keywords": [
+    "api",
+    "compat",
+    "database"
+  ],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "mocha": "^3.2.0",
     "wdio-mocha-framework": "^0.5.8",
+    "wdio-sauce-service": "^0.3.1",
     "wdio-selenium-standalone-service": "^0.0.7",
     "webdriverio": "^4.6.1"
+  },
+  "devDependencies": {
+    "babel-eslint": "^7.1.1",
+    "eslint": "^3.13.1",
+    "eslint-config-airbnb-base": "^11.0.1",
+    "eslint-plugin-import": "^2.2.0"
   }
 }

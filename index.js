@@ -1,6 +1,6 @@
-var webdriverio = require('webdriverio');
-var options = { desiredCapabilities: { browserName: 'chrome' } };
-var client = webdriverio.remote(options);
+const webdriverio = require('webdriverio');
+const options = { desiredCapabilities: { browserName: 'chrome' } };
+const client = webdriverio.remote(options);
 // var client = require('webdriverio').remote({
 //     desiredCapabilities: {
 //     	platformName: 'iOS',
