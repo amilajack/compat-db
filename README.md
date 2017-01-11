@@ -3,6 +3,7 @@ compat-db
 
 A work-in-progress attempt to make a central and scalable browser api compatability database
 
+## Installation
 ```bash
 # Clone and install
 git clone https://github.com/amilajack/compat-db.git
