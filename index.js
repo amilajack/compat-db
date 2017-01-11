@@ -1,10 +1,12 @@
 const webdriverio = require('webdriverio');
+
 const options = {
   desiredCapabilities: {
     browserName: 'chrome',
-    version: '27.0',
-  },
+    version: '27.0'
+  }
 };
+
 const client = webdriverio.remote(options);
 
 describe('Compat', () => {
