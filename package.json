@@ -1,6 +1,6 @@
 {
   "name": "compat-db",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "A central and scalable browser API compatability database",
   "main": "index.js",
   "scripts": {
