@@ -3,6 +3,10 @@ compat-db
 
 A work-in-progress attempt to make a central and scalable browser api compatability database
 
+## Goals
+- [ ] Provide a compiled list of compatibility records
+- [ ] Provide an API for traversing/filtering the records and finding supported features
+
 ## Installation
 ```bash
 # Clone and install
