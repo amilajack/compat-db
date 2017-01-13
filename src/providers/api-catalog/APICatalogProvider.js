@@ -1,7 +1,7 @@
 // @flow
-import type { ProviderAPIResponses } from '../ProviderType';
+import type { ProviderAPIResponse } from '../ProviderType';
 
 
-export default function APICatalogProvider(): ProviderAPIResponses {
+export default function APICatalogProvider(): ProviderAPIResponse {
 
 }
