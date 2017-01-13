@@ -44,14 +44,19 @@ export type ProviderAPIResponse = {
    * cannot be determined, (ex. block) then create two responses with different
    * `type`'s
    */
-  type: 'js-api' | 'css-api',
+  type: 'js-api' | 'css-api' | 'html-api',
 
   /**
    * The data type of the api
    */
   apiType: Array<'global' | 'object' | 'function' | 'property' | 'method'>
+          // css-api specific
           | 'declaration'
           | 'property'
+          // html-api specific
+          | 'attr'
+          | 'value'
+          | 'tag'
 };
 
 export type ProviderAPIResponses = Array<ProviderAPIResponse>;
