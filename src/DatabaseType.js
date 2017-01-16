@@ -5,14 +5,18 @@
 import type { ProviderAPIResponse } from './providers/ProviderType';
 
 
-// ex. targets: { chrome: { '50': 'y' } }
-type Record = {
-  targets: {
-    [name: string]: {
-      [version: string]: string
-    }
-  }
-  & ProviderAPIResponse
+type DBCompatRecord = ProviderAPIResponse & {
+  /**
+   * The data type of the api
+   */
+  apiType: Array<'global' | 'object' | 'function' | 'property' | 'method'>
+          // css-api specific
+          | 'declaration'
+          | 'property'
+          // html-api specific
+          | 'attr'
+          | 'value'
+          | 'tag'
 };
 
 export type Database = {
@@ -28,5 +32,12 @@ export type Database = {
       }
     }
   },
-  records: Array<Record>
+  records: Array<{
+    targets: {
+      [target: string]: {
+        [version: string]: string
+      }
+    },
+    records: DBCompatRecord
+  }>
 };

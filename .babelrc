@@ -2,7 +2,10 @@
   "presets": ["es2015", "stage-0"],
   "plugins": [
     "syntax-flow",
-    /*"tcomb",*/
+    /*["flow-runtime", {
+      "assert": true,
+      "decorate": false
+    }],*/
     "transform-flow-strip-types",
 		"transform-runtime",
     "add-module-exports",
