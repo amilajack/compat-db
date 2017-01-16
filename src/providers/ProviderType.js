@@ -1,9 +1,43 @@
-// @flow
+/**
+ * Providers are responsible for parsing sources of information and returning
+ * a formatted list of information, as described below. It is not responsible
+ * for actually running the tests
+ *
+ * @flow
+ */
 export type ProviderAPIResponse = {
   /**
    * The human readable name of the API. This will be used for error reporting
    */
   name: string,
+
+  /**
+   * The unique id that is used to search for the property
+   */
+  id: string,
+
+  /**
+   * The possible vendor prefixes of the API
+   * @TODO
+   */
+  // prefix: bool | string | '-moz-' | '-webkit-' | '-ms-',
+
+  /**
+   * An object containing information about the spec. This information is not
+   * relevant to the compatability of the spec it self. It may describe what the
+   * API does
+   */
+  meta?: {
+    /**
+     * An optional description of the API
+     */
+    desc: string,
+
+    /**
+     * Future possible metadata fields
+     */
+    [property: string]: any
+  },
 
   /**
    * The official name of the specification
@@ -18,22 +52,14 @@ export type ProviderAPIResponse = {
   /**
    * Prototype chain/method list
    *
-   * ex. ['window']              <= default
+   * ex. ['window']                               <= default
    *
-   * ex. ['document']            <= This is an example of `querySelector`'s
-   *                                protoChain
+   * ex. ['window', 'document', 'querySelector']  <= Ex. of `querySelector`'s
+   *                                                 protoChain
    *
-   * ex. ['Array', 'prototype']  <= This is an example what the protoChain of
-   *                                `push` would look like
+   * ex. ['window', 'Array', 'prototype', push]   <= Example of `push` protoChain
    */
   protoChain: Array<string>,
-
-  /**
-   * The method or object to typecheck
-   * ex. fetch, ServiceWorker, navigator.serviceWorker
-   * Will be typechecked like so: typeof fetch !== 'undefined'
-   */
-  apiValueCheck: string,
 
   /**
    * Categorize the api as a css style or a javascript api. For example,
@@ -45,18 +71,4 @@ export type ProviderAPIResponse = {
    * `type`'s
    */
   type: 'js-api' | 'css-api' | 'html-api',
-
-  /**
-   * The data type of the api
-   */
-  apiType: Array<'global' | 'object' | 'function' | 'property' | 'method'>
-          // css-api specific
-          | 'declaration'
-          | 'property'
-          // html-api specific
-          | 'attr'
-          | 'value'
-          | 'tag'
 };
-
-export type ProviderAPIResponses = Array<ProviderAPIResponse>;
