@@ -9,6 +9,8 @@
  * @flow
  */
 
+/* eslint fp/no-throw: 0 */
+
 import APICatalogProvider from './api-catalog/APICatalogProvider';
 import type { ProviderAPIResponse } from './ProviderType';
 
