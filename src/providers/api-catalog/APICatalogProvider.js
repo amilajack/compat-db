@@ -48,6 +48,7 @@ export default function APICatalogProvider(): Array<ProviderAPIResponse> {
     // names are numbers from some odd reason
     .filter(fRecord =>
       !fRecord.name.includes('-') &&
+      fRecord.parentName !== ('CSS2Properties') &&
       Number.isNaN(parseInt(fRecord.name, 10)) &&
       typeof fRecord.spec !== 'undefined'
     )
@@ -69,8 +70,6 @@ export default function APICatalogProvider(): Array<ProviderAPIResponse> {
       name: camelToHyphen(record.name),
       type: 'css-api'
     }));
-
-  console.log(CSSAPIs[100]);
 
   return [...CSSAPIs, ...JSAPIs];
 }

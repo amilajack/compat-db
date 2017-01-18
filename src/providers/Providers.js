@@ -24,6 +24,10 @@ export function find(id: string): ProviderAPIResponse {
   throw new Error(`API by id of '${id}' cannot be found`);
 }
 
-export function ofAPIType(type: string): Array<ProviderAPIResponse> {
-  return APICatalogProvider().filter(record => record.type === type);
+
+// @TODO
+// export function filterByProtoChain(chain: Array<string>): ProviderAPIResponse {}
+
+export function ofAPIType(type: 'css' | 'js' | 'html'): Array<ProviderAPIResponse> {
+  return APICatalogProvider().filter(record => record.type === `${type}-api`);
 }
