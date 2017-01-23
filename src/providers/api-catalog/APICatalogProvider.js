@@ -31,6 +31,9 @@ export function camelToHyphen(string: string): string {
     .join('');
 }
 
+/**
+ * @TODO: Allow overriding database records
+ */
 export default function APICatalogProvider(): Array<ProviderAPIResponse> {
   const formattedRecords = [];
 
@@ -71,5 +74,6 @@ export default function APICatalogProvider(): Array<ProviderAPIResponse> {
       type: 'css-api'
     }));
 
-  return [...CSSAPIs, ...JSAPIs];
+  return CSSAPIs.concat(JSAPIs);
+  // return [...CSSAPIs, ...JSAPIs];
 }

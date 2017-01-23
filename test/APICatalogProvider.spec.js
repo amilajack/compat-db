@@ -1,6 +1,4 @@
 import { camelToHyphen } from '../src/providers/api-catalog/APICatalogProvider';
-// import APICatalog, { camelToHyphen } from '../src/providers/api-catalog/APICatalogProvider';
-// import Database from '../src/providers/api-catalog/apicatalogdata.json';
 
 
 describe('APICatalog', () => {
