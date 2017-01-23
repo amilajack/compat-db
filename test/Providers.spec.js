@@ -1,6 +1,12 @@
 import { expect as chaiExpect } from 'chai';
-import { find, ofAPIType } from '../src/providers/Providers';
+import { join } from 'path';
+import { writeFileSync } from 'fs';
+import Providers, { find, ofAPIType } from '../src/providers/Providers';
 
+
+// Temporary way of outputing providers
+const ProvidersJSON = JSON.stringify(Providers());
+writeFileSync(join(__dirname, '..', 'compat-db.json'), ProvidersJSON, 'utf8');
 
 describe('Providers', () => {
   describe('API Filtering', () => {
@@ -58,11 +64,56 @@ describe('Providers', () => {
       const records = ofAPIType('js');
 
       describe('JS APIs', () => {
-        it('should get have non-style related APIs', () => {
+        it('should get contain non-style related APIs', () => {
           records.filter(record => record.protoChain.includes('navigator'));
         });
 
-        it('should have navigator.serviceWorker', () => {
+        it('should contain requestAnimationFrame record', () => {
+          const record = find('requestAnimationFrame');
+          expect(record).toBeDefined();
+          expect(record.protoChain).toContain('window');
+          expect(record.protoChain).toContain('requestAnimationFrame');
+        });
+
+        it('should contain applicationCache record', () => {
+          const record = find('applicationCache');
+          expect(record).toBeDefined();
+          expect(record.protoChain).toContain('window');
+          expect(record.protoChain).toContain('applicationCache');
+        });
+
+        it('should contain math record', () => {
+          const methods = ['cos', 'acos', 'sin', 'asin', 'asin'];
+          for (const method of methods) {
+            const record = find(method);
+            expect(record).toBeDefined();
+            expect(record.protoChain).toContain('Math');
+            expect(record.protoChain).toContain(method);
+          }
+        });
+
+        it('should contain requestIdleCallback record', () => {
+          const record = find('requestIdleCallback');
+          expect(record).toBeDefined();
+          expect(record.protoChain).toContain('window');
+          expect(record.protoChain).toContain('requestIdleCallback');
+        });
+
+        it.skip('should contain IntersectionObserver record', () => {
+          const record = find('IntersectionObserver');
+          expect(record).toBeDefined();
+          expect(record.protoChain).toContain('window');
+          expect(record.protoChain).toContain('IntersectionObserver');
+        });
+
+        it('should contain createImageBitmap record', () => {
+          const record = find('createImageBitmap');
+          expect(record).toBeDefined();
+          expect(record.protoChain).toContain('window');
+          expect(record.protoChain).toContain('createImageBitmap');
+        });
+
+        it('should contain navigator.serviceWorker record', () => {
           expect(records.find(record =>
             record.protoChain.includes('window') &&
             record.protoChain.includes('Navigator') &&

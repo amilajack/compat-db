@@ -1,7 +1,8 @@
 /**
  * Providers are responsible for parsing sources of information and returning
  * a formatted list of information, as described below. It is not responsible
- * for actually running the tests
+ * for actually running the tests. Providers to not handle logic related to
+ * determining which API's are supported in certain browsers.
  *
  * @flow
  */
@@ -15,12 +16,6 @@ export type ProviderAPIResponse = {
    * The unique id that is used to search for the property
    */
   id: string,
-
-  /**
-   * The possible vendor prefixes of the API
-   * @TODO
-   */
-  // prefix: bool | string | '-moz-' | '-webkit-' | '-ms-',
 
   /**
    * An object containing information about the spec. This information is not

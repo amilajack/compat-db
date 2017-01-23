@@ -31,3 +31,6 @@ node_modules
 
 .idea
 .eslintcache
+
+lib
+compat-db.json
