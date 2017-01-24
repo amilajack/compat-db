@@ -25,7 +25,7 @@ selenium-standalone install
 selenium-standalone start
 
 # In a new tab, run the tests
-npm run spec
+npm run compat-test
 ```
 
 ## Roadmap
