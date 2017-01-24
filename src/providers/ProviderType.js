@@ -1,8 +1,7 @@
 /**
  * Providers are responsible for parsing sources of information and returning
- * a formatted list of information, as described below. It is not responsible
- * for actually running the tests. Providers to not handle logic related to
- * determining which API's are supported in certain browsers.
+ * a formatted list of information, as described below. It does not
+ * actually run the tests which determine browser API compatibility.
  *
  * @flow
  */
