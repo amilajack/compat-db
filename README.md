@@ -24,6 +24,8 @@ npm install selenium-standalone@latest -g
 selenium-standalone install
 selenium-standalone start
 
+# ⚠️  Make sure to add your saucelabs keys to your `.env` file ⚠️
+
 # In a new tab, run the tests
 npm run spec
 ```
