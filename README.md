@@ -11,6 +11,7 @@ A work-in-progress attempt to make a central and scalable browser api compatibil
 ## Goals
 - [ ] Provide a compiled list of compatibility records
 - [ ] Provide an API for traversing/filtering the records and finding supported features
+- [ ] Collect all CSS properties and their corresponding values
 
 ## Installation
 ```bash

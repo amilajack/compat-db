@@ -25,6 +25,10 @@ function formatCSSAssertion(record: ProviderAPIResponse): string {
   return `return typeof Array.prototype.slice.call(document.defaultView.getComputedStyle(document.body, ''),0).indexOf('${cssPropertyName}') > -1`;
 }
 
+// function formatCSSPropertyAssertion(record: ProviderAPIResponse): string {
+//   return `CSS.supports ? CSS.supports('${record.}') : false`
+// }
+
 export default function AssertionFormatter(record: ProviderAPIResponse): AssertionFormatterType {
   switch (record.type) {
     case 'css-api':
