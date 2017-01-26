@@ -51,7 +51,7 @@ export type ProviderAPIResponse = {
    * ex. ['window', 'document', 'querySelector']  <= Ex. of `querySelector`'s
    *                                                 protoChain
    *
-   * ex. ['window', 'Array', 'prototype', push]   <= Example of `push` protoChain
+   * ex. ['window', 'Array', 'prototype', 'push']   <= Example of `push` protoChain
    */
   protoChain: Array<string>,
 

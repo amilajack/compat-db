@@ -11,6 +11,7 @@ A work-in-progress attempt to make a central and scalable browser api compatibil
 ## Goals
 - [ ] Provide a compiled list of compatibility records
 - [ ] Provide an API for traversing/filtering the records and finding supported features
+- [ ] Collect all CSS properties and their corresponding values
 
 ## Installation
 ```bash
@@ -23,6 +24,10 @@ yarn # or npm install
 npm install selenium-standalone@latest -g
 selenium-standalone install
 selenium-standalone start
+
+# Create your `.env` file
+cp .env.example .env
+# ⚠️  Make sure to add your saucelabs keys to your `.env` file ⚠️
 
 # In a new tab, run the tests
 npm run compat-test

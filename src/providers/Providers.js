@@ -29,5 +29,6 @@ export function find(id: string): ProviderAPIResponse {
 // export function filterByProtoChain(chain: Array<string>): ProviderAPIResponse {}
 
 export function ofAPIType(type: 'css' | 'js' | 'html'): Array<ProviderAPIResponse> {
-  return APICatalogProvider().filter(record => record.type === `${type}-api`);
+  return APICatalogProvider()
+    .filter(record => record.type === `${type}-api` || record.type === `${type}`);
 }

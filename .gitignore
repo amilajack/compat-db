@@ -34,3 +34,5 @@ node_modules
 
 lib
 compat-db.json
+.env
+errorShots

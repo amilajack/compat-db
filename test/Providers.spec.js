@@ -75,6 +75,71 @@ describe('Providers', () => {
           expect(record.protoChain).toContain('requestAnimationFrame');
         });
 
+        it.skip('should contain currentScript record', () => {
+          const record = find('currentScript');
+          expect(record).toBeDefined();
+          expect(record.protoChain).toContain('window');
+          expect(record.protoChain).toContain('document');
+          expect(record.protoChain).toContain('currentScript');
+        });
+
+        it('should contain PaymentRequest record', () => {
+          const [record] = records
+            .filter(e => e.protoChain.includes('window'))
+            .filter(e => e.protoChain.includes('PaymentRequest'));
+
+          expect(record).toBeDefined();
+          expect(record.protoChain).toContain('window');
+          expect(record.protoChain).toContain('PaymentRequest');
+        });
+
+        it.skip('should contain WebAssembly record', () => {
+          const [record] = records
+            .filter(e => e.protoChain.includes('window'))
+            .filter(e => e.protoChain.includes('WebAssembly'));
+
+          expect(record).toBeDefined();
+          expect(record.protoChain).toContain('window');
+          expect(record.protoChain).toContain('WebAssembly');
+        });
+
+        it.skip('should contain WebAssembly.compile record', () => {
+          const [record] = records
+            .filter(e => e.protoChain.includes('window'))
+            .filter(e => e.protoChain.includes('WebAssembly'))
+            .filter(e => e.protoChain.includes('compile'));
+
+          expect(record).toBeDefined();
+          expect(record.protoChain).toContain('window');
+          expect(record.protoChain).toContain('WebAssembly');
+          expect(record.protoChain).toContain('compile');
+        });
+
+        it('should contain supports record', () => {
+          const [record] = records
+            .filter(e => e.protoChain.includes('CSS'))
+            .filter(e => e.protoChain.includes('supports'));
+
+          expect(record).toBeDefined();
+          expect(record.protoChain).toContain('window');
+          expect(record.protoChain).toContain('CSS');
+          expect(record.protoChain).toContain('supports');
+        });
+
+        it('should contain fetch record', () => {
+          const [record] = records
+            .filter(e => e.protoChain.includes('window'))
+            .filter(e => e.protoChain.includes('fetch'));
+
+          expect(record).toBeDefined();
+          expect(record.protoChain).toContain('window');
+          expect(record.protoChain).toContain('fetch');
+        });
+
+        it('description', () => {
+
+        });
+
         it('should contain applicationCache record', () => {
           const record = find('applicationCache');
           expect(record).toBeDefined();
