@@ -20,11 +20,6 @@ git clone https://github.com/amilajack/compat-db.git
 cd compat-db
 yarn # or npm install
 
-# Install and start selenium server
-npm install selenium-standalone@latest -g
-selenium-standalone install
-selenium-standalone start
-
 # Create your `.env` file
 cp .env.example .env
 # ⚠️  Make sure to add your saucelabs keys to your `.env` file ⚠️
