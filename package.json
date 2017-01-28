@@ -43,7 +43,7 @@
     "wdio-mocha-framework": "^0.5.8",
     "wdio-sauce-service": "^0.3.1",
     "wdio-selenium-standalone-service": "^0.0.7",
-    "webdriverio": "^4.6.1"
+    "webdriverio": "^4.6.2"
   },
   "devDependencies": {
     "babel-cli": "^6.22.2",
@@ -61,13 +61,14 @@
     "chai": "^3.5.0",
     "cross-env": "^3.1.4",
     "download-cli": "^1.0.1",
-    "eslint": "^3.14.0",
-    "eslint-config-bliss": "0.0.3",
+    "eslint": "^3.14.1",
+    "eslint-config-bliss": "^0.0.6",
     "eslint-formatter-pretty": "^1.1.0",
     "flow-bin": "^0.38.0",
     "flow-runtime": "^0.2.1",
     "flow-typed": "^2.0.0",
     "jest-cli": "^18.1.0",
+    "nightmare": "^2.9.1",
     "tcomb": "^3.2.16"
   },
   "engines": {

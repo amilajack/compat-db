@@ -1,16 +1,36 @@
-import AssertionFormatter from '../src/assertions/AssertionFormatter';
-import Providers from '../src/providers/Providers';
+/* eslint no-eval: 0 */
+import Nightmare from 'nightmare';
+import AssertionFormatter, { determineASTNodeType } from '../src/assertions/AssertionFormatter';
 
 
-describe('AssertionFormatter', () => {
-  it('should return typeof assertion for every record', () => {
-    const records = Providers();
-    for (const record of records) {
-      expect(AssertionFormatter(record).assertion).toContain('return typeof');
-    }
+async function testDetermineASTNodeType(protoChain: Array<string>) {
+  const compatTest = determineASTNodeType({ protoChain });
+  const nightmare = Nightmare();
+  return nightmare
+    .goto('https://example.com')
+    .evaluate((compatTest) => eval(compatTest), compatTest) // eslint-disable-line
+    .end();
+}
+
+describe('determineASTNodeType()', () => {
+  it('should determine MemberExpressions', async () => {
+    expect(await testDetermineASTNodeType(['window', 'fetch']))
+      .toEqual(['CallExpression']);
   });
 
-  it('should create assertions for CSS API records', () => {
+  it('should determine NewExpression', async () => {
+    expect(await testDetermineASTNodeType(['window', 'Array']))
+      .toEqual(['CallExpression', 'NewExpression']);
+  });
+
+  it('should determine MemberExpression', async () => {
+    expect(await testDetermineASTNodeType(['window', 'Array', 'push']))
+      .toEqual(['MemberExpression']);
+  });
+});
+
+describe('AssertionFormatter', () => {
+  it('should create assertions for CSS API records', async () => {
     const cssAPIRecord = {
       id: 'border-width',
       name: 'border-width',
@@ -20,10 +40,38 @@ describe('AssertionFormatter', () => {
       protoChain: ['window', 'CSSStyleDeclaration', 'borderWidth']
     };
 
-    expect(AssertionFormatter(cssAPIRecord)).toEqual({
-      ...cssAPIRecord,
-      assertion: "return typeof Array.prototype.slice.call(document.defaultView.getComputedStyle(document.body, ''),0).indexOf('borderWidth') > -1"
-    });
+    const { assertion } = AssertionFormatter(cssAPIRecord);
+    const nightmare = Nightmare();
+
+    expect(
+      await nightmare
+        .goto('https://example.com')
+        .evaluate((compatTest) => eval(compatTest), assertion)
+        .end()
+    )
+    .toEqual(true);
+  });
+
+  it('should create assertions for CSS API records', async () => {
+    const cssAPIRecord = {
+      id: 'super-width',
+      name: 'super-width',
+      specNames: ['css21', 'css-background-3'],
+      type: 'css-api',
+      specIsFinished: false,
+      protoChain: ['window', 'CSSStyleDeclaration', 'superWidth']
+    };
+
+    const { assertion } = AssertionFormatter(cssAPIRecord);
+    const nightmare = Nightmare();
+
+    expect(
+      await nightmare
+        .goto('https://example.com')
+        .evaluate((compatTest) => eval(compatTest), assertion)
+        .end()
+    )
+    .toEqual(false);
   });
 
   it('should create assertions for JS API records', () => {

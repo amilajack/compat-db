@@ -24,7 +24,7 @@ type DBCompatRecord = ProviderAPIResponse & {
    * ex. navigator.serviceWorker() => 'MemberExpression'
    * ex. new PaymentRequest() => 'NewExpression'
    */
-  ASTNodeType: 'MemberExpression' | 'NewExpression' | 'CallExpression'
+  ASTNodeTypes: Array<'MemberExpression' | 'NewExpression' | 'CallExpression'>
 };
 
 export type Database = {

@@ -20,9 +20,51 @@ function formatJSAssertion(record: ProviderAPIResponse): string {
   return `return typeof ${formattedProtoChain} !== undefined`;
 }
 
+/**
+ * Check if a CSS property or value is supported
+ * @TODO: Use CSS.supports() api
+ */
 function formatCSSAssertion(record: ProviderAPIResponse): string {
   const cssPropertyName = record.protoChain[record.protoChain.length - 1];
-  return `return typeof Array.prototype.slice.call(document.defaultView.getComputedStyle(document.body, ''),0).indexOf('${cssPropertyName}') > -1`;
+  return `
+    (function () {
+      var items = document.body.style
+
+      for (var item in items) {
+        if (item === '${cssPropertyName}') return true
+      }
+
+      return false
+    })()
+  `;
+}
+
+export function determineASTNodeType(record: ProviderAPIResponse): string {
+  const api = record.protoChain.join('.');
+  const { length } = record.protoChain;
+
+  return `
+    (function() {
+      var items = []
+      if (
+        ${length} <= 2 &&
+        typeof ${api} === 'function'
+      ) {
+        items.push('CallExpression')
+      }
+
+      try {
+        new ${api}()
+        items.push('NewExpression')
+      } catch (e) {
+        if (${length} > 2) {
+          items.push('MemberExpression')
+        }
+      }
+
+      return items
+    })()
+  `;
 }
 
 // function formatCSSPropertyAssertion(record: ProviderAPIResponse): string {

@@ -1,1 +1,4 @@
 flow-typed/**/*.js
+compat-tests
+lib
+errorShots
