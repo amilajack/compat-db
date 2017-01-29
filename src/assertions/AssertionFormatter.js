@@ -1,6 +1,7 @@
 /**
  * Take a record from a provider and create an assertion out of it. These
- * assertions are used to check if a browser supports a certain api
+ * assertions are used to check if a browser supports a certain api. When the
+ * assertions are evaluated, they will return true if the API is supported
  *
  * @flow
  */
@@ -10,9 +11,13 @@
 import type { ProviderAPIResponse } from '../providers/ProviderType';
 
 
-type AssertionFormatterType = ProviderAPIResponse & { assertion: string };
+type AssertionFormatterType = ProviderAPIResponse & {
+  apiIsSupported: string,
+
+};
 
 /**
+ * Check if the JS API is defined
  * ex. ['window', 'ServiceWorker'] => 'window.ServiceWorker'
  */
 function formatJSAssertion(record: ProviderAPIResponse): string {
@@ -21,20 +26,14 @@ function formatJSAssertion(record: ProviderAPIResponse): string {
 }
 
 /**
- * Check if a CSS property or value is supported
- * @TODO: Use CSS.supports() api
+ * Create assertion to check if a CSS property is supported
  */
 function formatCSSAssertion(record: ProviderAPIResponse): string {
   const cssPropertyName = record.protoChain[record.protoChain.length - 1];
   return `
     (function () {
       var items = document.body.style
-
-      for (var item in items) {
-        if (item === '${cssPropertyName}') return true
-      }
-
-      return false
+      return '${cssPropertyName}' in items
     })()
   `;
 }
@@ -67,21 +66,37 @@ export function determineASTNodeType(record: ProviderAPIResponse): string {
   `;
 }
 
-// function formatCSSPropertyAssertion(record: ProviderAPIResponse): string {
-//   return `CSS.supports ? CSS.supports('${record.}') : false`
-// }
+/**
+ * Get all the supported css values. Evaluation will return an array of camel-cased
+ * properties.
+ */
+export function getAllSupportCSSProperties(): string {
+  return `
+    (function () {
+      var styles = document.createElement('div').style;
+      var stylesList = []
+      for (var style in styles) {
+        stylesList.push(style)
+      }
+      return stylesList
+    })()
+  `;
+}
 
+/**
+ * Create a list of browser API assertions to check if an API is supported
+ */
 export default function AssertionFormatter(record: ProviderAPIResponse): AssertionFormatterType {
   switch (record.type) {
     case 'css-api':
       return {
         ...record,
-        assertion: formatCSSAssertion(record)
+        apiIsSupported: formatCSSAssertion(record)
       };
     case 'js-api':
       return {
         ...record,
-        assertion: formatJSAssertion(record)
+        apiIsSupported: formatJSAssertion(record)
       };
     default:
       throw new Error(`Invalid API type: "${record.type}"`);

@@ -19,12 +19,12 @@ type DBCompatRecord = ProviderAPIResponse & {
           | 'tag',
 
   /**
-   * The type of ESLint AST node
+   * The type of ESLint AST node. These are only required for JS API's
    * ex. fetch('google.com') => 'CallExpression'
    * ex. navigator.serviceWorker() => 'MemberExpression'
    * ex. new PaymentRequest() => 'NewExpression'
    */
-  ASTNodeTypes: Array<'MemberExpression' | 'NewExpression' | 'CallExpression'>
+  ASTNodeTypes: Array<'MemberExpression' | 'NewExpression' | 'CallExpression'> | false
 };
 
 export type Database = {

@@ -1,14 +1,19 @@
 /* eslint no-eval: 0 */
 import Nightmare from 'nightmare';
-import AssertionFormatter, { determineASTNodeType } from '../src/assertions/AssertionFormatter';
+import CSSProperties from './CSSProperties.json';
+import AssertionFormatter, {
+  determineASTNodeType,
+  getAllSupportCSSProperties
+} from '../src/assertions/AssertionFormatter';
 
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000; // eslint-disable-line
 
 async function testDetermineASTNodeType(protoChain: Array<string>) {
-  const compatTest = determineASTNodeType({ protoChain });
+  const determineNodeTest = determineASTNodeType({ protoChain });
   const nightmare = Nightmare();
   return nightmare
     .goto('https://example.com')
-    .evaluate((compatTest) => eval(compatTest), compatTest) // eslint-disable-line
+    .evaluate((compatTest) => eval(compatTest), determineNodeTest)
     .end();
 }
 
@@ -29,6 +34,21 @@ describe('determineASTNodeType()', () => {
   });
 });
 
+describe('getAllSupportCSSProperties()', () => {
+  it('should get all supported css properties', async () => {
+    const nightmare = Nightmare();
+    const supportedCSSProperties = new Set(
+      await nightmare
+        .goto('https://example.com')
+        .evaluate((compatTest) => eval(compatTest), getAllSupportCSSProperties())
+        .end()
+    );
+    for (const property of new Set(CSSProperties)) {
+      expect(supportedCSSProperties).toContain(property);
+    }
+  });
+});
+
 describe('AssertionFormatter', () => {
   it('should create assertions for CSS API records', async () => {
     const cssAPIRecord = {
@@ -40,13 +60,13 @@ describe('AssertionFormatter', () => {
       protoChain: ['window', 'CSSStyleDeclaration', 'borderWidth']
     };
 
-    const { assertion } = AssertionFormatter(cssAPIRecord);
+    const { apiIsSupported } = AssertionFormatter(cssAPIRecord);
     const nightmare = Nightmare();
 
     expect(
       await nightmare
         .goto('https://example.com')
-        .evaluate((compatTest) => eval(compatTest), assertion)
+        .evaluate((compatTest) => eval(compatTest), apiIsSupported)
         .end()
     )
     .toEqual(true);
@@ -62,31 +82,15 @@ describe('AssertionFormatter', () => {
       protoChain: ['window', 'CSSStyleDeclaration', 'superWidth']
     };
 
-    const { assertion } = AssertionFormatter(cssAPIRecord);
+    const { apiIsSupported } = AssertionFormatter(cssAPIRecord);
     const nightmare = Nightmare();
 
     expect(
       await nightmare
         .goto('https://example.com')
-        .evaluate((compatTest) => eval(compatTest), assertion)
+        .evaluate((compatTest) => eval(compatTest), apiIsSupported)
         .end()
     )
     .toEqual(false);
-  });
-
-  it('should create assertions for JS API records', () => {
-    const jsAPIRecord = {
-      id: 'ownerElement',
-      name: 'ownerElement',
-      specNames: ['dom-level-3-xpath'],
-      type: 'js-api',
-      specIsFinished: false,
-      protoChain: ['window', 'XPathNamespace', 'ownerElement']
-    };
-
-    expect(AssertionFormatter(jsAPIRecord)).toEqual({
-      ...jsAPIRecord,
-      assertion: 'return typeof window.XPathNamespace.ownerElement !== undefined'
-    });
   });
 });

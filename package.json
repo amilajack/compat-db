@@ -10,7 +10,7 @@
   "scripts": {
     "build": "cross-env NODE_ENV=production rm -rf lib && babel src --out-dir lib",
     "compat-test": "./node_modules/.bin/wdio wdio.conf.js",
-    "flow": "flow",
+    "flow": "flow check",
     "flow-typed": "flow-typed install",
     "lint": "eslint --cache --format=node_modules/eslint-formatter-pretty .",
     "spec": "jest",
@@ -24,7 +24,10 @@
   "keywords": [
     "api",
     "compat",
-    "database"
+    "caniuse",
+    "support",
+    "database",
+    "db"
   ],
   "author": "Amila Welihinda",
   "license": "MIT",
@@ -37,7 +40,7 @@
   ],
   "homepage": "https://github.com/amilajack/compat-db#readme",
   "dependencies": {
-    "caniuse-db": "^1.0.30000613",
+    "caniuse-db": "1.0.30000613",
     "dotenv": "^4.0.0",
     "mocha": "^3.2.0",
     "wdio-mocha-framework": "^0.5.8",
