@@ -5,27 +5,31 @@
 import type { ProviderAPIResponse } from './providers/ProviderType';
 
 
-type DBCompatRecord = ProviderAPIResponse & {
+type DBCompatRecord = ProviderAPIResponse
+& ({
   /**
-   * The data type of the api
+   * The data type of the api. This is specific to only CSS and HTML API's. JS
+   * API's should have `false` for this property. `null` will be used for API's
+   * whose types cannot be determined
    */
-  apiType: Array<'global' | 'object' | 'function' | 'property' | 'method'>
-          // css-api specific
-          | 'declaration'
+  apiType: 'value'
           | 'property'
           // html-api specific
           | 'attr'
           | 'value'
-          | 'tag',
-
+          | 'tag'
+          // Undetermined API type
+          | null
+}
+| {
   /**
    * The type of ESLint AST node. These are only required for JS API's
    * ex. fetch('google.com') => 'CallExpression'
    * ex. navigator.serviceWorker() => 'MemberExpression'
    * ex. new PaymentRequest() => 'NewExpression'
    */
-  ASTNodeTypes: Array<'MemberExpression' | 'NewExpression' | 'CallExpression'> | false
-};
+  ASTNodeTypes: Array<'MemberExpression' | 'NewExpression' | 'CallExpression'>
+});
 
 export type Database = {
   // The same 'agents' property from caniuse
@@ -43,9 +47,14 @@ export type Database = {
   records: Array<{
     targets: {
       [target: string]: {
-        [version: string]: string
+        [version: string]: 'y' | 'n' | 'prefixed'
       }
-    },
-    records: DBCompatRecord
+    }
+    & DBCompatRecord
+    & ? {
+      // Lists of hyphen-separated CSS properties and values
+      allCSSProperties: Array<string>,
+      allCSSValues: Array<string>
+    }
   }>
 };

@@ -1,4 +1,3 @@
-/* eslint no-eval: 0 */
 import Nightmare from 'nightmare';
 import CSSProperties from './CSSProperties.json';
 import AssertionFormatter, {
@@ -6,7 +5,8 @@ import AssertionFormatter, {
   getAllSupportCSSProperties
 } from '../src/assertions/AssertionFormatter';
 
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000; // eslint-disable-line
+
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 200000; // eslint-disable-line
 
 async function testDetermineASTNodeType(protoChain: Array<string>) {
   const determineNodeTest = determineASTNodeType({ protoChain });
@@ -49,8 +49,11 @@ describe('getAllSupportCSSProperties()', () => {
   });
 });
 
+/**
+ * @TODO: Refactor, add additional tests
+ */
 describe('AssertionFormatter', () => {
-  it('should create assertions for CSS API records', async () => {
+  it('should create assertions for CSS property API records', async () => {
     const cssAPIRecord = {
       id: 'border-width',
       name: 'border-width',
@@ -58,6 +61,28 @@ describe('AssertionFormatter', () => {
       type: 'css-api',
       specIsFinished: false,
       protoChain: ['window', 'CSSStyleDeclaration', 'borderWidth']
+    };
+
+    const { apiIsSupported } = AssertionFormatter(cssAPIRecord);
+    const nightmare = Nightmare();
+
+    expect(
+      await nightmare
+        .goto('https://example.com')
+        .evaluate((compatTest) => eval(compatTest), apiIsSupported)
+        .end()
+    )
+    .toEqual(true);
+  });
+
+  it('should create assertions for CSS value API records', async () => {
+    const cssAPIRecord = {
+      id: 'flex',
+      name: 'flex',
+      specNames: ['css21', 'css-background-3'],
+      type: 'css-api',
+      specIsFinished: false,
+      protoChain: ['window', 'CSSStyleDeclaration', 'flex']
     };
 
     const { apiIsSupported } = AssertionFormatter(cssAPIRecord);
