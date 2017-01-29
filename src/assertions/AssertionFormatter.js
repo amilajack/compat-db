@@ -27,6 +27,7 @@ type AssertionFormatterType = {
 /**
  * Check if the JS API is defined
  * ex. ['window', 'ServiceWorker'] => 'window.ServiceWorker'
+ * @TODO: Support checking if API is 'prefixed'
  */
 function formatJSAssertion(record: ProviderAPIResponse): string {
   const formattedProtoChain = record.protoChain.join('.');
@@ -35,6 +36,7 @@ function formatJSAssertion(record: ProviderAPIResponse): string {
 
 /**
  * Create assertion to check if a CSS property is supported
+ * @TODO: Support checking if API is 'prefixed'
  */
 function formatCSSAssertion(record: ProviderAPIResponse): string {
   const cssPropertyName = record.protoChain[record.protoChain.length - 1];
