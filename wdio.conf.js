@@ -10,17 +10,23 @@ exports.config = {
   ],
   maxInstances: 40,
   capabilities: [
+    // @TODO: Test against all supported browsers caniuse supports. Create a
+    //        helper function for this
+    // @NOTE: Use the Platform Configurator to help with finding platforms:
+    //        https://wiki.saucelabs.com/display/DOCS/Platform+Configurator#/
     { browserName: 'firefox', platform: 'Windows 10', version: '41.0' },
-    { browserName: 'chrome', platform: 'OS X 10.10', version: '45.0' },
-    { browserName: 'internet explorer', platform: 'Windows 7', version: '10' }
+    { browserName: 'chrome', platform: 'Windows 10', version: '45.0' },
+    { browserName: 'opera', platform: 'Windows 7', version: '12.12' },
+    { browserName: 'MicrosoftEdge', platform: 'Windows 10', version: '14.14393' },
+    { browserName: 'safari', platform: 'OS X 10.12', version: '10.0' },
+    { browserName: 'internet explorer', platform: 'Windows 7', version: '10.0' }
   ],
   sync: true,
   logLevel: 'error',
   coloredLogs: true,
   screenshotPath: './errorShots/',
   baseUrl: 'http://saucelabs.github.io',
-  // waitforTimeout: 10000,
-  // connectionRetryTimeout: 90000,
+  waitforTimeout: 100000,
   connectionRetryCount: 3,
   services: ['sauce'],
   framework: 'mocha',
@@ -29,6 +35,7 @@ exports.config = {
     outputDir: './'
   },
   mochaOpts: {
-    ui: 'bdd'
+    ui: 'bdd',
+    compilers: ['js:babel-register']
   }
 };
