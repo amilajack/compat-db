@@ -1,5 +1,6 @@
 // @flow
 import APICatalog from './apicatalogdata.json';
+import HasPrefix from '../../helpers/PrefixHandler';
 import type { ProviderAPIResponse } from '../ProviderType';
 
 
@@ -36,14 +37,19 @@ export function camelToHyphen(string: string): string {
  */
 export default function APICatalogProvider(): Array<ProviderAPIResponse> {
   const formattedRecords = [];
+  const ignoredAPIs = ['arguments', 'caller', 'constructor', 'length', 'name', 'prototype'];
 
   // Convert two dimentional records to single dimentional array
   (APICatalog: APICatalogType)
-    .forEach(record => record.apis.forEach(api => formattedRecords.push({
-      ...api,
-      spec: record.spec || false,
-      parentName: record.name
-    })));
+    .forEach(record => record.apis.forEach(api =>
+      // @TODO: Properly strip vendor prefixes and check if non-prefixed API
+      //        exists. If not, create the record for it
+      formattedRecords.push({
+        ...api,
+        spec: record.spec || false,
+        parentName: record.name
+      })
+    ));
 
   const JSAPIs = formattedRecords
     // Filter all CSS records. For some reason reason, APICatalog does not report
@@ -62,7 +68,12 @@ export default function APICatalogProvider(): Array<ProviderAPIResponse> {
       type: 'js-api',
       specIsFinished: fRecord.spec,
       protoChain: ['window', fRecord.parentName, fRecord.name]
-    }));
+    }))
+    .filter(record => (
+      !ignoredAPIs.includes(record.name) &&
+      !HasPrefix(record.name) &&
+      record.protoChain.every(proto => !HasPrefix(proto))
+    ));
 
   // Find the CSS DOM API's and use them create the css style records
   const CSSAPIs = JSAPIs
@@ -75,5 +86,4 @@ export default function APICatalogProvider(): Array<ProviderAPIResponse> {
     }));
 
   return CSSAPIs.concat(JSAPIs);
-  // return [...CSSAPIs, ...JSAPIs];
 }

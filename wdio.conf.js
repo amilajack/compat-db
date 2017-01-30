@@ -1,6 +1,5 @@
 require('dotenv').config();
 
-
 /* eslint fp/no-mutation: 0, no-mixed-operators: 0 */
 
 /**
@@ -46,17 +45,17 @@ exports.config = {
     // @NOTE: Use the Platform Configurator to help with finding platforms:
     //        https://wiki.saucelabs.com/display/DOCS/Platform+Configurator#/
     //        https://saucelabs.com/platforms
-    // Firefox
+    // // Firefox
     ...getFirefoxCapabilities(),
-    // Chrome
+    // // Chrome
     ...getChromeCapabilities(),
-    // Opera
+    // // Opera
     { browserName: 'opera', platform: 'Windows 7', version: '12.12' },
     { browserName: 'opera', platform: 'Windows 7', version: '11.64' },
-    // Edge
+    // // Edge
     { browserName: 'MicrosoftEdge', platform: 'Windows 10', version: '14.14393' },
     { browserName: 'MicrosoftEdge', platform: 'Windows 10', version: '13.10586' },
-    // Safari
+    // // Safari
     { browserName: 'safari', platform: 'OS X 10.12', version: '10.0' },
     { browserName: 'safari', platform: 'OS X 10.11', version: '9.0' },
     { browserName: 'safari', platform: 'OS X 10.10', version: '8.0' },
@@ -69,7 +68,7 @@ exports.config = {
     { browserName: 'internet explorer', platform: 'Windows 7', version: '8.0' },
     { browserName: 'internet explorer', platform: 'Windows XP', version: '7.0' },
     { browserName: 'internet explorer', platform: 'Windows XP', version: '6.0' }
-  ],
+  ].map(e => { e['idle-timeout'] = 30000; return e; }), // eslint-disable-line
   sync: true,
   logLevel: 'error',
   coloredLogs: true,

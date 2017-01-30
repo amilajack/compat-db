@@ -12,7 +12,10 @@ import { updateDatabaseRecord, findDatabaseRecord } from '../src/database/Prepar
  *        test only the first x records. There's hundreds of records so this may
  *        take a while
  */
-const records = Providers();
+const records = Providers().slice(
+  parseInt(process.env.PROVIDERS_INDEX_START, 10) || 0,
+  parseInt(process.env.PROVIDERS_INDEX_END, 10) || Providers().length - 1,
+);
 
 // A mapping of saucelabs names to their correspodning caniuse target ID's
 // See saucelabs.com/platforms for all supported saucelabs platforms
@@ -42,8 +45,7 @@ const { browserName, platform, version } = browser.desiredCapabilities; // eslin
 const caniuseId = mappings[browserName];
 
 describe('Compat Tests', () => {
-  // $FlowFixMe: Flow requires type definition
-  browser.url('http://example.com/'); // eslint-disable-line
+  browser.url('http://example.com/');
 
   // Dynamically generate compat-tests for each record and each browser
   records.forEach(record => {
@@ -64,7 +66,7 @@ describe('Compat Tests', () => {
 
     if (earlierNotSupports || olderSupports) {
       console.log(`
-        "${record.name}" ${earlierNotSupports ? 'is NOT ❌ ' : 'IS ✅ '} API supported in ${browserName} ${version} on ${platform}
+        "${record.name}" API ${earlierNotSupports ? 'is NOT ❌ ' : 'is ✅ '} supported in ${browserName} ${version} on ${platform}
       `);
 
       return updateDatabaseRecord(
