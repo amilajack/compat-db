@@ -31,9 +31,9 @@ type DBCompatRecord = ProviderAPIResponse
   ASTNodeTypes: Array<'MemberExpression' | 'NewExpression' | 'CallExpression'>
 });
 
-export type Database = {
+export type DatabaseType = {
   // The same 'agents' property from caniuse
-  agents: {
+  agents?: {
     [name: string]: {
       browser: string,
       abbr: string,
@@ -44,17 +44,26 @@ export type Database = {
       }
     }
   },
+  meta?: {
+    // A list of all the camelcase CSS properties and values found in all browsers
+    allCSSProperties: Array<string>,
+    allCSSValues: Array<string>,
+    // A list of all the camelcase CSS properties and values found in each browsers
+    browsers: {
+      [name: string]: {
+        [version: string]: {
+          allCSSProperties: Array<string>,
+          allCSSValues: Array<string>
+        }
+      }
+    }
+  },
   records: Array<{
     targets: {
-      [target: string]: {
+      [name: string]: {
         [version: string]: 'y' | 'n' | 'prefixed'
       }
     }
     & DBCompatRecord
-    & ? {
-      // Lists of hyphen-separated CSS properties and values
-      allCSSProperties: Array<string>,
-      allCSSValues: Array<string>
-    }
   }>
 };

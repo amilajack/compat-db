@@ -15,6 +15,11 @@ A work-in-progress attempt to make a central and scalable browser api compatibil
 
 ## Installation
 ```bash
+npm install --save compat-db
+```
+
+## Development Setup
+```bash
 # Clone and install
 git clone https://github.com/amilajack/compat-db.git
 cd compat-db
@@ -24,8 +29,17 @@ yarn # or npm install
 cp .env.example .env
 # ⚠️  Make sure to add your saucelabs keys to your `.env` file ⚠️
 
-# In a new tab, run the tests
-npm run compat-test
+# Build the compatibility database to ./lib/all.json
+# 💡 You can limit the amount of tests that you run by setting the following ENV's
+# PROVIDERS_INDEX_START=0 PROVIDERS_INDEX_END=10 in your `.env` to run the first
+# 10 tests
+npm run build-compat-db
+
+# Run specs
+npm run spec
+
+# Run all tests
+npm test
 ```
 
 ## Roadmap

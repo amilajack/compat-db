@@ -6,9 +6,16 @@ import Providers, { find, ofAPIType } from '../src/providers/Providers';
 
 // Temporary way of outputing providers
 const ProvidersJSON = JSON.stringify(Providers());
-writeFileSync(join(__dirname, '..', 'compat-db.json'), ProvidersJSON, 'utf8');
+writeFileSync(join(__dirname, '..', 'compat-db.json'), ProvidersJSON);
 
 describe('Providers', () => {
+  describe('Constraints', () => {
+    it('should be below length of 2000', () => {
+      expect(ofAPIType('css').length).toBeLessThan(2000);
+      expect(ofAPIType('js').length).toBeLessThan(12000);
+    });
+  });
+
   describe('API Filtering', () => {
     it('should return filtered CSS APIs', () => {
       const filteredAPIs = ofAPIType('css');
