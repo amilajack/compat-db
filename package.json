@@ -2,21 +2,22 @@
   "name": "compat-db",
   "version": "0.0.1-0",
   "description": "A central and scalable browser api compatability database",
-  "main": "lib/index.js",
+  "main": "lib/src/index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/amilajack/compat-db.git"
   },
   "scripts": {
-    "build": "cross-env NODE_ENV=production rm -rf lib && babel src --out-dir lib",
-    "compat-test": "./node_modules/.bin/wdio wdio.conf.js",
+    "build": "cross-env NODE_ENV=production rm -rf lib && mkdir lib && babel src/index.js --out-file lib/index.js",
+    "compat-test": "rm -rf lib && mkdir lib && node -r babel-register compat-tests/index.js && ./node_modules/.bin/wdio wdio.conf.js",
     "flow": "flow check",
     "flow-typed": "flow-typed install",
     "lint": "eslint --cache --format=node_modules/eslint-formatter-pretty .",
-    "spec": "jest",
+    "spec": "jest test/*.js",
     "test": "cross-env NODE_ENV=development npm run lint && npm run flow && npm run spec",
     "update-catalog-api-db": "download https://raw.githubusercontent.com/MicrosoftEdge/APICatalogData/master/apicatalogdata.json && mkdir -p src/providers/api-catalog && mv apicatalogdata.json src/providers/api-catalog/apicatalogdata.json",
-    "version": "npm run build"
+    "version": "npm run build",
+    "view-compat-db": "cat ./lib/all.json | jq"
   },
   "jest": {
     "testEnvironment": "node"
