@@ -12,8 +12,8 @@ function getFirefoxCapabilities() {
   return Array(firefoxRange).fill({}).map((each, i) => ({
     browserName: 'firefox',
     platform: 'Windows 10',
-    version: `${i + 4}.0`,
-    specs: [i + 4 === 50 ? './compat-tests/*.spec.js' : './compat-tests/Compat.spec.js']
+    version: `${i + min}.0`,
+    specs: [i + min === 50 ? './compat-tests/*.spec.js' : './compat-tests/Compat.spec.js']
   }));
 }
 
@@ -27,8 +27,8 @@ function getChromeCapabilities() {
   return Array(chromeRange).fill({}).map((each, i) => ({
     browserName: 'chrome',
     platform: 'Windows 10',
-    version: `${i + 26}.0`,
-    specs: [i + 26 === 55 ? './compat-tests/*.spec.js' : './compat-tests/Compat.spec.js']
+    version: `${i + min}.0`,
+    specs: [i + min === 55 ? './compat-tests/*.spec.js' : './compat-tests/Compat.spec.js']
   }));
 }
 

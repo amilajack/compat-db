@@ -9,7 +9,7 @@
   },
   "scripts": {
     "build": "cross-env NODE_ENV=production rm -rf lib && mkdir lib && babel src/index.js --out-file lib/index.js",
-    "build-compat-db": "rm -rf lib && mkdir lib && node -r babel-register compat-tests/index.js && ./node_modules/.bin/wdio wdio.conf.js",
+    "build-compat-db": "rm -rf lib && mkdir lib && node -r babel-register compat-tests/index.js && wdio wdio.conf.js",
     "flow": "flow check",
     "flow-typed": "flow-typed install",
     "lint": "eslint --cache --format=node_modules/eslint-formatter-pretty .",

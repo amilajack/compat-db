@@ -39,6 +39,7 @@ const mappings = {
   // '': 'samsung'
 };
 
+const allowCrossProcessReads = false;
 const databasePath = join(__dirname, '..', 'lib', 'all.json');
 // $FlowFixMe: Flow requires type definition
 const { browserName, platform, version } = browser.desiredCapabilities; // eslint-disable-line
@@ -51,31 +52,33 @@ describe('Compat Tests', () => {
   records.forEach(record => {
     // If newer version does not support API, current browser version doesn't support it
     // If older version does support API, current browser version does support it
-    const databaseRecordTargets = findDatabaseRecord(databasePath, record).targets;
-    const existingRecordTargetVersions = Object.keys(databaseRecordTargets);
+    if (allowCrossProcessReads) {
+      const databaseRecordTargets = findDatabaseRecord(databasePath, record).targets;
+      const existingRecordTargetVersions = Object.keys(databaseRecordTargets);
 
-    const earlierNotSupports = existingRecordTargetVersions.every(targetVersion => (
-      targetVersion > version &&
-      databaseRecordTargets[targetVersion] === 'n'
-    ));
+      const earlierNotSupports = existingRecordTargetVersions.every(targetVersion => (
+        targetVersion > version &&
+        databaseRecordTargets[targetVersion] === 'n'
+      ));
 
-    const olderSupports = existingRecordTargetVersions.every(targetVersion => (
-      targetVersion < version &&
-      databaseRecordTargets[targetVersion] === 'y'
-    ));
+      const olderSupports = existingRecordTargetVersions.every(targetVersion => (
+        targetVersion < version &&
+        databaseRecordTargets[targetVersion] === 'y'
+      ));
 
-    if (earlierNotSupports || olderSupports) {
-      console.log(`
-        "${record.name}" API ${earlierNotSupports ? 'is NOT ❌ ' : 'is ✅ '} supported in ${browserName} ${version} on ${platform}
-      `);
+      if (earlierNotSupports || olderSupports) {
+        console.log(`
+          "${record.name}" API ${earlierNotSupports ? 'is NOT ❌ ' : 'is ✅ '} supported in ${browserName} ${version} on ${platform}
+        `);
 
-      return updateDatabaseRecord(
-        databasePath,
-        record,
-        caniuseId,
-        version,
-        earlierNotSupports ? false : (olderSupports ? true : false) // eslint-disable-line
-      );
+        return updateDatabaseRecord(
+          databasePath,
+          record,
+          caniuseId,
+          version,
+          earlierNotSupports ? false : (olderSupports ? true : false) // eslint-disable-line
+        );
+      }
     }
 
     it(`${record.name} Compat Tests`, () => {
