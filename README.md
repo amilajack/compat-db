@@ -6,7 +6,9 @@ compat-db
 [![Dependency Status](https://img.shields.io/david/amilajack/compat-db.svg?maxAge=2592)](https://david-dm.org/amilajack/compat-db)
 [![npm](https://img.shields.io/npm/dm/compat-db.svg?maxAge=2592)](https://npm-stat.com/charts.html?package=compat-db)
 
-A work-in-progress attempt to make a central and scalable browser api compatibility database
+A central and scalable browser API compatibility database
+
+**❌ WORK IN PROGRESS. DO NOT USE ❌**
 
 ## Goals
 - [ ] Provide a compiled list of compatibility records

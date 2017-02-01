@@ -1,5 +1,6 @@
 require('dotenv').config();
 
+
 /* eslint fp/no-mutation: 0, no-mixed-operators: 0 */
 
 /**
@@ -13,7 +14,11 @@ function getFirefoxCapabilities() {
     browserName: 'firefox',
     platform: 'Windows 10',
     version: `${i + min}.0`,
-    specs: [i + min === 50 ? './compat-tests/*.spec.js' : './compat-tests/Compat.spec.js']
+    specs: [
+      i + min === 50
+        ? './compat-tests/*.spec.js'
+        : './compat-tests/Compat.spec.js'
+    ]
   }));
 }
 
@@ -38,7 +43,7 @@ exports.config = {
   specs: [
     './compat-tests/Compat.spec.js'
   ],
-  maxInstances: 1,
+  maxInstances: 40,
   capabilities: [
     // @TODO: Test against all supported browsers caniuse supports. Create a
     //        helper function for this
@@ -47,7 +52,7 @@ exports.config = {
     //        https://saucelabs.com/platforms
     // // Firefox
     ...getFirefoxCapabilities(),
-    // // Chrome
+    // // // Chrome
     ...getChromeCapabilities(),
     // // Opera
     { browserName: 'opera', platform: 'Windows 7', version: '12.12' },
@@ -61,7 +66,7 @@ exports.config = {
     { browserName: 'safari', platform: 'OS X 10.10', version: '8.0' },
     { browserName: 'safari', platform: 'OS X 10.9', version: '7.0' },
     { browserName: 'safari', platform: 'OS X 10.8', version: '6.0' },
-    // IE
+    // // IE
     { browserName: 'internet explorer', platform: 'Windows 7', version: '11.0' },
     { browserName: 'internet explorer', platform: 'Windows 7', version: '10.0' },
     { browserName: 'internet explorer', platform: 'Windows 7', version: '9.0' },
@@ -69,7 +74,7 @@ exports.config = {
     { browserName: 'internet explorer', platform: 'Windows XP', version: '7.0' },
     { browserName: 'internet explorer', platform: 'Windows XP', version: '6.0' }
   ].map(e => { e['idle-timeout'] = 30000; return e; }), // eslint-disable-line
-  sync: true,
+  sync: false,
   logLevel: 'error',
   coloredLogs: true,
   screenshotPath: './errorShots/',

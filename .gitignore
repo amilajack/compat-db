@@ -36,3 +36,4 @@ lib
 compat-db.json
 .env
 errorShots
+tmp-db-records

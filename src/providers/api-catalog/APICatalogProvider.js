@@ -1,6 +1,6 @@
 // @flow
 import APICatalog from './apicatalogdata.json';
-import HasPrefix from '../../helpers/PrefixHandler';
+import HasPrefix from '../../helpers/HasPrefix';
 import type { ProviderAPIResponse } from '../ProviderType';
 
 
@@ -67,12 +67,14 @@ export default function APICatalogProvider(): Array<ProviderAPIResponse> {
       specNames: fRecord.specNames,
       type: 'js-api',
       specIsFinished: fRecord.spec,
-      protoChain: ['window', fRecord.parentName, fRecord.name]
+      protoChain: ['window', fRecord.parentName, fRecord.name],
+      protoChainId: ['window', fRecord.parentName, fRecord.name].join('.')
     }))
     .filter(record => (
       !ignoredAPIs.includes(record.name) &&
       !HasPrefix(record.name) &&
-      record.protoChain.every(proto => !HasPrefix(proto))
+      !HasPrefix(record.protoChainId) &&
+      !HasPrefix(record.id)
     ));
 
   // Find the CSS DOM API's and use them create the css style records
@@ -85,5 +87,5 @@ export default function APICatalogProvider(): Array<ProviderAPIResponse> {
       type: 'css-api'
     }));
 
-  return CSSAPIs.concat(JSAPIs);
+  return [...CSSAPIs, ...JSAPIs];
 }

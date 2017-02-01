@@ -1,7 +1,7 @@
 // @flow
 // $FlowFixMe: Flow requires type definition
 import { agents } from 'caniuse-db/fulldata-json/data-2.0.json'; // eslint-disable-line
-import { writeFileSync, readFileSync } from 'fs';
+import { writeFileSync, readFileSync, existsSync } from 'fs';
 import type { ProviderAPIResponse } from '../providers/ProviderType';
 
 
@@ -18,12 +18,23 @@ export function updateDatabaseRecord(
   version: number,
   isSupported: bool
 ) {
-  const database = JSON.parse(readFileSync(databasePath).toString());
+  const { records } = existsSync(databasePath)
+    ? JSON.parse(readFileSync(databasePath).toString())
+    : {
+      records: {}
+    };
 
-  const foundRecord = database.records.find(_record => _record.name === record.name);
-  foundRecord.targets[caniuseId][String(Math.floor(version))] = isSupported ? 'y' : 'n';
+  const recordToInsert = {
+    targets: {
+      [caniuseId]: {
+        [String(Math.floor(version))]: isSupported ? 'y' : 'n'
+      }
+    }
+  };
 
-  writeFileSync(databasePath, JSON.stringify(database));
+  records[record.protoChainId] = recordToInsert;
+
+  writeFileSync(databasePath, JSON.stringify({ records }));
 }
 
 // @TODO
@@ -38,7 +49,10 @@ export function findDatabaseRecord(databasePath: string, record: ProviderAPIResp
   return JSON.parse(
     readFileSync(databasePath).toString()
   )
-  .records.find((_record) => _record.id === record.id);
+  .records.find((_record) =>
+    _record.id === record.id &&
+    _record.protoChainId === record.protoChainId
+  );
 }
 
 /**

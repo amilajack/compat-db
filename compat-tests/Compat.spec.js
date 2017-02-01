@@ -40,10 +40,10 @@ const mappings = {
 };
 
 const allowCrossProcessReads = false;
-const databasePath = join(__dirname, '..', 'lib', 'all.json');
 // $FlowFixMe: Flow requires type definition
 const { browserName, platform, version } = browser.desiredCapabilities; // eslint-disable-line
 const caniuseId = mappings[browserName];
+const databasePath = join(__dirname, '..', 'tmp-db-records', `${caniuseId}-${version}.json`);
 
 describe('Compat Tests', () => {
   browser.url('http://example.com/');
@@ -81,9 +81,9 @@ describe('Compat Tests', () => {
       }
     }
 
-    it(`${record.name} Compat Tests`, () => {
+    it(`${record.name} Compat Tests`, async () => {
       const assertions = AssertionFormatter(record);
-      const { value } = browser.execute(`return (${assertions.apiIsSupported})`);
+      const { value } = await browser.execute(`return (${assertions.apiIsSupported})`);
 
       console.log(`
         "${record.name}" ${value ? 'IS ✅ ' : 'is NOT ❌ '} API supported in ${browserName} ${version} on ${platform}

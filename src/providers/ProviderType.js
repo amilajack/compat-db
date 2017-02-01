@@ -56,6 +56,12 @@ export type ProviderAPIResponse = {
   protoChain: Array<string>,
 
   /**
+   * A stringified protoChain
+   * ex. ['window', 'fetch'] => 'window.fetch'
+   */
+  protoChainId: string,
+
+  /**
    * Categorize the api as a css style or a javascript api. For example,
    * `display` and `block` would have `css-api` as the `type`. Array.prototype.includes
    * will have `js-api` as `type`

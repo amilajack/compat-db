@@ -1,27 +1,28 @@
-import hasPrefix from '../src/helpers/PrefixHandler';
+import HasPrefix from '../src/helpers/HasPrefix';
 
 
-describe('PrefixHandler', () => {
+describe('HasPrefix', () => {
   describe('isPrefixed', () => {
     it('should check prefixes for JS APIs', () => {
-      expect(hasPrefix('document.mozFullscreen()')).toBe(true);
-      expect(hasPrefix('document.webkitFullscreen()')).toBe(true);
-      expect(hasPrefix('document.msFullscreen()')).toBe(true);
-      expect(hasPrefix('document.fullscreen()')).toBe(false);
+      expect(HasPrefix('document.mozFullscreen()')).toEqual(true);
+      expect(HasPrefix('document.webkitFullscreen()')).toEqual(true);
+      expect(HasPrefix('document.msFullscreen()')).toEqual(true);
+      expect(HasPrefix('document.fullscreen()')).toEqual(false);
+      expect(HasPrefix('-moz-animation')).toEqual(true);
     });
 
     it('should check prefixes for CSS APIs', () => {
-      expect(hasPrefix('display: -webkit-box;')).toBe(true);
-      expect(hasPrefix('display: -ms-flexbox;')).toBe(true);
-      expect(hasPrefix('display: flex;')).toBe(false);
-      expect(hasPrefix('-webkit-transition: all .5s;')).toBe(true);
-      expect(hasPrefix('transition: all .5s;')).toBe(false);
-      expect(hasPrefix('-webkit-user-select: none;')).toBe(true);
-      expect(hasPrefix('-moz-user-select: none;')).toBe(true);
-      expect(hasPrefix('-ms-user-select: none;')).toBe(true);
-      expect(hasPrefix('user-select: none;')).toBe(false);
-      expect(hasPrefix('background: -webkit-linear-gradient(top, white, black);')).toBe(true);
-      expect(hasPrefix('background: linear-gradient(to bottom, white, black);')).toBe(false);
+      expect(HasPrefix('display: -webkit-box;')).toEqual(true);
+      expect(HasPrefix('display: -ms-flexbox;')).toEqual(true);
+      expect(HasPrefix('display: flex;')).toEqual(false);
+      expect(HasPrefix('-webkit-transition: all .5s;')).toEqual(true);
+      expect(HasPrefix('transition: all .5s;')).toEqual(false);
+      expect(HasPrefix('-webkit-user-select: none;')).toEqual(true);
+      expect(HasPrefix('-moz-user-select: none;')).toEqual(true);
+      expect(HasPrefix('-ms-user-select: none;')).toEqual(true);
+      expect(HasPrefix('user-select: none;')).toEqual(false);
+      expect(HasPrefix('background: -webkit-linear-gradient(top, white, black);')).toEqual(true);
+      expect(HasPrefix('background: linear-gradient(to bottom, white, black);')).toEqual(false);
     });
   });
 });

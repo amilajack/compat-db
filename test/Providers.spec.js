@@ -4,15 +4,39 @@ import { writeFileSync } from 'fs';
 import Providers, { find, ofAPIType } from '../src/providers/Providers';
 
 
-// Temporary way of outputing providers
-const ProvidersJSON = JSON.stringify(Providers());
-writeFileSync(join(__dirname, '..', 'compat-db.json'), ProvidersJSON);
-
 describe('Providers', () => {
+  const providers = Providers();
+
+  beforeAll(() => {
+    // Temporary way of outputing providers
+    writeFileSync(
+      join(__dirname, '..', 'compat-db.json'),
+      JSON.stringify(providers)
+    );
+  });
+
   describe('Constraints', () => {
-    it('should be below length of 2000', () => {
+    it('should be below expected length', () => {
       expect(ofAPIType('css').length).toBeLessThan(2000);
       expect(ofAPIType('js').length).toBeLessThan(12000);
+    });
+
+    it('should be above expected length', () => {
+      expect(ofAPIType('css').length).toBeGreaterThan(300);
+      expect(ofAPIType('js').length).toBeGreaterThan(10000);
+    });
+  });
+
+  describe('Vendor Prefixes', () => {
+    it('should not have vendor prefixes', () => {
+      const properties = ['protoChainId', 'id', 'name'];
+      providers.forEach(rule => {
+        properties.forEach(property => {
+          chaiExpect(rule[property]).to.not.contain('moz');
+          chaiExpect(rule[property]).to.not.contain('webkit');
+          chaiExpect(rule[property]).to.not.contain('moz');
+        });
+      });
     });
   });
 
@@ -239,6 +263,7 @@ describe('Providers', () => {
           specNames: ['css-background-3'],
           type: 'js-api',
           specIsFinished: false,
+          protoChainId: 'window.CSSStyleDeclaration.borderTopRightRadius',
           protoChain: ['window', 'CSSStyleDeclaration', 'borderTopRightRadius']
         });
       });
@@ -250,7 +275,8 @@ describe('Providers', () => {
           specNames: ['css-background-3'],
           type: 'css-api',
           specIsFinished: false,
-          protoChain: ['window', 'CSSStyleDeclaration', 'borderTopRightRadius']
+          protoChain: ['window', 'CSSStyleDeclaration', 'borderTopRightRadius'],
+          protoChainId: 'window.CSSStyleDeclaration.borderTopRightRadius'
         });
       });
 
@@ -261,7 +287,8 @@ describe('Providers', () => {
           specNames: ['css-flexbox-1'],
           type: 'css-api',
           specIsFinished: false,
-          protoChain: ['window', 'CSSStyleDeclaration', 'flex']
+          protoChain: ['window', 'CSSStyleDeclaration', 'flex'],
+          protoChainId: 'window.CSSStyleDeclaration.flex'
         });
       });
 
@@ -272,7 +299,8 @@ describe('Providers', () => {
           specNames: ['css-flexbox-1'],
           type: 'js-api',
           specIsFinished: false,
-          protoChain: ['window', 'CSSStyleDeclaration', 'flex']
+          protoChain: ['window', 'CSSStyleDeclaration', 'flex'],
+          protoChainId: 'window.CSSStyleDeclaration.flex'
         });
       });
     });
