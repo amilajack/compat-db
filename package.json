@@ -36,7 +36,9 @@
   "bugs": {
     "url": "https://github.com/amilajack/compat-db/issues"
   },
-  "files": ["databases"],
+  "files": [
+    "databases"
+  ],
   "homepage": "https://github.com/amilajack/compat-db#readme",
   "devDependencies": {
     "babel-cli": "^6.22.2",
@@ -77,5 +79,8 @@
   "devEngines": {
     "node": ">=4.x",
     "npm": ">=3.x"
+  },
+  "dependencies": {
+    "lodash": "^4.17.4"
   }
 }

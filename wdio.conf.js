@@ -33,7 +33,11 @@ function getChromeCapabilities() {
     browserName: 'chrome',
     platform: 'Windows 10',
     version: `${i + min}.0`,
-    specs: [i + min === 55 ? './compat-tests/*.spec.js' : './compat-tests/Compat.spec.js']
+    specs: [
+      i + min === 55
+        ? './compat-tests/*.spec.js'
+        : './compat-tests/Compat.spec.js'
+    ]
   }));
 }
 

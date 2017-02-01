@@ -1,18 +1,22 @@
 // @flow
 import { join } from 'path';
+// $FlowFixMe: Flow requires type definition
+import Shuffle from 'lodash/shuffle'; // eslint-disable-line
 import Providers from '../src/providers/Providers';
 import AssertionFormatter from '../src/assertions/AssertionFormatter';
-import { updateDatabaseRecord, findDatabaseRecord } from '../src/database/PrepareDatabase';
+import {
+  updateTmpDatabaseRecord,
+  checkCompatRecordExists } from '../src/database/TmpDatabase';
 
 
-/* eslint no-undef: 0, fp/no-mutation: 0, no-let: 0 */
+/* eslint no-undef: 0, fp/no-mutation: 0, no-let: 0, fp/no-throw: 0 */
 
 /**
  * @NOTE: If you only want to test a few of these, remember to .slice(0, x) to
  *        test only the first x records. There's hundreds of records so this may
  *        take a while
  */
-const records = Providers().slice(
+const records = Shuffle(Providers()).slice(
   parseInt(process.env.PROVIDERS_INDEX_START, 10) || 0,
   parseInt(process.env.PROVIDERS_INDEX_END, 10) || Providers().length - 1,
 );
@@ -39,11 +43,11 @@ const mappings = {
   // '': 'samsung'
 };
 
-const allowCrossProcessReads = false;
 // $FlowFixMe: Flow requires type definition
 const { browserName, platform, version } = browser.desiredCapabilities; // eslint-disable-line
 const caniuseId = mappings[browserName];
 const databasePath = join(__dirname, '..', 'tmp-db-records', `${caniuseId}-${version}.json`);
+
 
 describe('Compat Tests', () => {
   browser.url('http://example.com/');
@@ -52,44 +56,52 @@ describe('Compat Tests', () => {
   records.forEach(record => {
     // If newer version does not support API, current browser version doesn't support it
     // If older version does support API, current browser version does support it
-    if (allowCrossProcessReads) {
-      const databaseRecordTargets = findDatabaseRecord(databasePath, record).targets;
-      const existingRecordTargetVersions = Object.keys(databaseRecordTargets);
+    const existingRecordTargetVersions: Array<{
+      version: number,
+      supports: 'y' | 'n'
+    }> = checkCompatRecordExists(caniuseId, version, record);
 
-      const earlierNotSupports = existingRecordTargetVersions.every(targetVersion => (
-        targetVersion > version &&
-        databaseRecordTargets[targetVersion] === 'n'
-      ));
+    const earlierNotSupports = existingRecordTargetVersions.find(target => (
+      target.version > version &&
+      target.supports === 'n'
+    ));
 
-      const olderSupports = existingRecordTargetVersions.every(targetVersion => (
-        targetVersion < version &&
-        databaseRecordTargets[targetVersion] === 'y'
-      ));
+    const olderSupports = existingRecordTargetVersions.find(target => (
+      target.version < version &&
+      target.supports === 'y'
+    ));
 
-      if (earlierNotSupports || olderSupports) {
-        console.log(`
-          "${record.name}" API ${earlierNotSupports ? 'is NOT ❌ ' : 'is ✅ '} supported in ${browserName} ${version} on ${platform}
-        `);
+    if (earlierNotSupports || olderSupports) {
+      console.log('************ USING SHORTCUT ******************');
+      console.log(earlierNotSupports ? 'earlierNotSupports' : 'olderSupports');
+      console.log(`
+        "${record.protoChainId}" API ${earlierNotSupports ? 'is NOT ❌ ' : 'is ✅ '} supported in ${browserName} ${version} on ${platform}
+      `);
 
-        return updateDatabaseRecord(
-          databasePath,
-          record,
-          caniuseId,
-          version,
-          earlierNotSupports ? false : (olderSupports ? true : false) // eslint-disable-line
-        );
-      }
+      return updateTmpDatabaseRecord(
+        databasePath,
+        record,
+        caniuseId,
+        version,
+        earlierNotSupports
+          ? false
+          : (olderSupports ? true : false) // eslint-disable-line
+      );
     }
 
-    it(`${record.name} Compat Tests`, async () => {
+    it(`${record.protoChainId} Compat Tests`, async () => {
       const assertions = AssertionFormatter(record);
       const { value } = await browser.execute(`return (${assertions.apiIsSupported})`);
 
       console.log(`
-        "${record.name}" ${value ? 'IS ✅ ' : 'is NOT ❌ '} API supported in ${browserName} ${version} on ${platform}
+        "${record.protoChainId}" ${value ? 'IS ✅ ' : 'is NOT ❌ '} API supported in ${browserName} ${version} on ${platform}
       `);
 
-      updateDatabaseRecord(
+      if (typeof value !== 'boolean') {
+        throw new Error('Invalid JS execution value returned from Sauce Labs');
+      }
+
+      return updateTmpDatabaseRecord(
         databasePath,
         record,
         caniuseId,

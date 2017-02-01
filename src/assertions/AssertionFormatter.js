@@ -28,10 +28,32 @@ type AssertionFormatterType = {
  * Check if the JS API is defined
  * ex. ['window', 'ServiceWorker'] => 'window.ServiceWorker'
  * @TODO: Support checking if API is 'prefixed'
+ * @HACK: This method assumes that the maximum length of the protoChain is 3
+ * @HACK: Method's that throw errors upon property access are usually supported
  */
 function formatJSAssertion(record: ProviderAPIResponse): string {
+  const firstTwoProto = record.protoChain.filter((e, i) => i < 2).join('.');
   const formattedProtoChain = record.protoChain.join('.');
-  return `return typeof ${formattedProtoChain} !== undefined`;
+  return `
+    (function () {
+      try {
+        // window.a
+        if (typeof window === 'undefined') { return false }
+        // window.a
+        if (typeof ${firstTwoProto} === 'undefined') { return false }
+        // window.a.b
+        if (typeof ${formattedProtoChain} !== 'undefined')  { return false }
+        // window.a.prototype.b
+        if (typeof ${firstTwoProto}.prototype !== 'undefined') {
+          return typeof ${firstTwoProto}.prototype.${record.protoChain[2]} !== 'undefined'
+        }
+        return false
+      } catch (e) {
+        return true
+      }
+    })()
+  `;
+  // return `return typeof ${formattedProtoChain} !== undefined`;
 }
 
 /**
