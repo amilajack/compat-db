@@ -8,7 +8,7 @@
 
 /* eslint fp/no-throw: 0 */
 
-import type { ProviderAPIResponse } from '../providers/ProviderType';
+import type { RecordType } from '../providers/ProviderType';
 
 
 type AssertionFormatterType = {
@@ -21,7 +21,8 @@ type AssertionFormatterType = {
 }
 | {
   // Only used for JS API's
-  determineASTNodeType: string
+  determineASTNodeType: string,
+  determineIsStatic: string
 });
 
 /**
@@ -31,7 +32,7 @@ type AssertionFormatterType = {
  * @HACK: This method assumes that the maximum length of the protoChain is 3
  * @HACK: Method's that throw errors upon property access are usually supported
  */
-function formatJSAssertion(record: ProviderAPIResponse): string {
+function formatJSAssertion(record: RecordType): string {
   const firstTwoProto = record.protoChain.filter((e, i) => i < 2).join('.');
   const formattedProtoChain = record.protoChain.join('.');
   return `
@@ -49,18 +50,41 @@ function formatJSAssertion(record: ProviderAPIResponse): string {
         }
         return false
       } catch (e) {
-        return true
+        // TypeError thrown on property access and all prototypes are defined,
+        // item usually experiences getter error
+        // Ex. HTMLInputElement.prototype.indeterminate
+        // -> 'The HTMLInputElement.indeterminate getter can only be used on instances of HTMLInputElement'
+        return (e instanceof TypeError)
       }
     })()
   `;
-  // return `return typeof ${formattedProtoChain} !== undefined`;
+}
+
+/**
+ * Takes a `protoChain` and returns bool if supported. Should only be run if
+ * supported. Evaluation returns true if defined
+ *
+ * ex. ['window', 'Array', 'push'] => false
+ * ex. ['window', 'document', 'querySelector'] => true
+ */
+export function determineIsStatic(record: RecordType): string {
+  return `
+    (function () {
+      try {
+        var protoChainIdType = typeof ${record.protoChain.join('.')}
+        return protoChainIdType !== 'undefined'
+      } catch (e) {
+        return e instanceof TypeError
+      }
+    })()
+  `;
 }
 
 /**
  * Create assertion to check if a CSS property is supported
  * @TODO: Support checking if API is 'prefixed'
  */
-function formatCSSAssertion(record: ProviderAPIResponse): string {
+function formatCSSAssertion(record: RecordType): string {
   const cssPropertyName = record.protoChain[record.protoChain.length - 1];
   return `
     (function () {
@@ -77,7 +101,7 @@ function formatCSSAssertion(record: ProviderAPIResponse): string {
   `;
 }
 
-export function determineASTNodeType(record: ProviderAPIResponse): string {
+export function determineASTNodeType(record: RecordType): string {
   const api = record.protoChain.join('.');
   const { length } = record.protoChain;
 
@@ -142,7 +166,7 @@ export function getAllSupportCSSProperties(): string {
 /**
  * Create a list of browser API assertions to check if an API is supported
  */
-export default function AssertionFormatter(record: ProviderAPIResponse): AssertionFormatterType {
+export default function AssertionFormatter(record: RecordType): AssertionFormatterType {
   switch (record.type) {
     case 'css-api':
       return {
@@ -153,7 +177,8 @@ export default function AssertionFormatter(record: ProviderAPIResponse): Asserti
     case 'js-api':
       return {
         apiIsSupported: formatJSAssertion(record),
-        determineASTNodeType: determineASTNodeType(record)
+        determineASTNodeType: determineASTNodeType(record),
+        determineIsStatic: determineIsStatic(record)
       };
     default:
       throw new Error(`Invalid API type: "${record.type}"`);

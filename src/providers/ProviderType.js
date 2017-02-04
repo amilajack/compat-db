@@ -5,7 +5,7 @@
  *
  * @flow
  */
-export type ProviderAPIResponse = {
+export type RecordType = {
   /**
    * The human readable name of the API. This will be used for error reporting
    */

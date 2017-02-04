@@ -12,12 +12,12 @@
 /* eslint fp/no-throw: 0 */
 
 import APICatalogProvider from './api-catalog/APICatalogProvider';
-import type { ProviderAPIResponse } from './ProviderType';
+import type { RecordType } from './ProviderType';
 
 
 export default APICatalogProvider;
 
-export function find(id: string): ProviderAPIResponse {
+export function find(id: string): RecordType {
   const foundRecord = APICatalogProvider().find(record => record.id === id);
 
   if (foundRecord) return foundRecord;
@@ -27,9 +27,12 @@ export function find(id: string): ProviderAPIResponse {
 
 
 // @TODO
-// export function filterByProtoChain(chain: Array<string>): ProviderAPIResponse {}
+// export function filterByProtoChain(chain: Array<string>): RecordType {}
 
-export function ofAPIType(type: 'css' | 'js' | 'html'): Array<ProviderAPIResponse> {
+export function ofAPIType(type: 'css' | 'js' | 'html'): Array<RecordType> {
   return APICatalogProvider()
-    .filter(record => record.type === `${type}-api` || record.type === `${type}`);
+    .filter(record =>
+      record.type === `${type}-api` ||
+      record.type === String(type)
+    );
 }

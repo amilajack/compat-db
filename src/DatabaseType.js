@@ -2,10 +2,10 @@
  * This is the typing for compat-db
  * @flow
  */
-import type { ProviderAPIResponse } from './providers/ProviderType';
+import type { RecordType } from './providers/ProviderType';
 
 
-type DBCompatRecord = ProviderAPIResponse
+type DBCompatRecord = RecordType
 & ({
   /**
    * The data type of the api. This is specific to only CSS and HTML API's. JS

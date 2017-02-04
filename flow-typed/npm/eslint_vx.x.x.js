@@ -1,4 +1,4 @@
-// flow-typed signature: 40586f78c0c45570f4a19ed6a487a88d
+// flow-typed signature: 5d93b500860666823fd726ff57d6ca47
 // flow-typed version: <<STUB>>/eslint_v^3.14.1/flow_v0.38.0
 
 /**
@@ -1134,6 +1134,10 @@ declare module 'eslint/lib/rules/template-curly-spacing' {
   declare module.exports: any;
 }
 
+declare module 'eslint/lib/rules/template-tag-spacing' {
+  declare module.exports: any;
+}
+
 declare module 'eslint/lib/rules/unicode-bom' {
   declare module.exports: any;
 }
@@ -2084,6 +2088,9 @@ declare module 'eslint/lib/rules/symbol-description.js' {
 }
 declare module 'eslint/lib/rules/template-curly-spacing.js' {
   declare module.exports: $Exports<'eslint/lib/rules/template-curly-spacing'>;
+}
+declare module 'eslint/lib/rules/template-tag-spacing.js' {
+  declare module.exports: $Exports<'eslint/lib/rules/template-tag-spacing'>;
 }
 declare module 'eslint/lib/rules/unicode-bom.js' {
   declare module.exports: $Exports<'eslint/lib/rules/unicode-bom'>;

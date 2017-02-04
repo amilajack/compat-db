@@ -1,7 +1,7 @@
 // @flow
 import APICatalog from './apicatalogdata.json';
 import HasPrefix from '../../helpers/HasPrefix';
-import type { ProviderAPIResponse } from '../ProviderType';
+import type { RecordType } from '../ProviderType';
 
 
 type APICatalogType = Array<{
@@ -35,7 +35,7 @@ export function camelToHyphen(string: string): string {
 /**
  * @TODO: Allow overriding database records
  */
-export default function APICatalogProvider(): Array<ProviderAPIResponse> {
+export default function APICatalogProvider(): Array<RecordType> {
   const formattedRecords = [];
   const ignoredAPIs = ['arguments', 'caller', 'constructor', 'length', 'name', 'prototype'];
 

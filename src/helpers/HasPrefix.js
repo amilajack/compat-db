@@ -18,10 +18,11 @@ export const prefixes = Object.values(vendorPrefixMappings);
 
 /**
  * Determine if a css or js value is prefixed
- * ex. hasPrefix('document.mozOffscreenWidth()') => true
- * ex. hasPrefix('document.offscreenWidth()') => false
+ * ex. HasPrefix('document.mozOffscreenWidth()') => true
+ * ex. HasPrefix('document.offscreenWidth()') => false
  */
 export default function HasPrefix(property: string): bool {
+  const lowerCaseProperty = property.toLowerCase();
   // $FlowFixMe: Waiting on github.com/facebook/flow/issues/2174
-  return prefixes.some(prefix => property.toLowerCase().includes(prefix));
+  return prefixes.some(prefix => lowerCaseProperty.includes(prefix));
 }

@@ -65,8 +65,11 @@
     "flow-runtime": "^0.2.1",
     "flow-typed": "^2.0.0",
     "jest-cli": "^18.1.0",
+    "lodash": "^4.17.4",
     "mocha": "^3.2.0",
     "nightmare": "^2.9.1",
+    "sequelize": "^3.30.1",
+    "sqlite3": "^3.1.8",
     "tcomb": "^3.2.16",
     "wdio-mocha-framework": "^0.5.8",
     "wdio-sauce-service": "^0.3.1",
@@ -79,8 +82,5 @@
   "devEngines": {
     "node": ">=4.x",
     "npm": ">=3.x"
-  },
-  "dependencies": {
-    "lodash": "^4.17.4"
   }
 }
