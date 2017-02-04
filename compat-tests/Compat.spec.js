@@ -25,11 +25,11 @@ const database = new Sequelize('database', 'username', 'password', {
 });
 
 const Records = database.define('Records', {
-  protoChainId: { type: Sequelize.STRING, primaryKey: true, unique: true },
-  caniuseId: { type: Sequelize.STRING, allowNull: true, unique: false },
-  name: { type: Sequelize.STRING, allowNull: true, unique: false },
-  version: { type: Sequelize.STRING, allowNull: true, unique: false },
-  isSupported: { type: Sequelize.STRING, allowNull: true, unique: false }
+  protoChainId: { type: Sequelize.STRING, allowNull: false, unique: false },
+  caniuseId: { type: Sequelize.STRING, allowNull: false, unique: false },
+  name: { type: Sequelize.STRING, allowNull: false, unique: false },
+  version: { type: Sequelize.STRING, allowNull: false, unique: false },
+  isSupported: { type: Sequelize.STRING, allowNull: false, unique: false }
 }, {
   timestamps: true
 });
