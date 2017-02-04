@@ -10,10 +10,11 @@
   "scripts": {
     "build": "cross-env NODE_ENV=production rm -rf lib && mkdir lib && babel src/index.js --out-file lib/index.js",
     "build-compat-db": "rm -rf lib tmp-db-records && mkdir lib tmp-db-records && node -r babel-register compat-tests/index.js && wdio wdio.conf.js",
+    "dir-remove": "rm -rf tmp-db-records && mkdir tmp-db-records",
     "flow": "flow check",
     "flow-typed": "flow-typed install",
     "lint": "eslint --cache --format=node_modules/eslint-formatter-pretty .",
-    "spec": "jest test/*.js",
+    "spec": "npm run dir-remove && touch tmp-db-records/database.sqlite && jest test/*.js",
     "test": "cross-env NODE_ENV=development npm run lint && npm run flow && npm run spec",
     "update-catalog-api-db": "download https://raw.githubusercontent.com/MicrosoftEdge/APICatalogData/master/apicatalogdata.json && mkdir -p src/providers/api-catalog && mv apicatalogdata.json src/providers/api-catalog/apicatalogdata.json",
     "version": "npm run build-compat-db && npm run build",
