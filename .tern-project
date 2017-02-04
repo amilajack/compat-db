@@ -10,6 +10,7 @@
     "modules": {},
     "es_modules": {},
     "node": {},
+    "node-express": {},
     "doc_comment": {
       "fullDocs": true,
       "strong": true
