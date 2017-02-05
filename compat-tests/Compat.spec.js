@@ -28,6 +28,7 @@ const Records = database.define('Records', {
   protoChainId: { type: Sequelize.STRING, allowNull: false, unique: false },
   caniuseId: { type: Sequelize.STRING, allowNull: false, unique: false },
   name: { type: Sequelize.STRING, allowNull: false, unique: false },
+  type: { type: Sequelize.STRING, allowNull: false, unique: false },
   version: { type: Sequelize.STRING, allowNull: false, unique: false },
   isSupported: { type: Sequelize.STRING, allowNull: false, unique: false }
 }, {

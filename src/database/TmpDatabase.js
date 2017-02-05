@@ -41,6 +41,7 @@ export async function insertTmpDatabaseRecord(
   // Find the record to update
   return (await database).create({
     name: caniuseId,
+    type: record.type,
     protoChainId: record.protoChainId,
     isSupported: isSupported ? 'y' : 'n',
     caniuseId,
@@ -55,6 +56,7 @@ export async function migrate() {
     protoChainId: { type: Sequelize.STRING, allowNull: false, unique: false },
     caniuseId: { type: Sequelize.STRING, allowNull: false, unique: false },
     name: { type: Sequelize.STRING, allowNull: false, unique: false },
+    type: { type: Sequelize.STRING, allowNull: false, unique: false },
     version: { type: Sequelize.STRING, allowNull: false, unique: false },
     isSupported: { type: Sequelize.STRING, allowNull: false, unique: false }
   }, {
@@ -75,6 +77,7 @@ export async function findSameVersionCompatRecord(
   return (await database).findAll({
     where: {
       name: caniuseId,
+      type: record.type,
       protoChainId: record.protoChainId
     }
   });
