@@ -16,14 +16,11 @@ describe('Providers', () => {
   });
 
   describe('Constraints', () => {
-    it('should be below expected length', () => {
-      expect(ofAPIType('css').length).toBeLessThan(2000);
-      expect(ofAPIType('js').length).toBeLessThan(12000);
-    });
-
-    it('should be above expected length', () => {
+    it('should have record count in between expected counts', () => {
       expect(ofAPIType('css').length).toBeGreaterThan(300);
       expect(ofAPIType('js').length).toBeGreaterThan(10000);
+      expect(ofAPIType('css').length).toBeLessThan(2000);
+      expect(ofAPIType('js').length).toBeLessThan(12000);
     });
   });
 

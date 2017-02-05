@@ -12,6 +12,10 @@ install:
   - set CI=true
   - yarn
 
+matrix:
+  allow_failures:
+    - nodejs_version: 7
+
 cache:
   - "%LOCALAPPDATA%/Yarn"
 

@@ -24,11 +24,9 @@ const shouldLogCompatSpecResults =
     ? process.env.LOG_COMPAT_SPEC_RESULTS === 'true'
     : true;
 
-/**
- * @NOTE: If you only want to test a few of these, remember to .slice(0, x) to
- *        test only the first x records. There's hundreds of records so this may
- *        take a while
- */
+// @NOTE: If you only want to test a few of these, remember to .slice(0, x) to
+//        test only the first x records. There's hundreds of records so this may
+//        take a while
 const records = Shuffle(Providers()).slice(
   parseInt(process.env.PROVIDERS_INDEX_START, 10) || 0,
   parseInt(process.env.PROVIDERS_INDEX_END, 10) || Providers().length - 1,
