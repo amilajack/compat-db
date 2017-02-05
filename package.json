@@ -1,7 +1,7 @@
 {
   "name": "compat-db",
   "version": "0.0.1-0",
-  "description": "A central and scalable browser api compatability database",
+  "description": "A central and scalable browser api compatibility database",
   "main": "lib/src/index.js",
   "repository": {
     "type": "git",
@@ -9,7 +9,7 @@
   },
   "scripts": {
     "build": "cross-env NODE_ENV=production rm -rf lib && mkdir lib && babel src/index.js --out-file lib/index.js",
-    "build-compat-db": "rm -rf lib tmp-db-records && mkdir lib tmp-db-records && node -r babel-register compat-tests/index.js && node --max_old_space_size=2500 ./node_modules/.bin/wdio wdio.conf.js",
+    "build-compat-db": "rm -rf lib tmp-db-records && mkdir lib tmp-db-records && node -r babel-register compat-tests/index.js && wdio wdio.conf.js",
     "dir-remove": "rm -rf tmp-db-records && mkdir tmp-db-records",
     "flow": "flow check",
     "flow-typed": "flow-typed install",

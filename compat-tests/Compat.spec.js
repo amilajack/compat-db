@@ -5,39 +5,24 @@ import Providers from '../src/providers/Providers';
 import AssertionFormatter from '../src/assertions/AssertionFormatter';
 import {
   insertTmpDatabaseRecord,
+  Records,
   findSameVersionCompatRecord } from '../src/database/TmpDatabase';
 
 
-const Sequelize = require('sequelize');
-const { join } = require('path');
+declare var browser: Object
 
+type browserType = {
+  desiredCapabilities: {
+    browserName: string,
+    version: number,
+    platform: string,
+  }
+};
 
-const database = new Sequelize('database', 'username', 'password', {
-  host: 'localhost',
-  dialect: 'sqlite',
-  pool: {
-    max: 18,
-    min: 0,
-    idle: 10000
-  },
-  logging: false,
-  storage: join(__dirname, '..', 'tmp-db-records', 'database.sqlite')
-});
-
-const Records = database.define('Records', {
-  protoChainId: { type: Sequelize.STRING, allowNull: false, unique: false },
-  caniuseId: { type: Sequelize.STRING, allowNull: false, unique: false },
-  name: { type: Sequelize.STRING, allowNull: false, unique: false },
-  type: { type: Sequelize.STRING, allowNull: false, unique: false },
-  version: { type: Sequelize.STRING, allowNull: false, unique: false },
-  isSupported: { type: Sequelize.STRING, allowNull: false, unique: false }
-}, {
-  timestamps: true
-});
-
-Records.sync();
-
-/* eslint no-undef: 0, fp/no-mutation: 0, no-let: 0, fp/no-throw: 0, consistent-return: 0 */
+const shouldLogCompatSpecResults =
+  process.env.LOG_COMPAT_SPEC_RESULTS
+    ? process.env.LOG_COMPAT_SPEC_RESULTS === 'true'
+    : true;
 
 /**
  * @NOTE: If you only want to test a few of these, remember to .slice(0, x) to
@@ -71,8 +56,7 @@ const mappings = {
   // '': 'samsung'
 };
 
-// $FlowFixMe: Flow requires type definition
-const { browserName, platform, version } = browser.desiredCapabilities; // eslint-disable-line
+const { browserName, platform, version } = (browser: browserType).desiredCapabilities;
 const caniuseId = mappings[browserName];
 
 
@@ -85,7 +69,7 @@ describe('Compat Tests', () => {
       // If newer version does not support API, current browser version doesn't support it
       // If older version does support API, current browser version does support it
       const existingRecordTargetVersions =
-        await findSameVersionCompatRecord(Records, caniuseId, version, record);
+        await findSameVersionCompatRecord(Records, caniuseId, record);
 
       // If the record already exists, skip tests
       const recordAlreadyExists = existingRecordTargetVersions.find(target => (
@@ -103,12 +87,6 @@ describe('Compat Tests', () => {
         target.isSupported === 'n'
       ));
 
-      if (earlierNotSupports) {
-        console.log('version', earlierNotSupports.version);
-        console.log('isSupported', earlierNotSupports.isSupported);
-        console.log('chain', record.protoChainId);
-      }
-
       const olderSupports = existingRecordTargetVersions.find(target => (
         target.version < version &&
         target.caniuseId === caniuseId &&
@@ -116,36 +94,47 @@ describe('Compat Tests', () => {
         target.isSupported === 'y'
       ));
 
-      if (olderSupports) {
-        console.log('version', olderSupports.version);
-        console.log('isSupported', olderSupports.isSupported);
-        console.log('chain', record.protoChainId);
+      if (shouldLogCompatSpecResults) {
+        if (earlierNotSupports) {
+          console.log('version', earlierNotSupports.version);
+          console.log('isSupported', earlierNotSupports.isSupported);
+          console.log('chain', record.protoChainId);
+        }
+        if (olderSupports) {
+          console.log('version', olderSupports.version);
+          console.log('isSupported', olderSupports.isSupported);
+          console.log('chain', record.protoChainId);
+        }
       }
 
       if (earlierNotSupports || olderSupports) {
-        console.log('************ USING SHORTCUT ******************');
-        console.log(earlierNotSupports ? 'earlierNotSupports' : 'olderSupports');
-        console.log(`
-          "${record.protoChainId}" API ${earlierNotSupports ? 'is NOT ❌ ' : 'is ✅ '} supported in ${browserName} ${version} on ${platform}
-        `);
+        if (shouldLogCompatSpecResults) {
+          console.log('************ USING SHORTCUT ******************');
+          console.log(earlierNotSupports ? 'earlierNotSupports' : 'olderSupports');
+          console.log(`
+            "${record.protoChainId}" API ${earlierNotSupports ? 'is NOT ❌ ' : 'is ✅ '} supported in ${browserName} ${version} on ${platform}
+          `);
+        }
 
         return insertTmpDatabaseRecord(
           Records,
           record,
           caniuseId,
-          version,
+          String(version),
           earlierNotSupports
             ? false
-            : (olderSupports ? true : false) // eslint-disable-line
+            : !!olderSupports
         );
       }
 
       const assertions = AssertionFormatter(record);
       const { value } = await browser.execute(`return (${assertions.apiIsSupported})`);
 
-      console.log(`
-        "${record.protoChainId}" ${value ? 'IS ✅ ' : 'is NOT ❌ '} API supported in ${browserName} ${version} on ${platform}
-      `);
+      if (shouldLogCompatSpecResults) {
+        console.log(`
+          "${record.protoChainId}" ${value ? 'IS ✅ ' : 'is NOT ❌ '} API supported in ${browserName} ${version} on ${platform}
+        `);
+      }
 
       if (typeof value !== 'boolean') {
         throw new Error(`Invalid JS execution value returned from Sauce Labs. Received ${value} and expected boolean`);
@@ -155,7 +144,7 @@ describe('Compat Tests', () => {
         Records,
         record,
         caniuseId,
-        version,
+        String(version),
         value
       );
     });

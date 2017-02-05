@@ -1,16 +1,40 @@
-import { insertTmpDatabaseRecord, migrate } from '../src/database/TmpDatabase';
+import {
+  insertTmpDatabaseRecord,
+  initializeDatabase,
+  defineSchema,
+  migrate } from '../src/database/TmpDatabase';
 
 
 describe('TmpDatabase', () => {
-  it('should clear database', async () => {
+  beforeEach(async () => {
+    await migrate();
+  });
+
+  it('should migrate database', async () => {
     const Records = await migrate();
+    expect(await (await Records).count()).toEqual(0);
+  });
+
+  it('should clear database', async () => {
+    const Records = defineSchema(initializeDatabase());
+    expect(await (await Records).count()).toEqual(0);
+  });
+
+  it('should insert records', async () => {
+    const Records = defineSchema(initializeDatabase());
+
+    expect(await (await Records).count()).toEqual(0);
+
     await Records.create({
       protoChainId: 'some',
       caniuseId: 'moo',
+      type: 'js-api',
       name: 'foo',
       version: 'loo',
       isSupported: 'y'
     });
+
+    expect(await (await Records).count()).toEqual(1);
 
     expect(
       await Records.findOne({
@@ -33,12 +57,16 @@ describe('TmpDatabase', () => {
     });
   });
 
-  it('should update database record', async () => {
-    const Records = await migrate();
+  it('should update database record with insertTmpDatabaseRecord()', async () => {
+    const Records = defineSchema(initializeDatabase());
+    expect(await (await Records).count()).toEqual(0);
 
-    insertTmpDatabaseRecord(
+    await insertTmpDatabaseRecord(
       Records,
-      { protoChainId: 'window.alert()' },
+      {
+        protoChainId: 'window.alert()',
+        type: 'js-api'
+      },
       'chrome',
       '48',
       false

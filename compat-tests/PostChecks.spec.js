@@ -1,5 +1,5 @@
 /**
- * A collection of tests not related to determining compatability. These tests
+ * A collection of tests not related to determining compatibility. These tests
  * are used to determine the types of API's.
  *
  * These tests only run on the latest version of popular browsers.

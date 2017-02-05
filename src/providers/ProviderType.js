@@ -18,7 +18,7 @@ export type RecordType = {
 
   /**
    * An object containing information about the spec. This information is not
-   * relevant to the compatability of the spec it self. It may describe what the
+   * relevant to the compatibility of the spec it self. It may describe what the
    * API does
    */
   meta?: {

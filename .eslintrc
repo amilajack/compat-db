@@ -1,7 +1,11 @@
 {
   "extends": "bliss",
   "rules": {
+    "consistent-return": 0,
+    "fp/no-mutation": 0,
+    "fp/no-throw": 0,
     "import/no-extraneous-dependencies": 0,
+    "no-let": 0,
     "no-plusplus": 0
   }
 }

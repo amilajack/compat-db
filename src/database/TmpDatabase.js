@@ -12,6 +12,8 @@ import type { RecordType } from '../providers/ProviderType';
 type str = string;
 type num = number;
 
+type SequalizeType = Promise<Sequelize>;
+
 type recordExists = Promise<Array<{
   version: num,
   isSupported: 'y' | 'n' | 'n/a'
@@ -32,10 +34,10 @@ export function initializeDatabase() {
 }
 
 export async function insertTmpDatabaseRecord(
-  database: Sequelize,
+  database: SequalizeType,
   record: RecordType,
   caniuseId: str,
-  version: num,
+  version: str,
   isSupported: bool
 ) {
   // Find the record to update
@@ -49,9 +51,7 @@ export async function insertTmpDatabaseRecord(
   });
 }
 
-export async function migrate() {
-  const database = initializeDatabase();
-
+export function defineSchema(database: any) {
   const Records = database.define('Records', {
     protoChainId: { type: Sequelize.STRING, allowNull: false, unique: false },
     caniuseId: { type: Sequelize.STRING, allowNull: false, unique: false },
@@ -63,6 +63,15 @@ export async function migrate() {
     timestamps: true
   });
 
+  Records.sync();
+
+  return Records;
+}
+
+export async function migrate() {
+  const database = initializeDatabase();
+  const Records = defineSchema(database);
+
   await Records.drop();
   await Records.sync({ force: true });
 
@@ -70,10 +79,10 @@ export async function migrate() {
 }
 
 /**
- * Find all the compatability records for every version of the same browser
+ * Find all the compatibility records for every version of the same browser
  */
 export async function findSameVersionCompatRecord(
-  database: Sequelize, caniuseId: str, record: RecordType): recordExists {
+  database: SequalizeType, caniuseId: str, record: RecordType): recordExists {
   return (await database).findAll({
     where: {
       name: caniuseId,
@@ -82,3 +91,7 @@ export async function findSameVersionCompatRecord(
     }
   });
 }
+
+export const database = initializeDatabase();
+
+export const Records = defineSchema(database);
