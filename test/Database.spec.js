@@ -1,95 +1,138 @@
 import {
-  insertTmpDatabaseRecord,
-  initializeDatabase,
-  defineSchema,
+  insertRecord,
+  insertBulkRecords,
+  findSameVersionCompatRecord,
+  initializeDatabaseConnection,
   migrate } from '../src/database/TmpDatabase';
 
 
 describe('TmpDatabase', () => {
-  beforeEach(async () => {
+  afterEach(async () => {
     await migrate();
   });
 
   it('should migrate database', async () => {
-    const Records = await migrate();
-    expect(await (await Records).count()).toEqual(0);
-  });
-
-  it('should clear database', async () => {
-    const Records = defineSchema(initializeDatabase());
-    expect(await (await Records).count()).toEqual(0);
+    const Database = await migrate();
+    expect(await Database.count()).toEqual(0);
   });
 
   it('should insert records', async () => {
-    const Records = defineSchema(initializeDatabase());
+    const { Database } = initializeDatabaseConnection();
+    expect(await Database.count()).toEqual(0);
 
-    expect(await (await Records).count()).toEqual(0);
-
-    await Records.create({
+    await new Database({
       protoChainId: 'some',
-      caniuseId: 'moo',
+      caniuseId: 'chrome',
       type: 'js-api',
-      name: 'foo',
+      name: 'chrome',
       version: 'loo',
       isSupported: 'y'
-    });
+    })
+    .save();
 
-    expect(await (await Records).count()).toEqual(1);
+    expect(await Database.count()).toEqual(1);
 
     expect(
-      await Records.findOne({
-        protoChainId: 'some'
-      })
-      .then(record => ({
-        protoChainId: record.protoChainId,
-        caniuseId: record.caniuseId,
-        name: record.name,
-        version: record.version,
-        isSupported: record.isSupported
-      }))
+      await findSameVersionCompatRecord({
+        protoChainId: 'some',
+        caniuseId: 'chrome',
+        type: 'js-api',
+        name: 'chrome',
+        version: 'loo',
+        isSupported: 'y'
+      }, 'chrome')
     )
-    .toEqual({
+    .toEqual([{
       protoChainId: 'some',
-      caniuseId: 'moo',
-      name: 'foo',
+      caniuseId: 'chrome',
+      type: 'js-api',
+      name: 'chrome',
+      id: 1,
       version: 'loo',
       isSupported: 'y'
-    });
+    }]);
   });
 
-  it('should update database record with insertTmpDatabaseRecord()', async () => {
-    const Records = defineSchema(initializeDatabase());
-    expect(await (await Records).count()).toEqual(0);
+  it('should create bulk version records: insertBulkRecord()', async () => {
+    const { Database } = initializeDatabaseConnection();
+    expect(await Database.count()).toEqual(0);
 
-    await insertTmpDatabaseRecord(
-      Records,
+    await insertBulkRecords(
       {
         protoChainId: 'window.alert()',
         type: 'js-api'
       },
       'chrome',
-      '48',
+      ['6.0', '11.0', '16.0'],
       false
     );
 
+    expect(await Database.count()).toEqual(3);
+
     expect(
-      await Records.findOne({
-        protoChainId: 'window.alert()'
-      })
-      .then(record => ({
-        protoChainId: record.protoChainId,
-        caniuseId: record.caniuseId,
-        name: record.name,
-        version: record.version,
-        isSupported: record.isSupported
-      }))
+      await findSameVersionCompatRecord({
+        protoChainId: 'window.alert()',
+        type: 'js-api'
+      },
+      'chrome')
     )
-    .toEqual({
+    .toEqual([
+      {
+        protoChainId: 'window.alert()',
+        caniuseId: 'chrome',
+        name: 'chrome',
+        version: '6.0',
+        id: 1,
+        type: 'js-api',
+        isSupported: 'n'
+      },
+      {
+        protoChainId: 'window.alert()',
+        caniuseId: 'chrome',
+        name: 'chrome',
+        version: '11.0',
+        id: 2,
+        type: 'js-api',
+        isSupported: 'n'
+      },
+      {
+        protoChainId: 'window.alert()',
+        caniuseId: 'chrome',
+        name: 'chrome',
+        version: '16.0',
+        type: 'js-api',
+        id: 3,
+        isSupported: 'n'
+      }
+    ]);
+  });
+
+  it('should update database record with insertRecord()', async () => {
+    const { Database } = initializeDatabaseConnection();
+    expect(await Database.count()).toEqual(0);
+
+    const record = {
       protoChainId: 'window.alert()',
       caniuseId: 'chrome',
+      type: 'js-api',
+      name: 'chrome',
+      version: 'loo',
+      isSupported: 'y'
+    };
+
+    await insertRecord(record, 'chrome', '48', false);
+
+    expect(
+      await findSameVersionCompatRecord(record, 'chrome')
+    )
+    .toEqual([{
+      protoChainId: 'window.alert()',
+      caniuseId: 'chrome',
+      type: 'js-api',
+      id: 1,
       name: 'chrome',
       version: '48',
       isSupported: 'n'
-    });
+    }]);
   });
 });

@@ -1,15 +1,14 @@
 // @flow
-// $FlowFixMe: Flow requires type definition
-import Shuffle from 'lodash/shuffle'; // eslint-disable-line
 import Providers from '../src/providers/Providers';
 import AssertionFormatter from '../src/assertions/AssertionFormatter';
 import {
-  insertTmpDatabaseRecord,
-  Records,
+  insertBulkRecords,
   findSameVersionCompatRecord } from '../src/database/TmpDatabase';
+import { getVersionsToMark } from '../src/helpers/GenerateVersions';
+import type { RecordType } from '../src/providers/ProviderType';
 
 
-declare var browser: Object
+declare var browser: Object;
 
 type browserType = {
   desiredCapabilities: {
@@ -27,7 +26,7 @@ const shouldLogCompatSpecResults =
 // @NOTE: If you only want to test a few of these, remember to .slice(0, x) to
 //        test only the first x records. There's hundreds of records so this may
 //        take a while
-const records = Shuffle(Providers()).slice(
+const records = Providers().slice(
   parseInt(process.env.PROVIDERS_INDEX_START, 10) || 0,
   parseInt(process.env.PROVIDERS_INDEX_END, 10) || Providers().length - 1,
 );
@@ -58,16 +57,24 @@ const { browserName, platform, version } = (browser: browserType).desiredCapabil
 const caniuseId = mappings[browserName];
 
 
+function log(record: Object, isSupported: bool) {
+  if (shouldLogCompatSpecResults) {
+    console.log(`
+      "${record.protoChainId}" ${isSupported ? 'IS ✅ ' : 'is NOT ❌ '} API supported in ${browserName} ${version} on ${platform}
+    `);
+  }
+}
+
 describe('Compat Tests', () => {
   browser.url('http://example.com/');
 
   // Dynamically generate compat-tests for each record and each browser
-  records.forEach(record => {
+  records.forEach((record: RecordType) => {
     it(`${record.protoChainId} Compat Tests`, async () => {
       // If newer version does not support API, current browser version doesn't support it
       // If older version does support API, current browser version does support it
       const existingRecordTargetVersions =
-        await findSameVersionCompatRecord(Records, caniuseId, record);
+        await findSameVersionCompatRecord(record, caniuseId);
 
       // If the record already exists, skip tests
       const recordAlreadyExists = existingRecordTargetVersions.find(target => (
@@ -78,73 +85,30 @@ describe('Compat Tests', () => {
         return true;
       }
 
-      const earlierNotSupports = existingRecordTargetVersions.find(target => (
-        target.version > version &&
-        target.caniuseId === caniuseId &&
-        target.protoChainId === record.protoChainId &&
-        target.isSupported === 'n'
-      ));
-
-      const olderSupports = existingRecordTargetVersions.find(target => (
-        target.version < version &&
-        target.caniuseId === caniuseId &&
-        target.protoChainId === record.protoChainId &&
-        target.isSupported === 'y'
-      ));
-
-      if (shouldLogCompatSpecResults) {
-        if (earlierNotSupports) {
-          console.log('version', earlierNotSupports.version);
-          console.log('isSupported', earlierNotSupports.isSupported);
-          console.log('chain', record.protoChainId);
-        }
-        if (olderSupports) {
-          console.log('version', olderSupports.version);
-          console.log('isSupported', olderSupports.isSupported);
-          console.log('chain', record.protoChainId);
-        }
-      }
-
-      if (earlierNotSupports || olderSupports) {
-        if (shouldLogCompatSpecResults) {
-          console.log('************ USING SHORTCUT ******************');
-          console.log(earlierNotSupports ? 'earlierNotSupports' : 'olderSupports');
-          console.log(`
-            "${record.protoChainId}" API ${earlierNotSupports ? 'is NOT ❌ ' : 'is ✅ '} supported in ${browserName} ${version} on ${platform}
-          `);
-        }
-
-        return insertTmpDatabaseRecord(
-          Records,
-          record,
-          caniuseId,
-          String(version),
-          earlierNotSupports
-            ? false
-            : !!olderSupports
-        );
-      }
-
       const assertions = AssertionFormatter(record);
-      const { value } = await browser.execute(`return (${assertions.apiIsSupported})`);
+      const isSupported = (await browser.execute(`return (${assertions.apiIsSupported})`)).value;
 
-      if (shouldLogCompatSpecResults) {
-        console.log(`
-          "${record.protoChainId}" ${value ? 'IS ✅ ' : 'is NOT ❌ '} API supported in ${browserName} ${version} on ${platform}
-        `);
+      if (typeof isSupported !== 'boolean') {
+        throw new Error([
+          'Invalid JS execution value returned from Sauce Labs.',
+          `Received ${isSupported} and expected boolean`
+        ].join((' ')));
       }
 
-      if (typeof value !== 'boolean') {
-        throw new Error(`Invalid JS execution value returned from Sauce Labs. Received ${value} and expected boolean`);
-      }
+      const { left, right } = getVersionsToMark(existingRecordTargetVersions, caniuseId);
 
-      insertTmpDatabaseRecord(
-        Records,
+      // If middle is supported, mark all right as supported. Otherwise, mark
+      // all left as unsupported
+      insertBulkRecords(
         record,
         caniuseId,
-        String(version),
-        value
+        [
+          ...(isSupported ? right : left),
+          String(version)
+        ],
+        isSupported
       );
+      log(record, isSupported);
     });
 
     return true;

@@ -3,95 +3,102 @@
  * @flow
  */
 import { join } from 'path';
-import Sequelize from 'sequelize';
-import type { RecordType } from '../providers/ProviderType';
+import Knex from 'knex';
+import bookshelf from 'bookshelf';
+import type { RecordType as RType } from '../providers/ProviderType';
 
 
 /* eslint fp/no-let: 0, fp/no-loops: 0, fp/no-mutation: 0, fp/no-throw: 0 */
 
 type str = string;
-type num = number;
 
-type SequalizeType = Promise<Sequelize>;
-
-type recordExists = Promise<Array<{
-  version: num,
+export type schemaType = {
+  name: string,
+  version: string,
   isSupported: 'y' | 'n' | 'n/a'
-}>>;
+};
 
-export function initializeDatabase() {
-  return new Sequelize('database', 'username', 'password', {
-    host: 'localhost',
-    dialect: 'sqlite',
-    pool: {
-      max: 18,
-      min: 0,
-      idle: 10000
-    },
-    logging: false,
-    storage: join(__dirname, '..', '..', 'tmp-db-records', 'database.sqlite')
+type recordExists = Promise<Array<schemaType>>;
+
+export function initializeDatabaseConnection() {
+  const knex = Knex({
+    client: 'sqlite3',
+    useNullAsDefault: true,
+    connection: {
+      filename: join(__dirname, '..', '..', 'tmp-db-records', 'database.sqlite')
+    }
   });
+
+  const Bookshelf = bookshelf(knex);
+
+  const Database = Bookshelf.Model.extend({
+    tableName: 'records'
+  });
+
+  return { knex, Database };
 }
 
-export async function insertTmpDatabaseRecord(
-  database: SequalizeType,
-  record: RecordType,
-  caniuseId: str,
-  version: str,
-  isSupported: bool
-) {
+export async function migrate() {
+  const { knex, Database } = initializeDatabaseConnection();
+
+  /* eslint-disable */
+  // $FlowFixMe: Flow definition issue
+  await knex.schema.dropTableIfExists('records').createTable('records', (table) => {
+    table.increments('id').primary();
+    table.string('name');
+    table.string('version');
+    table.string('protoChainId');
+    table.string('isSupported');
+    table.string('type');
+    table.string('caniuseId');
+  });
+  /* eslint-enable */
+
+  return Database;
+}
+
+export const Database = initializeDatabaseConnection().Database;
+
+export function insertRecord(record: RType, caniuseId: str, version: str, isSupported: bool) {
   // Find the record to update
-  return (await database).create({
+  return new Database({
     name: caniuseId,
     type: record.type,
     protoChainId: record.protoChainId,
     isSupported: isSupported ? 'y' : 'n',
     caniuseId,
     version
-  });
+  })
+  .save();
 }
 
-export function defineSchema(database: any) {
-  const Records = database.define('Records', {
-    protoChainId: { type: Sequelize.STRING, allowNull: false, unique: false },
-    caniuseId: { type: Sequelize.STRING, allowNull: false, unique: false },
-    name: { type: Sequelize.STRING, allowNull: false, unique: false },
-    type: { type: Sequelize.STRING, allowNull: false, unique: false },
-    version: { type: Sequelize.STRING, allowNull: false, unique: false },
-    isSupported: { type: Sequelize.STRING, allowNull: false, unique: false }
-  }, {
-    timestamps: true
-  });
-
-  Records.sync();
-
-  return Records;
-}
-
-export async function migrate() {
-  const database = initializeDatabase();
-  const Records = defineSchema(database);
-
-  await Records.drop();
-  await Records.sync({ force: true });
-
-  return Records;
+export function insertBulkRecords(
+  record: RType,
+  caniuseId: str,
+  versions: Array<str>,
+  isSupported: bool
+) {
+  return Promise.all(versions.map((version) => new Database({
+    name: caniuseId,
+    type: record.type,
+    protoChainId: record.protoChainId,
+    isSupported: isSupported ? 'y' : 'n',
+    caniuseId,
+    version
+  })
+  .save()));
 }
 
 /**
  * Find all the compatibility records for every version of the same browser
  */
-export async function findSameVersionCompatRecord(
-  database: SequalizeType, caniuseId: str, record: RecordType): recordExists {
-  return (await database).findAll({
-    where: {
-      name: caniuseId,
-      type: record.type,
-      protoChainId: record.protoChainId
-    }
-  });
+export function findSameVersionCompatRecord(record: RType, caniuseId: str): recordExists {
+  return Database.where({
+    name: caniuseId,
+    type: record.type,
+    protoChainId: record.protoChainId,
+    caniuseId
+  })
+  .fetchAll()
+  .then((user) => user.toJSON());
 }
-
-export const database = initializeDatabase();
-
-export const Records = defineSchema(database);
