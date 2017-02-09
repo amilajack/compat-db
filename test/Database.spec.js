@@ -7,6 +7,10 @@ import {
 
 
 describe('TmpDatabase', () => {
+  beforeEach(async () => {
+    await migrate();
+  });
+
   afterEach(async () => {
     await migrate();
   });
@@ -16,7 +20,7 @@ describe('TmpDatabase', () => {
     expect(await Database.count()).toEqual(0);
   });
 
-  it('should insert records', async () => {
+  it('should find same record versions', async () => {
     const { Database } = initializeDatabaseConnection();
     expect(await Database.count()).toEqual(0);
 
@@ -25,8 +29,10 @@ describe('TmpDatabase', () => {
       caniuseId: 'chrome',
       type: 'js-api',
       name: 'chrome',
-      version: 'loo',
-      isSupported: 'y'
+      versions: JSON.stringify({
+        50: 'y',
+        49: 'y'
+      })
     })
     .save();
 
@@ -37,23 +43,23 @@ describe('TmpDatabase', () => {
         protoChainId: 'some',
         caniuseId: 'chrome',
         type: 'js-api',
-        name: 'chrome',
-        version: 'loo',
-        isSupported: 'y'
+        name: 'chrome'
       }, 'chrome')
     )
-    .toEqual([{
+    .toEqual({
       protoChainId: 'some',
       caniuseId: 'chrome',
       type: 'js-api',
       name: 'chrome',
       id: 1,
-      version: 'loo',
-      isSupported: 'y'
-    }]);
+      versions: {
+        50: 'y',
+        49: 'y'
+      }
+    });
   });
 
-  it('should create bulk version records: insertBulkRecord()', async () => {
+  it('should insert bulk bulk version records', async () => {
     const { Database } = initializeDatabaseConnection();
     expect(await Database.count()).toEqual(0);
 
@@ -67,7 +73,7 @@ describe('TmpDatabase', () => {
       false
     );
 
-    expect(await Database.count()).toEqual(3);
+    expect(await Database.count()).toEqual(1);
 
     expect(
       await findSameVersionCompatRecord({
@@ -76,38 +82,79 @@ describe('TmpDatabase', () => {
       },
       'chrome')
     )
-    .toEqual([
+    .toEqual({
+      protoChainId: 'window.alert()',
+      caniuseId: 'chrome',
+      name: 'chrome',
+      versions: {
+        '6.0': 'n',
+        '11.0': 'n',
+        '16.0': 'n'
+      },
+      id: 1,
+      type: 'js-api'
+    });
+  });
+
+  it('should handle multiple bulk version inserts', async () => {
+    const { Database } = initializeDatabaseConnection();
+    expect(await Database.count()).toEqual(0);
+
+    await insertBulkRecords(
       {
         protoChainId: 'window.alert()',
-        caniuseId: 'chrome',
-        name: 'chrome',
-        version: '6.0',
-        id: 1,
-        type: 'js-api',
-        isSupported: 'n'
+        type: 'js-api'
+      },
+      'chrome',
+      ['6.0', '11.0', '16.0'],
+      false
+    );
+
+    await insertBulkRecords(
+      {
+        protoChainId: 'window.foo()',
+        type: 'js-api'
+      },
+      'chrome',
+      ['21.0', '11.0', '19.0'],
+      true
+    );
+
+    expect(await Database.count()).toEqual(2);
+
+    const items = (await Promise.all([
+      findSameVersionCompatRecord({
+        protoChainId: 'window.alert()',
+        type: 'js-api'
+      }, 'chrome'),
+      findSameVersionCompatRecord({
+        protoChainId: 'window.foo()',
+        type: 'js-api'
+      }, 'chrome')
+    ]))
+    .map(e => ({ protoChainId: e.protoChainId, versions: e.versions }));
+
+    expect(items).toEqual([
+      {
+        protoChainId: 'window.alert()',
+        versions: {
+          '6.0': 'n',
+          '11.0': 'n',
+          '16.0': 'n'
+        }
       },
       {
-        protoChainId: 'window.alert()',
-        caniuseId: 'chrome',
-        name: 'chrome',
-        version: '11.0',
-        id: 2,
-        type: 'js-api',
-        isSupported: 'n'
-      },
-      {
-        protoChainId: 'window.alert()',
-        caniuseId: 'chrome',
-        name: 'chrome',
-        version: '16.0',
-        type: 'js-api',
-        id: 3,
-        isSupported: 'n'
+        protoChainId: 'window.foo()',
+        versions: {
+          '21.0': 'y',
+          '11.0': 'y',
+          '19.0': 'y'
+        }
       }
     ]);
   });
 
-  it('should update database record with insertRecord()', async () => {
+  it.skip('should update database record with insertRecord()', async () => {
     const { Database } = initializeDatabaseConnection();
     expect(await Database.count()).toEqual(0);
 

@@ -14,11 +14,12 @@ type str = string;
 
 export type schemaType = {
   name: string,
-  version: string,
-  isSupported: 'y' | 'n' | 'n/a'
+  versions: {
+    [version: string]: 'y' | 'n' | 'n/a'
+  }
 };
 
-type recordExists = Promise<Array<schemaType>>;
+type recordExists = Promise<schemaType>;
 
 export function initializeDatabaseConnection() {
   const knex = Knex({
@@ -26,14 +27,14 @@ export function initializeDatabaseConnection() {
     useNullAsDefault: true,
     connection: {
       filename: join(__dirname, '..', '..', 'tmp-db-records', 'database.sqlite')
+    },
+    pool: {
+      min: 0,
+      max: 30
     }
   });
-
   const Bookshelf = bookshelf(knex);
-
-  const Database = Bookshelf.Model.extend({
-    tableName: 'records'
-  });
+  const Database = Bookshelf.Model.extend({ tableName: 'records' });
 
   return { knex, Database };
 }
@@ -46,9 +47,8 @@ export async function migrate() {
   await knex.schema.dropTableIfExists('records').createTable('records', (table) => {
     table.increments('id').primary();
     table.string('name');
-    table.string('version');
     table.string('protoChainId');
-    table.string('isSupported');
+    table.string('versions');
     table.string('type');
     table.string('caniuseId');
   });
@@ -57,37 +57,7 @@ export async function migrate() {
   return Database;
 }
 
-export const Database = initializeDatabaseConnection().Database;
-
-export function insertRecord(record: RType, caniuseId: str, version: str, isSupported: bool) {
-  // Find the record to update
-  return new Database({
-    name: caniuseId,
-    type: record.type,
-    protoChainId: record.protoChainId,
-    isSupported: isSupported ? 'y' : 'n',
-    caniuseId,
-    version
-  })
-  .save();
-}
-
-export function insertBulkRecords(
-  record: RType,
-  caniuseId: str,
-  versions: Array<str>,
-  isSupported: bool
-) {
-  return Promise.all(versions.map((version) => new Database({
-    name: caniuseId,
-    type: record.type,
-    protoChainId: record.protoChainId,
-    isSupported: isSupported ? 'y' : 'n',
-    caniuseId,
-    version
-  })
-  .save()));
-}
+export const { Database } = initializeDatabaseConnection();
 
 /**
  * Find all the compatibility records for every version of the same browser
@@ -100,5 +70,37 @@ export function findSameVersionCompatRecord(record: RType, caniuseId: str): reco
     caniuseId
   })
   .fetchAll()
-  .then((user) => user.toJSON());
+  .then(records => records.toJSON())
+  .then(records => records.map(_record => ({
+    ..._record,
+    versions: JSON.parse(_record.versions)
+  })))
+  .then(_records => (_records.length ? _records[0] : null));
+}
+
+export async function insertBulkRecords(
+  record: RType,
+  caniuseId: str,
+  versions: Array<str>,
+  isSupported: bool
+) {
+  const newlyGenerateRecordVersions = {};
+
+  versions.forEach((version) => {
+    newlyGenerateRecordVersions[version] = isSupported ? 'y' : 'n';
+  });
+
+  const compatRecord = await findSameVersionCompatRecord(record, caniuseId);
+
+  return new Database({ protoChainId: record.protoChainId })
+    .save({
+      name: caniuseId,
+      type: record.type,
+      protoChainId: record.protoChainId,
+      versions: JSON.stringify({
+        ...(compatRecord || {}),
+        ...newlyGenerateRecordVersions
+      }),
+      caniuseId
+    });
 }

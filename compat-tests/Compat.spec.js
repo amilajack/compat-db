@@ -77,9 +77,12 @@ describe('Compat Tests', () => {
         await findSameVersionCompatRecord(record, caniuseId);
 
       // If the record already exists, skip tests
-      const recordAlreadyExists = existingRecordTargetVersions.find(target => (
-        target.version === String(version)
-      ));
+      const recordAlreadyExists = existingRecordTargetVersions
+        ? Object
+          .keys(existingRecordTargetVersions.versions)
+          .find(target => (target === String(version)))
+        : false;
+
       if (recordAlreadyExists) {
         console.log('**Record already exists**');
         return true;
@@ -95,7 +98,12 @@ describe('Compat Tests', () => {
         ].join((' ')));
       }
 
-      const { left, right } = getVersionsToMark(existingRecordTargetVersions, caniuseId);
+      const { left, right } = getVersionsToMark(
+        existingRecordTargetVersions
+          ? Object.keys(existingRecordTargetVersions.versions)
+          : [],
+        caniuseId
+      );
 
       // If middle is supported, mark all right as supported. Otherwise, mark
       // all left as unsupported

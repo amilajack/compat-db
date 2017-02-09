@@ -1,7 +1,6 @@
 // @flow
 /* eslint no-mixed-operators: 0, max-len: ['error', 120] */
 import { browserNameToCaniuseMappings, fixedBrowserVersions } from './Constants';
-import type { schemaType } from '../../src/database/TmpDatabase';
 
 
 type targetType = {
@@ -62,7 +61,7 @@ type versionsToMarkType = {
  * yet and find the 'povit'. If middle is supported, mark 'right' elements as supported.
  * Otherwise, mark 'left' as unsupported.
  */
-export function getVersionsToMark(markedVersions: Array<schemaType>, caniuseId: string): versionsToMarkType {
+export function getVersionsToMark(markedVersions: Array<string>, caniuseId: string): versionsToMarkType {
   const markedVersionsSet = new Set(markedVersions);
   const allVersionsSet = getAllVersionsOfTarget(caniuseId);
   const versionsToMark = allVersionsSet
