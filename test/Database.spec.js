@@ -1,5 +1,4 @@
 import {
-  insertRecord,
   insertBulkRecords,
   findSameVersionCompatRecord,
   initializeDatabaseConnection,
@@ -152,34 +151,5 @@ describe('TmpDatabase', () => {
         }
       }
     ]);
-  });
-
-  it.skip('should update database record with insertRecord()', async () => {
-    const { Database } = initializeDatabaseConnection();
-    expect(await Database.count()).toEqual(0);
-
-    const record = {
-      protoChainId: 'window.alert()',
-      caniuseId: 'chrome',
-      type: 'js-api',
-      name: 'chrome',
-      version: 'loo',
-      isSupported: 'y'
-    };
-
-    await insertRecord(record, 'chrome', '48', false);
-
-    expect(
-      await findSameVersionCompatRecord(record, 'chrome')
-    )
-    .toEqual([{
-      protoChainId: 'window.alert()',
-      caniuseId: 'chrome',
-      type: 'js-api',
-      id: 1,
-      name: 'chrome',
-      version: '48',
-      isSupported: 'n'
-    }]);
   });
 });

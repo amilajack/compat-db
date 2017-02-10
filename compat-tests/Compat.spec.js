@@ -79,8 +79,8 @@ describe('Compat Tests', () => {
       // If the record already exists, skip tests
       const recordAlreadyExists = existingRecordTargetVersions
         ? Object
-          .keys(existingRecordTargetVersions.versions)
-          .find(target => (target === String(version)))
+            .keys(existingRecordTargetVersions.versions)
+            .find(target => (target === String(version)))
         : false;
 
       if (recordAlreadyExists) {

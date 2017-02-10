@@ -5,10 +5,13 @@
 import { join } from 'path';
 import Knex from 'knex';
 import bookshelf from 'bookshelf';
+import dotenv from 'dotenv';
 import type { RecordType as RType } from '../providers/ProviderType';
 
 
 /* eslint fp/no-let: 0, fp/no-loops: 0, fp/no-mutation: 0, fp/no-throw: 0 */
+
+dotenv.config();
 
 type str = string;
 
@@ -22,21 +25,37 @@ export type schemaType = {
 type recordExists = Promise<schemaType>;
 
 export function initializeDatabaseConnection() {
-  const knex = Knex({
-    client: 'sqlite3',
-    useNullAsDefault: true,
+  const mysqlConfig = {
+    client: 'mysql',
     connection: {
-      filename: join(__dirname, '..', '..', 'tmp-db-records', 'database.sqlite')
+      host: process.env.MYSQL_IP_ADDRESS || '127.0.0.1',
+      user: 'username',
+      password: 'secret',
+      database: 'compat-db',
+      charset: 'utf8'
     },
     pool: {
       min: 0,
       max: 30
     }
-  });
+  };
+  const sqliteConfig = {
+    client: 'sqlite3',
+    useNullAsDefault: true,
+    connection: {
+      filename: join(__dirname, '..', '..', 'tmp-db-records', 'database.sqlite')
+    }
+  };
+
+  const knex = Knex(
+    process.env.USE_SQLITE === 'false'
+      ? mysqlConfig
+      : sqliteConfig
+  );
   const Bookshelf = bookshelf(knex);
   const Database = Bookshelf.Model.extend({ tableName: 'records' });
 
-  return { knex, Database };
+  return { knex, Database, Bookshelf };
 }
 
 export async function migrate() {
@@ -48,8 +67,8 @@ export async function migrate() {
     table.increments('id').primary();
     table.string('name');
     table.string('protoChainId');
-    table.string('versions');
-    table.string('type');
+    table.string('versions', 4000);
+    table.enu('type', ['js-api', 'css-api', 'html-api']);
     table.string('caniuseId');
   });
   /* eslint-enable */
@@ -92,15 +111,17 @@ export async function insertBulkRecords(
 
   const compatRecord = await findSameVersionCompatRecord(record, caniuseId);
 
-  return new Database({ protoChainId: record.protoChainId })
-    .save({
-      name: caniuseId,
-      type: record.type,
-      protoChainId: record.protoChainId,
-      versions: JSON.stringify({
-        ...(compatRecord || {}),
-        ...newlyGenerateRecordVersions
-      }),
-      caniuseId
-    });
+  return new Database({
+    protoChainId: record.protoChainId
+  })
+  .save({
+    name: caniuseId,
+    type: record.type,
+    protoChainId: record.protoChainId,
+    versions: JSON.stringify({
+      ...(compatRecord || {}),
+      ...newlyGenerateRecordVersions
+    }),
+    caniuseId
+  });
 }
