@@ -2,6 +2,9 @@ import HasPrefix from '../src/helpers/HasPrefix';
 import {
   getAllVersionsOfTarget,
   getCapabilities,
+  convertCaniuseToBrowserName,
+  convertBrowserNametoCaniuse,
+  filterDuplicateTargets,
   getVersionsToMark } from '../src/helpers/GenerateVersions';
 
 
@@ -17,6 +20,18 @@ describe('HasPrefix', () => {
   it('should check vendor prefixes for uppercase APIs', () => {
     expect(HasPrefix('document.WEBKIT_FULLSCREEN()')).toEqual(true);
     expect(HasPrefix('document.-MOZ-SOME()')).toEqual(true);
+  });
+
+  it('should convert caniuseIds to browserNames', () => {
+    expect(convertCaniuseToBrowserName('chrome')).toEqual('chrome');
+    expect(convertCaniuseToBrowserName('edge')).toEqual('MicrosoftEdge');
+    expect(convertCaniuseToBrowserName('ie')).toEqual('internet explorer');
+  });
+
+  it('should convert browserNames to caniuseId', () => {
+    expect(convertBrowserNametoCaniuse('chrome')).toEqual('chrome');
+    expect(convertBrowserNametoCaniuse('MicrosoftEdge')).toEqual('edge');
+    expect(convertBrowserNametoCaniuse('internet explorer')).toEqual('ie');
   });
 
   it('should check vendor prefixes for CSS APIs', () => {
@@ -35,6 +50,20 @@ describe('HasPrefix', () => {
 });
 
 describe('GenerateVersions', () => {
+  it('should filter duplicate targets with filterDuplicateTargets()', () => {
+    expect(filterDuplicateTargets([
+      { browserName: 'chrome', version: '48.0', platform: 'Windows 10' },
+      { browserName: 'chrome', version: '30.0', platform: 'Windows 10' },
+      { browserName: 'chrome', version: '48.0', platform: 'Windows 10' },
+      { browserName: 'chrome', version: '47.0', platform: 'Windows 10' }
+    ]))
+    .toEqual([
+      { browserName: 'chrome', version: '48.0', platform: 'Windows 10' },
+      { browserName: 'chrome', version: '30.0', platform: 'Windows 10' },
+      { browserName: 'chrome', version: '47.0', platform: 'Windows 10' }
+    ]);
+  });
+
   it('should get capabilities', () => {
     expect(getCapabilities({
       browserName: 'firefox',
@@ -71,6 +100,16 @@ describe('GenerateVersions', () => {
       left: ['7.0'],
       right: ['8.0', '9.0'],
       middle: '8.0'
+    });
+    expect(getVersionsToMark(['6.0', '7.0', '9.0', '10.0'], 'safari')).toEqual({
+      left: [],
+      right: ['8.0'],
+      middle: '8.0'
+    });
+    expect(getVersionsToMark(['6.0', '7.0', '8.0', '9.0', '10.0'], 'safari')).toEqual({
+      left: [],
+      right: [],
+      middle: undefined
     });
     // All IE versions: ['11.0', '10.0', '9.0', '8.0', '7.0', '6.0']
     expect(getVersionsToMark(['6.0', '11.0'], 'ie')).toEqual({

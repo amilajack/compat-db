@@ -37,3 +37,4 @@ compat-db.json
 .env
 errorShots
 tmp-db-records
+capabilities.json

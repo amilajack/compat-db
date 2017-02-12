@@ -10,6 +10,7 @@ import type { RecordType as RType } from '../providers/ProviderType';
 
 
 /* eslint fp/no-let: 0, fp/no-loops: 0, fp/no-mutation: 0, fp/no-throw: 0 */
+// @TODO: Extend AbstractDatabase
 
 dotenv.config();
 
@@ -21,8 +22,6 @@ export type schemaType = {
     [version: string]: 'y' | 'n' | 'n/a'
   }
 };
-
-type recordExists = Promise<schemaType>;
 
 export function initializeDatabaseConnection() {
   const mysqlConfig = {
@@ -67,8 +66,18 @@ export async function migrate() {
     table.increments('id').primary();
     table.string('name');
     table.string('protoChainId');
-    table.string('versions', 4000);
+    table.string('versions', 1000);
     table.enu('type', ['js-api', 'css-api', 'html-api']);
+    table.string('caniuseId');
+  });
+  await knex.schema.dropTableIfExists('jobs').createTable('jobs', (table) => {
+    table.increments('id').primary();
+    table.string('name');
+    table.string('browserName');
+    table.string('protoChainId');
+    table.string('version');
+    table.enu('type', ['js-api', 'css-api', 'html-api']);
+    table.string('record', 1000);
     table.string('caniuseId');
   });
   /* eslint-enable */
@@ -81,7 +90,7 @@ export const { Database } = initializeDatabaseConnection();
 /**
  * Find all the compatibility records for every version of the same browser
  */
-export function findSameVersionCompatRecord(record: RType, caniuseId: str): recordExists {
+export function findSameVersionCompatRecord(record: RType, caniuseId: str): Promise<schemaType> {
   return Database.where({
     name: caniuseId,
     type: record.type,

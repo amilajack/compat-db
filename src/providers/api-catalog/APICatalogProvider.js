@@ -19,7 +19,7 @@ type APICatalogType = Array<{
  * ex. camelCase => camel-case
  * This is used to map CSS DOM API names to css properties and attributes
  */
-export function camelToHyphen(string: string): string {
+export function camelCaseToHyphen(string: string): string {
   return Array
     // Covert string to array
     .from(string)
@@ -82,8 +82,8 @@ export default function APICatalogProvider(): Array<RecordType> {
     .filter(record => record.protoChain.includes('CSSStyleDeclaration'))
     .map(record => ({
       ...record,
-      id: camelToHyphen(record.name),
-      name: camelToHyphen(record.name),
+      id: camelCaseToHyphen(record.name),
+      name: camelCaseToHyphen(record.name),
       type: 'css-api'
     }));
 

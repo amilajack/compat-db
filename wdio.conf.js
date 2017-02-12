@@ -1,23 +1,17 @@
+// @flow
 require('babel-register');
-const { browserNameToCaniuseMappings } = require('./src/helpers/Constants');
-const { allTargets, getVersionsToMark } = require('./src/helpers/GenerateVersions');
-require('dotenv').config();
+const { readFileSync } = require('fs');
+const { join } = require('path');
 
 
 /* eslint fp/no-mutation: 0 */
 
-const caniuseIds = Object.values(browserNameToCaniuseMappings);
-const items = [];
+require('dotenv').config();
 
-caniuseIds.forEach(curr => {
-  const { middle } = getVersionsToMark([], curr);
-  allTargets
-    .filter(item =>
-      browserNameToCaniuseMappings[item.browserName] === curr &&
-      item.version === middle
-    )
-    .forEach(e => items.push(e));
-});
+function readCapabilities() {
+  const item = readFileSync(join(__dirname, 'capabilities.json'));
+  return JSON.parse(item.toString());
+}
 
 exports.config = {
   user: process.env.SAUCE_USERNAME,
@@ -34,7 +28,7 @@ exports.config = {
   //
   // @NOTE: 93 total targets being tested. ~14K records. ~1,358,000 tests/records total
 
-  capabilities: items.map(e => Object.assign({}, e, { 'idle-timeout': 30000 })),
+  capabilities: readCapabilities().map(e => Object.assign({}, e, { 'idle-timeout': 30000 })),
   sync: false,
   logLevel: 'error',
   execArgv: ['--max_old_space_size=4096'],

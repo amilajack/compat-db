@@ -1,5 +1,5 @@
 // @flow
-/* eslint no-mixed-operators: 0, max-len: ['error', 120] */
+/* eslint no-mixed-operators: 0, max-len: ['error', 120], no-restricted-syntax: 0, fp/no-loops: 0 */
 import { browserNameToCaniuseMappings, fixedBrowserVersions } from './Constants';
 
 
@@ -20,6 +20,24 @@ export function getCapabilities(object: capabilityType): Array<targetType> {
     platform: 'Windows 10',
     version: `${i + object.minVersion}.0`
   }));
+}
+
+export function filterDuplicateTargets(targets: Array<Object>): Array<Object> {
+  const filteredTargets = Array.from(new Set(targets.map(JSON.stringify)));
+  return filteredTargets.map(JSON.parse);
+}
+
+export function convertCaniuseToBrowserName(caniuseId: string): string {
+  for (const browserName in browserNameToCaniuseMappings) {
+    if (browserNameToCaniuseMappings[browserName] === caniuseId) {
+      return browserName;
+    }
+  }
+  throw new Error(`"${caniuseId}" is not a valid caniuseId. Cannot find corresponding browserName`);
+}
+
+export function convertBrowserNametoCaniuse(caniuseId: string): string {
+  return browserNameToCaniuseMappings[caniuseId] || '';
 }
 
 export const allTargets: Array<targetType> = [
@@ -54,7 +72,8 @@ export function getAllVersionsOfTarget(caniuseId: string): Array<string> {
 
 type versionsToMarkType = {
   left: Array<string>,
-  right: Array<string>
+  right: Array<string>,
+  middle: string
 };
 /**
  * Given the a list of the marked versions, find versions that haven't been marked
