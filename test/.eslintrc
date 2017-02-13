@@ -4,5 +4,9 @@
     "import/no-extraneous-dependencies": 0,
     "no-restricted-syntax": 0,
     "no-eval": 0
+  },
+  "env": {
+    "jest": true,
+    "jasmine": true
   }
 }

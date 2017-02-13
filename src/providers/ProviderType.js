@@ -5,7 +5,7 @@
  *
  * @flow
  */
-export type ProviderAPIResponse = {
+export type RecordType = {
   /**
    * The human readable name of the API. This will be used for error reporting
    */
@@ -18,7 +18,7 @@ export type ProviderAPIResponse = {
 
   /**
    * An object containing information about the spec. This information is not
-   * relevant to the compatability of the spec it self. It may describe what the
+   * relevant to the compatibility of the spec it self. It may describe what the
    * API does
    */
   meta?: {
@@ -54,6 +54,12 @@ export type ProviderAPIResponse = {
    * ex. ['window', 'Array', 'prototype', 'push']   <= Example of `push` protoChain
    */
   protoChain: Array<string>,
+
+  /**
+   * A stringified protoChain
+   * ex. ['window', 'fetch'] => 'window.fetch'
+   */
+  protoChainId: string,
 
   /**
    * Categorize the api as a css style or a javascript api. For example,

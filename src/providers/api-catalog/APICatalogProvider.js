@@ -1,7 +1,7 @@
 // @flow
 import APICatalog from './apicatalogdata.json';
-import HasPrefix from '../../helpers/PrefixHandler';
-import type { ProviderAPIResponse } from '../ProviderType';
+import HasPrefix from '../../helpers/HasPrefix';
+import type { RecordType } from '../ProviderType';
 
 
 type APICatalogType = Array<{
@@ -19,7 +19,7 @@ type APICatalogType = Array<{
  * ex. camelCase => camel-case
  * This is used to map CSS DOM API names to css properties and attributes
  */
-export function camelToHyphen(string: string): string {
+export function camelCaseToHyphen(string: string): string {
   return Array
     // Covert string to array
     .from(string)
@@ -35,7 +35,7 @@ export function camelToHyphen(string: string): string {
 /**
  * @TODO: Allow overriding database records
  */
-export default function APICatalogProvider(): Array<ProviderAPIResponse> {
+export default function APICatalogProvider(): Array<RecordType> {
   const formattedRecords = [];
   const ignoredAPIs = ['arguments', 'caller', 'constructor', 'length', 'name', 'prototype'];
 
@@ -67,12 +67,14 @@ export default function APICatalogProvider(): Array<ProviderAPIResponse> {
       specNames: fRecord.specNames,
       type: 'js-api',
       specIsFinished: fRecord.spec,
-      protoChain: ['window', fRecord.parentName, fRecord.name]
+      protoChain: ['window', fRecord.parentName, fRecord.name],
+      protoChainId: ['window', fRecord.parentName, fRecord.name].join('.')
     }))
     .filter(record => (
       !ignoredAPIs.includes(record.name) &&
       !HasPrefix(record.name) &&
-      record.protoChain.every(proto => !HasPrefix(proto))
+      !HasPrefix(record.protoChainId) &&
+      !HasPrefix(record.id)
     ));
 
   // Find the CSS DOM API's and use them create the css style records
@@ -80,10 +82,10 @@ export default function APICatalogProvider(): Array<ProviderAPIResponse> {
     .filter(record => record.protoChain.includes('CSSStyleDeclaration'))
     .map(record => ({
       ...record,
-      id: camelToHyphen(record.name),
-      name: camelToHyphen(record.name),
+      id: camelCaseToHyphen(record.name),
+      name: camelCaseToHyphen(record.name),
       type: 'css-api'
     }));
 
-  return CSSAPIs.concat(JSAPIs);
+  return [...CSSAPIs, ...JSAPIs];
 }

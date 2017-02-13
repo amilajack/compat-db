@@ -2,11 +2,11 @@ import Nightmare from 'nightmare';
 import CSSProperties from './CSSProperties.json';
 import AssertionFormatter, {
   determineASTNodeType,
-  getAllSupportCSSProperties
-} from '../src/assertions/AssertionFormatter';
+  getAllSupportCSSProperties,
+  determineIsStatic } from '../src/assertions/AssertionFormatter';
 
 
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 200000; // eslint-disable-line
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 200000;
 
 async function testDetermineASTNodeType(protoChain: Array<string>) {
   const determineNodeTest = determineASTNodeType({ protoChain });
@@ -117,5 +117,34 @@ describe('AssertionFormatter', () => {
         .end()
     )
     .toEqual(false);
+  });
+
+  describe('AssertionFormatter', () => {
+    const assertions = [
+      {
+        protoChain: ['window', 'document', 'querySelector'],
+        isStatic: true
+      },
+      {
+        protoChain: ['window', 'Array', 'push'],
+        isStatic: false
+      },
+      {
+        protoChain: ['window', 'alert'],
+        isStatic: true
+      }
+    ].map(assertion => ({
+      ...assertion,
+      assertions: Nightmare()
+        .goto('https://example.com')
+        .evaluate((compatTest) => eval(compatTest), determineIsStatic(assertion))
+        .end()
+    }));
+
+    for (const assertion of assertions) {
+      it(`should determine ${assertion.protoChain.join('.')} is static or non-static`, async () => {
+        expect(await assertion.assertions).toEqual(assertion.isStatic);
+      });
+    }
   });
 });

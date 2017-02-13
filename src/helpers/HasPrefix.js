@@ -3,6 +3,9 @@
  * @flow
  */
 
+
+/* eslint flowtype-errors/show-errors: 0 */
+
 export const vendorPrefixMappings = {
   chrome: 'webkit',
   safari: 'webkit',
@@ -15,10 +18,11 @@ export const prefixes = Object.values(vendorPrefixMappings);
 
 /**
  * Determine if a css or js value is prefixed
- * ex. hasPrefix('document.mozOffscreenWidth()') => true
- * ex. hasPrefix('document.offscreenWidth()') => false
+ * ex. HasPrefix('document.mozOffscreenWidth()') => true
+ * ex. HasPrefix('document.offscreenWidth()') => false
  */
-export default function PrefixHandler(property: string): bool {
+export default function HasPrefix(property: string): bool {
+  const lowerCaseProperty = property.toLowerCase();
   // $FlowFixMe: Waiting on github.com/facebook/flow/issues/2174
-  return prefixes.some(prefix => property.includes(prefix)); // eslint-disable-line
+  return prefixes.some(prefix => lowerCaseProperty.includes(prefix));
 }

@@ -1,0 +1,19 @@
+{
+  "ecmaVersion": 7,
+  "libs": [
+    "browser"
+  ],
+  "dontLoad": [
+    "node_modules/**"
+  ],
+  "plugins": {
+    "modules": {},
+    "es_modules": {},
+    "node": {},
+    "node-express": {},
+    "doc_comment": {
+      "fullDocs": true,
+      "strong": true
+    }
+  }
+}

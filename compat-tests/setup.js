@@ -4,6 +4,7 @@ import { writeFileSync } from 'fs';
 import Providers from '../src/providers/Providers';
 import PrepareDatabase from '../src/database/PrepareDatabase';
 import JobQueue from '../src/database/JobQueueDatabase';
+import writeAllJobsToJSON from './jobs';
 import { browserNameToCaniuseMappings } from '../src/helpers/Constants';
 import {
   convertCaniuseToBrowserName,
@@ -67,6 +68,8 @@ async function writeCapabilities() {
     join(__dirname, '..', 'capabilities.json'),
     JSON.stringify(targets)
   );
+
+  await writeAllJobsToJSON();
 
   process.exit(0);
 }
