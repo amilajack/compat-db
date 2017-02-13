@@ -1,5 +1,4 @@
 // @flow
-import { execSync } from 'child_process';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import AssertionFormatter from '../src/assertions/AssertionFormatter';
@@ -9,6 +8,7 @@ import {
 import { getVersionsToMark } from '../src/helpers/GenerateVersions';
 import { browserNameToCaniuseMappings } from '../src/helpers/Constants';
 import JobQueue from '../src/database/JobQueueDatabase';
+import writeAllJobsToJSON from './jobs';
 import type { RecordType } from '../src/providers/ProviderType';
 import type { schemaType as JobQueueType } from '../src/database/JobQueueDatabase';
 
@@ -39,8 +39,6 @@ const { browserName, platform, version } = (browser: browserType).desiredCapabil
 const caniuseId = browserNameToCaniuseMappings[browserName];
 
 function getJobs() {
-  execSync('babel-node jobs.js');
-
   return JSON.parse(
     readFileSync(join(__dirname, 'jobs.json')).toString()
   )
@@ -156,6 +154,8 @@ describe('Compat Tests', () => {
           browserName,
           caniuseId
         });
+
+        await writeAllJobsToJSON();
       });
 
       return true;

@@ -9,7 +9,7 @@
   },
   "scripts": {
     "build": "cross-env NODE_ENV=production rm -rf lib && mkdir lib && babel src/index.js --out-file lib/index.js",
-    "build-compat-db": "babel-node compat-tests/setup.js && wdio wdio.conf.js",
+    "build-compat-db": "node -r babel-register compat-tests/setup.js && wdio wdio.conf.js",
     "dir-remove": "rm -rf tmp-db-records && mkdir tmp-db-records && touch tmp-db-records/database.sqlite",
     "flow": "flow check",
     "flow-typed": "flow-typed install",

@@ -4,10 +4,11 @@ import { writeFileSync } from 'fs';
 import JobQueue from '../src/database/JobQueueDatabase';
 
 
-async function getAllJobs() {
+export default async function writeAllJobsToJSON() {
   const jobQueue = new JobQueue();
-  writeFileSync(JSON.stringify(await jobQueue.getAll()), join(__dirname, 'jobs.json'));
-  process.exit(0);
-}
 
-getAllJobs();
+  writeFileSync(
+    join(__dirname, 'jobs.json'),
+    JSON.stringify(await jobQueue.getAll()),
+  );
+}
