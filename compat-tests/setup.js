@@ -1,10 +1,6 @@
 // @flow
-import { join } from 'path';
-import { writeFileSync } from 'fs';
-import Providers from '../src/providers/Providers';
-import PrepareDatabase from '../src/database/PrepareDatabase';
+import { ofAPIType } from '../src/providers/Providers';
 import JobQueue from '../src/database/JobQueueDatabase';
-import writeAllJobsToJSON from './jobs';
 import { browserNameToCaniuseMappings } from '../src/helpers/Constants';
 import {
   convertCaniuseToBrowserName,
@@ -13,39 +9,52 @@ import {
   getVersionsToMark } from '../src/helpers/GenerateVersions';
 
 
-const records = Providers();
+export type browserCapabilityType = {
+  browserName: string,
+  version: string,
+  platform: string,
+};
 
-/**
- * Create 'capabilities' by writing to the temporary file `capabilities.json`.
- *
- * For every job in the JobQueue, remove duplicate targets and format the results
- * to capabilities. `wdio.js` will read the `capabilities.json` file
- */
-async function writeCapabilities() {
+export default async function createJobsFromRecords(): Promise<Array<browserCapabilityType>> {
   const queue = new JobQueue();
+  await queue.migrate();
+  const records = ofAPIType('js');
 
   // If there are jobs in the queue already, skip the following steps
-  if ((await queue.count()) > 0) return;
+  if ((await queue.count()) === 0) {
+    const caniuseIds: Array<string> = Object.values(browserNameToCaniuseMappings); // eslint-disable-line
+    const jobs = [];
 
-  const caniuseIds = (Object.values(browserNameToCaniuseMappings): Array<string>); // eslint-disable-line
-  const jobs = [];
+    // If no jobs are in the JobQueue, create a job for every record and caniuseId
+    records
+      .slice(
+        parseInt(process.env.PROVIDERS_INDEX_START, 10) || 0,
+        parseInt(process.env.PROVIDERS_INDEX_END, 10) || records.length - 1
+      )
+      .forEach(record => {
+        caniuseIds.forEach((caniuseId) => {
+          const version = getVersionsToMark([], caniuseId).middle;
+          const browserName = convertCaniuseToBrowserName(caniuseId);
+          const { platform } = allTargets.find(e =>
+            e.browserName === browserName &&
+            e.version === version
+          );
 
-  // If no jobs are in the JobQueue, create a job for every record and caniuseId
-  records.forEach(record => {
-    caniuseIds.forEach((caniuseId) => {
-      jobs.push({
-        name: caniuseId,
-        browserName: convertCaniuseToBrowserName(caniuseId),
-        record: JSON.stringify(record),
-        version: getVersionsToMark([], caniuseId).middle,
-        protoChainId: record.protoChainId,
-        type: record.type,
-        caniuseId
+          jobs.push({
+            name: caniuseId,
+            record: JSON.stringify(record),
+            protoChainId: record.protoChainId,
+            type: record.type,
+            platform,
+            browserName,
+            version,
+            caniuseId
+          });
+        });
       });
-    });
-  });
 
-  await queue.insertBulk(jobs);
+    await queue.insertBulk(jobs);
+  }
 
   // Take all the targets in JobQueue. Filter duplicates
   const targets = filterDuplicateTargets(
@@ -64,15 +73,8 @@ async function writeCapabilities() {
       }))
   );
 
-  writeFileSync(
-    join(__dirname, '..', 'capabilities.json'),
-    JSON.stringify(targets)
-  );
-
-  await writeAllJobsToJSON();
-
-  process.exit(0);
+  return targets;
 }
 
-PrepareDatabase(records, join(__dirname, '..', 'lib', 'all.json'));
-writeCapabilities();
+// @TODO
+// PrepareDatabase(records, join(__dirname, '..', 'lib', 'all.json'));

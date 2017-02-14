@@ -5,6 +5,7 @@ const baseRecord = {
   name: 'chrome',
   browserName: 'chrome',
   protoChainId: 'document.alert',
+  platform: 'Windows 10',
   version: '48',
   record: JSON.stringify({
     protoChainId: 'document.alert',
@@ -15,7 +16,7 @@ const baseRecord = {
 };
 
 describe('JobQueueDatabase', () => {
-  beforeEach(async () => {
+  beforeAll(async () => {
     const jobQueue = new JobQueueDatabase();
     await jobQueue.migrate();
   });
@@ -34,11 +35,13 @@ describe('JobQueueDatabase', () => {
         browserName: 'chrome',
         protoChainId: 'document.alert',
         version: '48',
+
         record: JSON.stringify({
           protoChainId: 'document.alert',
           caniuseId: 'chrome'
         }),
         type: 'js-api',
+        platform: 'Windows 10',
         caniuseId: 'chrome'
       },
       {
@@ -51,6 +54,7 @@ describe('JobQueueDatabase', () => {
           caniuseId: 'firefox'
         }),
         type: 'js-api',
+        platform: 'Windows 10',
         caniuseId: 'firefox'
       }
     ]);
@@ -69,6 +73,7 @@ describe('JobQueueDatabase', () => {
           caniuseId: 'chrome'
         }),
         type: 'js-api',
+        platform: 'Windows 10',
         caniuseId: 'chrome'
       },
       {
@@ -82,6 +87,7 @@ describe('JobQueueDatabase', () => {
           caniuseId: 'firefox'
         }),
         type: 'js-api',
+        platform: 'Windows 10',
         caniuseId: 'firefox'
       }
     ]);

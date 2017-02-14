@@ -1,163 +1,205 @@
 // @flow
-import { readFileSync } from 'fs';
-import { join } from 'path';
+import 'babel-polyfill';
+import dotenv from 'dotenv';
+import webdriver from 'selenium-webdriver';
 import AssertionFormatter from '../src/assertions/AssertionFormatter';
 import {
   insertBulkRecords,
   findSameVersionCompatRecord } from '../src/database/TmpDatabase';
 import { getVersionsToMark } from '../src/helpers/GenerateVersions';
-import { browserNameToCaniuseMappings } from '../src/helpers/Constants';
 import JobQueue from '../src/database/JobQueueDatabase';
-import writeAllJobsToJSON from './jobs';
+import setup from './setup';
 import type { RecordType } from '../src/providers/ProviderType';
 import type { schemaType as JobQueueType } from '../src/database/JobQueueDatabase';
+import type { browserCapabilityType } from './setup';
 
 
-declare var browser: Object;
+/* eslint no-console: 0 */
 
-type browserType = {
-  desiredCapabilities: {
-    browserName: string,
-    version: number,
-    platform: string,
-  }
+const jobQueue = new JobQueue();
+
+dotenv.config();
+
+type finishedTestType = {
+  job: JobQueueType,
+  record: RecordType,
+  isSupported: bool
 };
+type exTestType = Promise<finishedTestType[]>;
+/**
+ * Take an array of records, generate and run tests, and return the results
+ * @TODO: Optimization: Batch tests
+ */
+async function executeTests(browserName, platform, version, jobs: JobQueueType[]): exTestType {
+  const username = process.env.SAUCE_USERNAME;
+  const accessKey = process.env.SAUCE_ACCESS_KEY;
 
-const shouldLogCompatSpecResults =
-  process.env.LOG_COMPAT_SPEC_RESULTS
-    ? process.env.LOG_COMPAT_SPEC_RESULTS === 'true'
-    : true;
+  if (!accessKey || !username) {
+    throw new Error('Invalid Sauce Labs API key or username');
+  }
 
-// @NOTE: If you only want to test a few of these, remember to .slice(0, x) to
-//        test only the first x records. There's hundreds of records so this may
-//        take a while
-//
-// @TODO: Iterate through each job in the JobQueue where the job's browserName
-//        and version match the current browserName and version
+  const driver = new webdriver
+    .Builder()
+    .withCapabilities({
+      browserName,
+      platform,
+      version,
+      username,
+      accessKey
+    })
+    .usingServer(
+      `http://${username}:${accessKey}@ondemand.saucelabs.com:80/wd/hub`
+    )
+    .build();
 
-const { browserName, platform, version } = (browser: browserType).desiredCapabilities;
-const caniuseId = browserNameToCaniuseMappings[browserName];
+  const items = Promise.all(
+    jobs.map(job => {
+      const record: RecordType = JSON.parse(job.record);
+      const { apiIsSupported } = AssertionFormatter(record);
 
-function getJobs() {
-  return JSON.parse(
-    readFileSync(join(__dirname, 'jobs.json')).toString()
-  )
-  .filter(e =>
-    e.browserName === browserName &&
-    e.version === version
+      return driver
+        .executeScript(`return (${apiIsSupported})`)
+        .then(isSupported => {
+          if (typeof isSupported !== 'boolean') {
+            throw new Error([
+              'Invalid JS execution value returned from Sauce Labs.',
+              `Received ${isSupported} and expected boolean`
+            ].join((' ')));
+          }
+          return { record, isSupported, job };
+        })
+        .catch(console.log);
+    })
+  );
+
+  await driver.quit();
+
+  return items;
+}
+
+/**
+ * Handle the respective results
+ */
+async function handleFinishedTest(finishedTest: finishedTestType) {
+  const { job, record, isSupported } = finishedTest;
+  const { caniuseId, browserName, platform, version } = job;
+
+  const existingRecordTargetVersions =
+    await findSameVersionCompatRecord(record, caniuseId);
+
+  // If newer version does not support API, current browser version doesn't support it
+  // If older version does support API, current browser version does support it
+  const { left, right } = getVersionsToMark(
+    existingRecordTargetVersions
+      ? Object.keys(existingRecordTargetVersions.versions)
+      : [],
+    caniuseId
+  );
+
+  // If middle is supported, mark all right as supported. Otherwise, mark
+  // all left as unsupported
+  await insertBulkRecords(
+    record,
+    caniuseId,
+    [
+      ...(isSupported ? right : left),
+      String(version)
+    ],
+    isSupported
+  );
+
+  // log(browserName, version, platform, record, isSupported);
+
+  // Fetch the updated records from the TmpDatabase
+  const newExistingRecordTargetVersions =
+    await findSameVersionCompatRecord(record, caniuseId);
+
+  // Create new jobs if there are more versions of the target to test
+  const newVersions = getVersionsToMark(
+    Object.keys(newExistingRecordTargetVersions.versions),
+    caniuseId
+  );
+  if (newVersions.middle) {
+    await jobQueue.insertBulk([{
+      name: caniuseId,
+      record: JSON.stringify(record),
+      version: newVersions.middle,
+      protoChainId: record.protoChainId,
+      type: record.type,
+      platform,
+      browserName,
+      caniuseId
+    }]);
+  }
+
+  // Remove the finished job from the JobQueue
+  await jobQueue.remove({
+    name: caniuseId,
+    protoChainId: record.protoChainId,
+    type: record.type,
+    record: JSON.stringify(record),
+    version: String(version),
+    platform,
+    browserName,
+    caniuseId
+  });
+}
+
+/**
+ * @TODO: Optimizations:
+ *          * Pass references to records instead of values. Possibly use ID in
+ *            database. JSON.parse/stringify are expensive
+ */
+async function handleCapability(capability: browserCapabilityType) {
+  const { browserName, version, platform } = capability;
+
+  // Find all the jobs that match the current capability's browserName, version,
+  // and platform
+  const allJobs: Array<JobQueueType> = await jobQueue.find({
+    browserName,
+    version,
+    platform
+  });
+
+  const jobs = allJobs.slice(
+    parseInt(process.env.PROVIDERS_INDEX_START, 10) || 0,
+    parseInt(process.env.PROVIDERS_INDEX_END, 10) || allJobs.length - 1
+  );
+
+  return Promise.all(
+    (await executeTests(
+      browserName,
+      platform,
+      version,
+      jobs
+    ))
+    .map(handleFinishedTest)
   );
 }
 
-function log(record: Object, isSupported: bool) {
-  if (shouldLogCompatSpecResults) {
-    console.log([
-      `"${record.protoChainId}" ${isSupported ? 'IS ✅ ' : 'is NOT ❌ '}`,
-      `API supported in ${browserName} ${version} on ${platform}`
-    ].join(' '));
+/**
+ * @NOTE: If you only want to test a few of these, remember to .slice(0, x) to
+ *        test only the first x records. There's hundreds of records so this may
+ *        take a while
+ *
+ * @TODO: Batch tests on browsers
+ *
+ * @TODO: Throttle promise
+ */
+async function Compat() {
+  const browserCapabilities: Object[] = await setup();
+
+  if (typeof browserCapabilities === 'boolean') {
+    console.log('Jobs already exist in queue. No need to generate more');
+    return process.exit(0);
   }
-}
-
-describe('Compat Tests', () => {
-  const jobs = getJobs();
-
-  browser.url('http://example.com/');
-
-  const jobQueue = new JobQueue();
 
   // Dynamically generate compat-tests for each record and each browser
-  jobs
-    .slice(
-      parseInt(process.env.PROVIDERS_INDEX_START, 10) || 0,
-      parseInt(process.env.PROVIDERS_INDEX_END, 10) || jobs.length - 1
-    )
-    .forEach((job: JobQueueType) => {
-      const record = (JSON.parse(job.record): RecordType);
+  const runningJobs = browserCapabilities.map(handleCapability);
 
-      it(`${record.protoChainId} Compat Tests`, async () => {
-        const existingRecordTargetVersions =
-          await findSameVersionCompatRecord(record, caniuseId);
+  await Promise.all(runningJobs);
 
-        // If we have records for the current browser version, the tests are done
-        const recordAlreadyExists = existingRecordTargetVersions
-          ? Object
-              .keys(existingRecordTargetVersions.versions)
-              .find(target => (target === String(version)))
-          : false;
+  process.exit(0);
+}
 
-        if (recordAlreadyExists) {
-          console.log(
-            `**"${record.protoChainId}" record already exists for ${browserName} ${version} **`
-          );
-          return true;
-        }
-
-        const assertions = AssertionFormatter(record);
-        const isSupported = (await browser.execute(`return (${assertions.apiIsSupported})`)).value;
-
-        if (typeof isSupported !== 'boolean') {
-          throw new Error([
-            'Invalid JS execution value returned from Sauce Labs.',
-            `Received ${isSupported} and expected boolean`
-          ].join((' ')));
-        }
-
-        // If newer version does not support API, current browser version doesn't support it
-        // If older version does support API, current browser version does support it
-        const { left, right } = getVersionsToMark(
-          existingRecordTargetVersions
-            ? Object.keys(existingRecordTargetVersions.versions)
-            : [],
-          caniuseId
-        );
-
-        // If middle is supported, mark all right as supported. Otherwise, mark
-        // all left as unsupported
-        await insertBulkRecords(
-          record,
-          caniuseId,
-          [
-            ...(isSupported ? right : left),
-            String(version)
-          ],
-          isSupported
-        );
-        log(record, isSupported);
-
-        // Fetch the updated records from the TmpDatabase
-        const newExistingRecordTargetVersions =
-          await findSameVersionCompatRecord(record, caniuseId);
-
-        // Create new jobs if there are more versions of the target to test
-        const newVersions = getVersionsToMark(
-          Object.keys(newExistingRecordTargetVersions.versions),
-          caniuseId
-        );
-        if (newVersions.middle) {
-          await jobQueue.insertBulk([{
-            name: caniuseId,
-            record: JSON.stringify(record),
-            version: newVersions.middle,
-            protoChainId: record.protoChainId,
-            type: record.type,
-            browserName,
-            caniuseId
-          }]);
-        }
-
-        // Remove the finished job from the JobQueue
-        await jobQueue.remove({
-          name: caniuseId,
-          protoChainId: record.protoChainId,
-          type: record.type,
-          record: JSON.stringify(record),
-          version: String(version),
-          browserName,
-          caniuseId
-        });
-
-        await writeAllJobsToJSON();
-      });
-
-      return true;
-    });
-});
+Compat();

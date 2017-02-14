@@ -31,8 +31,5 @@ export function find(id: string): RecordType {
 
 export function ofAPIType(type: 'css' | 'js' | 'html'): Array<RecordType> {
   return APICatalogProvider()
-    .filter(record =>
-      record.type === `${type}-api` ||
-      record.type === String(type)
-    );
+    .filter(record => record.type === `${type}-api`);
 }

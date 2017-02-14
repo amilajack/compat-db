@@ -16,7 +16,7 @@ function readCapabilities() {
 exports.config = {
   user: process.env.SAUCE_USERNAME,
   key: process.env.SAUCE_ACCESS_KEY,
-  specs: ['./compat-tests/Compat.spec.js'],
+  specs: ['./compat-tests-webdriver/Compat.spec.js'],
   maxInstances: 40,
 
   // @TODO: Test against all supported browsers caniuse supports. Create a
