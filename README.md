@@ -28,8 +28,11 @@ cd compat-db
 yarn # or npm install
 
 # Create your `.env` file
-cp .env.example .env
 # ⚠️  Make sure to add your saucelabs keys to your `.env` file ⚠️
+cp .env.example .env
+
+# Migrate the sqlite (default) or mysql database
+npm run migrate
 
 # Build the compatibility database to ./lib/all.json
 # 💡 You can limit the amount of tests that you run by setting the following ENV's

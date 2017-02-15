@@ -121,6 +121,8 @@ export async function insertBulkRecords(
   const compatRecord = await findSameVersionCompatRecord(record, caniuseId);
 
   return new Database({
+    caniuseId,
+    name: caniuseId,
     protoChainId: record.protoChainId
   })
   .save({

@@ -12,12 +12,11 @@ import {
 export type browserCapabilityType = {
   browserName: string,
   version: string,
-  platform: string,
+  platform: string
 };
 
 export default async function createJobsFromRecords(): Promise<Array<browserCapabilityType>> {
   const queue = new JobQueue();
-  await queue.migrate();
   const records = ofAPIType('js');
 
   // If there are jobs in the queue already, skip the following steps
@@ -35,7 +34,7 @@ export default async function createJobsFromRecords(): Promise<Array<browserCapa
         caniuseIds.forEach((caniuseId) => {
           const version = getVersionsToMark([], caniuseId).middle;
           const browserName = convertCaniuseToBrowserName(caniuseId);
-          const { platform } = allTargets.find(e =>
+          const { platform } = allTargets.find(e => // eslint-disable-line
             e.browserName === browserName &&
             e.version === version
           );

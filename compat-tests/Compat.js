@@ -25,12 +25,18 @@ type finishedTestType = {
   record: RecordType,
   isSupported: bool
 };
+type capabilityType = {
+  browserName: string,
+  version: string,
+  platform: string,
+};
 type exTestType = Promise<finishedTestType[]>;
 /**
  * Take an array of records, generate and run tests, and return the results
  * @TODO: Optimization: Batch tests
  */
-async function executeTests(browserName, platform, version, jobs: JobQueueType[]): exTestType {
+export async function executeTests(capability: capabilityType, jobs: JobQueueType[]): exTestType {
+  const { browserName, platform, version } = capability;
   const username = process.env.SAUCE_USERNAME;
   const accessKey = process.env.SAUCE_ACCESS_KEY;
 
@@ -52,7 +58,9 @@ async function executeTests(browserName, platform, version, jobs: JobQueueType[]
     )
     .build();
 
-  const items = Promise.all(
+  console.log(`Executing ${jobs.length} tests in parallel on ${platform} ${browserName} ${version}`);
+
+  const items = await Promise.all(
     jobs.map(job => {
       const record: RecordType = JSON.parse(job.record);
       const { apiIsSupported } = AssertionFormatter(record);
@@ -77,10 +85,24 @@ async function executeTests(browserName, platform, version, jobs: JobQueueType[]
   return items;
 }
 
+function log(browserName, version, platform, record: Object, isSupported: bool) {
+  const shouldLogCompatSpecResults =
+    process.env.LOG_COMPAT_SPEC_RESULTS
+      ? process.env.LOG_COMPAT_SPEC_RESULTS === 'true'
+      : true;
+
+  if (shouldLogCompatSpecResults) {
+    console.log([
+      `"${record.protoChainId}" ${isSupported ? 'IS ✅ ' : 'is NOT ❌ '}`,
+      `API supported in ${browserName} ${version} on ${platform}`
+    ].join(' '));
+  }
+}
+
 /**
  * Handle the respective results
  */
-async function handleFinishedTest(finishedTest: finishedTestType) {
+export async function handleFinishedTest(finishedTest: finishedTestType) {
   const { job, record, isSupported } = finishedTest;
   const { caniuseId, browserName, platform, version } = job;
 
@@ -108,7 +130,7 @@ async function handleFinishedTest(finishedTest: finishedTestType) {
     isSupported
   );
 
-  // log(browserName, version, platform, record, isSupported);
+  log(browserName, version, platform, record, isSupported);
 
   // Fetch the updated records from the TmpDatabase
   const newExistingRecordTargetVersions =
@@ -133,7 +155,7 @@ async function handleFinishedTest(finishedTest: finishedTestType) {
   }
 
   // Remove the finished job from the JobQueue
-  await jobQueue.remove({
+  return jobQueue.remove({
     name: caniuseId,
     protoChainId: record.protoChainId,
     type: record.type,
@@ -150,7 +172,7 @@ async function handleFinishedTest(finishedTest: finishedTestType) {
  *          * Pass references to records instead of values. Possibly use ID in
  *            database. JSON.parse/stringify are expensive
  */
-async function handleCapability(capability: browserCapabilityType) {
+export async function handleCapability(capability: browserCapabilityType) {
   const { browserName, version, platform } = capability;
 
   // Find all the jobs that match the current capability's browserName, version,
@@ -162,19 +184,15 @@ async function handleCapability(capability: browserCapabilityType) {
   });
 
   const jobs = allJobs.slice(
-    parseInt(process.env.PROVIDERS_INDEX_START, 10) || 0,
-    parseInt(process.env.PROVIDERS_INDEX_END, 10) || allJobs.length - 1
+    parseInt(process.env.JOBS_INDEX_START, 10) || 0,
+    parseInt(process.env.JOBS_INDEX_END, 10) || allJobs.length - 1
   );
 
-  return Promise.all(
-    (await executeTests(
-      browserName,
-      platform,
-      version,
-      jobs
-    ))
-    .map(handleFinishedTest)
-  );
+  console.log(`Running ${jobs.length} jobs`);
+
+  const testsToHandle = (await executeTests(capability, jobs)).map(handleFinishedTest);
+
+  return Promise.all(testsToHandle);
 }
 
 /**
@@ -187,7 +205,7 @@ async function handleCapability(capability: browserCapabilityType) {
  * @TODO: Throttle promise
  */
 async function Compat() {
-  const browserCapabilities: Object[] = await setup();
+  const browserCapabilities: browserCapabilityType[] = await setup();
 
   if (typeof browserCapabilities === 'boolean') {
     console.log('Jobs already exist in queue. No need to generate more');
@@ -201,5 +219,7 @@ async function Compat() {
 
   process.exit(0);
 }
+
+export default Compat;
 
 Compat();
