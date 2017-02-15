@@ -133,8 +133,6 @@ describe('Comapt', () => {
 
     expect(firstRun).not.toEqual(secondRun);
     expect(thirdRun).not.toEqual(secondRun);
-
-    console.log(firstRun, secondRun, thirdRun);
   });
 
   // it.skip('should handle capabilities', () => {});

@@ -1,6 +1,7 @@
 // @flow
 import { ofAPIType } from '../src/providers/Providers';
 import JobQueue from '../src/database/JobQueueDatabase';
+import * as TmpRecordDatabase from '../src/database/TmpDatabase';
 import { browserNameToCaniuseMappings } from '../src/helpers/Constants';
 import {
   convertCaniuseToBrowserName,
@@ -24,8 +25,13 @@ export default async function createJobsFromRecords(): Promise<Array<browserCapa
     const caniuseIds: Array<string> = Object.values(browserNameToCaniuseMappings); // eslint-disable-line
     const jobs = [];
 
-    // If no jobs are in the JobQueue, create a job for every record and caniuseId
+    const existingRecords = new Set((await TmpRecordDatabase.getAll()).map(JSON.stringify));
+
+    // Make sure not to make jobs for records that are already in the database
     records
+      .filter(record =>
+        !existingRecords.has(JSON.stringify(record))
+      )
       .slice(
         parseInt(process.env.PROVIDERS_INDEX_START, 10) || 0,
         parseInt(process.env.PROVIDERS_INDEX_END, 10) || records.length - 1

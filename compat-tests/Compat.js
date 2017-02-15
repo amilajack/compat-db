@@ -173,22 +173,19 @@ export async function handleFinishedTest(finishedTest: finishedTestType) {
  *            database. JSON.parse/stringify are expensive
  */
 export async function handleCapability(capability: browserCapabilityType) {
-  const { browserName, version, platform } = capability;
+  const { browserName, version } = capability;
 
   // Find all the jobs that match the current capability's browserName, version,
   // and platform
   const allJobs: Array<JobQueueType> = await jobQueue.find({
     browserName,
-    version,
-    platform
+    version
   });
 
   const jobs = allJobs.slice(
     parseInt(process.env.JOBS_INDEX_START, 10) || 0,
-    parseInt(process.env.JOBS_INDEX_END, 10) || allJobs.length - 1
+    parseInt(process.env.JOBS_INDEX_END, 10) || allJobs.length
   );
-
-  console.log(`Running ${jobs.length} jobs`);
 
   const testsToHandle = (await executeTests(capability, jobs)).map(handleFinishedTest);
 

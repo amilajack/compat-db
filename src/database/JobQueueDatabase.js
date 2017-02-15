@@ -22,7 +22,7 @@ export type schemaType = {
 type whereClauseType = {
   browserName: string,
   version: string,
-  platform: string
+  platform?: string
 };
 
 export default class JobQueue extends AbstractDatabase {

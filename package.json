@@ -15,8 +15,8 @@
     "flow": "flow check",
     "flow-typed": "flow-typed install",
     "lint": "eslint --cache --format=node_modules/eslint-formatter-pretty .",
-    "migrate": "npm run dir-remove && npm run migrate && babel-node ./src/database/Migrate",
-    "spec": "npm run dir-remove && jest test/*.js",
+    "migrate": "npm run dir-remove && babel-node ./src/database/Migrate",
+    "spec": "npm run dir-remove && npm run migrate && jest test/*.js",
     "test": "cross-env NODE_ENV=development npm run lint && npm run spec",
     "update-catalog-api-db": "download https://raw.githubusercontent.com/MicrosoftEdge/APICatalogData/master/apicatalogdata.json && mkdir -p src/providers/api-catalog && mv apicatalogdata.json src/providers/api-catalog/apicatalogdata.json",
     "version": "npm run build-compat-db && npm run build"
