@@ -44,6 +44,9 @@ export default class JobQueue extends AbstractDatabase {
     });
   }
 
+  /**
+   * Override paramater type with stricter 'Array<schemaType>'
+   */
   insertBulk(recordsToInsert: Array<schemaType>) {
     return super.insertBulk(recordsToInsert);
   }
