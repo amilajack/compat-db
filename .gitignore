@@ -38,4 +38,4 @@ compat-db.json
 errorShots
 tmp-db-records
 capabilities.json
-compat-tests/jobs.json
+compat-tests-webdriver/jobs.json

@@ -6,6 +6,8 @@ import AssertionFormatter, {
   determineIsStatic } from '../src/assertions/AssertionFormatter';
 
 
+/* eslint no-await-in-loop: 0 */
+
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 200000;
 
 async function testDetermineASTNodeType(protoChain: Array<string>) {
@@ -53,6 +55,48 @@ describe('getAllSupportCSSProperties()', () => {
  * @TODO: Refactor, add additional tests
  */
 describe('AssertionFormatter', () => {
+  it('should test against multiple records', async () => {
+    const records = [
+      {
+        id: 'border-width',
+        name: 'border-width',
+        specNames: ['css21', 'css-background-3'],
+        type: 'css-api',
+        specIsFinished: false,
+        protoChain: ['window', 'CSSStyleDeclaration', 'borderWidth']
+      },
+      {
+        id: 'document-querySelector',
+        name: 'document-querySelector',
+        specNames: ['css21', 'css-background-3'],
+        type: 'js-api',
+        specIsFinished: false,
+        protoChain: ['window', 'Element', 'querySelector']
+      },
+      {
+        id: 'array-push',
+        name: 'array-push',
+        specNames: ['array', 'push'],
+        type: 'js-api',
+        specIsFinished: false,
+        protoChain: ['window', 'Array', 'push']
+      }
+    ];
+
+    for (const record of records) {
+      const { apiIsSupported } = AssertionFormatter(record);
+      const nightmare = Nightmare();
+
+      expect(
+        await nightmare
+          .goto('https://example.com')
+          .evaluate((compatTest) => eval(compatTest), apiIsSupported)
+          .end()
+      )
+      .toEqual(true);
+    }
+  });
+
   it('should create assertions for CSS property API records', async () => {
     const cssAPIRecord = {
       id: 'border-width',

@@ -118,19 +118,26 @@ export async function insertBulkRecords(
     newlyGenerateRecordVersions[version] = isSupported ? 'y' : 'n';
   });
 
-  const compatRecord = await findSameVersionCompatRecord(record, caniuseId);
-
   return new Database({
+    caniuseId,
+    name: caniuseId,
     protoChainId: record.protoChainId
   })
   .save({
     name: caniuseId,
     type: record.type,
     protoChainId: record.protoChainId,
-    versions: JSON.stringify({
-      ...(compatRecord || {}),
-      ...newlyGenerateRecordVersions
-    }),
+    versions: JSON.stringify(newlyGenerateRecordVersions),
     caniuseId
   });
+}
+
+export function count() {
+  return Database.count();
+}
+
+export function getAll() {
+  return Database
+    .fetchAll()
+    .then(res => res.toJSON());
 }

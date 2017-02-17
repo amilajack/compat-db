@@ -45,13 +45,13 @@ export const allTargets: Array<targetType> = [
   ...getCapabilities({
     browserName: 'chrome',
     minVersion: 26,
-    maxVersion: 55
+    maxVersion: 56
   }),
   // Firefox: 47 versions
   ...getCapabilities({
     browserName: 'firefox',
     minVersion: 4,
-    maxVersion: 50
+    maxVersion: 51
   }),
   ...fixedBrowserVersions
 ];

@@ -11,6 +11,7 @@ A central and scalable browser API compatibility database
 **❌ WORK IN PROGRESS. DO NOT USE ❌**
 
 ## Goals
+- [ ] Be a (almost) drop-in replacement for caniuse-db
 - [ ] Provide a compiled list of compatibility records
 - [ ] Provide an API for traversing/filtering the records and finding supported features
 - [ ] Collect all CSS properties and their corresponding values
@@ -28,8 +29,11 @@ cd compat-db
 yarn # or npm install
 
 # Create your `.env` file
-cp .env.example .env
 # ⚠️  Make sure to add your saucelabs keys to your `.env` file ⚠️
+cp .env.example .env
+
+# Migrate the sqlite (default) or mysql database
+npm run migrate
 
 # Build the compatibility database to ./lib/all.json
 # 💡 You can limit the amount of tests that you run by setting the following ENV's

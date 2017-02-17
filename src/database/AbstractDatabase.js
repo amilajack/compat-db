@@ -55,6 +55,7 @@ export default class AbstractDatabase {
         max: 30
       }
     };
+
     const sqliteConfig = {
       client: 'sqlite3',
       useNullAsDefault: true,
