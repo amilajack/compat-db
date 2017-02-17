@@ -50,6 +50,7 @@ export default class AbstractDatabase {
         database: 'compat-db',
         charset: 'utf8'
       },
+      acquireConnectionTimeout: 150000, // 15 sec
       pool: {
         min: 0,
         max: 30
