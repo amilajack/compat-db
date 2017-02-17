@@ -132,6 +132,10 @@ export async function insertBulkRecords(
   });
 }
 
+export function count() {
+  return Database.count();
+}
+
 export function getAll() {
   return Database
     .fetchAll()

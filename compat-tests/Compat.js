@@ -31,6 +31,7 @@ type capabilityType = {
   platform: string,
 };
 type exTestType = Promise<finishedTestType[]>;
+
 /**
  * Take an array of records, generate and run tests, and return the results
  * @TODO: Optimization: Batch tests
@@ -167,29 +168,34 @@ export async function handleFinishedTest(finishedTest: finishedTestType) {
   });
 }
 
+type handleCapabilityType = Promise<Array<Promise<any>>>;
+
 /**
  * @TODO: Optimizations:
  *          * Pass references to records instead of values. Possibly use ID in
  *            database. JSON.parse/stringify are expensive
  */
-export async function handleCapability(capability: browserCapabilityType) {
+export async function handleCapability(capability: browserCapabilityType): handleCapabilityType {
   const { browserName, version } = capability;
 
   // Find all the jobs that match the current capability's browserName, version,
   // and platform
-  const allJobs: Array<JobQueueType> = await jobQueue.find({
+  const allJobs: Array<JobQueueType> = (await jobQueue.find({
+    status: 'queued',
     browserName,
     version
-  });
+  }))
+  // @HACK: Temporarily avoid running on IE because of bugs with IE webdriver
+  .filter(job => job.caniuseId !== 'ie');
 
   const jobs = allJobs.slice(
     parseInt(process.env.JOBS_INDEX_START, 10) || 0,
     parseInt(process.env.JOBS_INDEX_END, 10) || allJobs.length
   );
 
-  const testsToHandle = (await executeTests(capability, jobs)).map(handleFinishedTest);
+  await Promise.all(jobs.map(job => jobQueue.markJobsStatus(job, 'running'))); // eslint-disable-line
 
-  return Promise.all(testsToHandle);
+  return (await executeTests(capability, jobs)).map(handleFinishedTest);
 }
 
 /**
@@ -210,11 +216,9 @@ async function Compat() {
   }
 
   // Dynamically generate compat-tests for each record and each browser
-  const runningJobs = browserCapabilities.map(handleCapability);
+  await Promise.all(browserCapabilities.map(handleCapability));
 
-  await Promise.all(runningJobs);
-
-  process.exit(0);
+  return process.exit(0);
 }
 
 export default Compat;

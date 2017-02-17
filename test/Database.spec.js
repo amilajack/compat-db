@@ -58,7 +58,7 @@ describe('TmpDatabase', () => {
     });
   });
 
-  it('should insert bulk bulk version records', async () => {
+  it('should insert bulk version records', async () => {
     const { Database } = initializeDatabaseConnection();
     expect(await Database.count()).toEqual(0);
 

@@ -11,6 +11,7 @@ A central and scalable browser API compatibility database
 **❌ WORK IN PROGRESS. DO NOT USE ❌**
 
 ## Goals
+- [ ] Be a (almost) drop-in replacement for caniuse-db
 - [ ] Provide a compiled list of compatibility records
 - [ ] Provide an API for traversing/filtering the records and finding supported features
 - [ ] Collect all CSS properties and their corresponding values

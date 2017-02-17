@@ -3,7 +3,6 @@
  * @flow
  */
 import AbstractDatabase from './AbstractDatabase';
-import type { schemaType as JobQueueType } from '../../src/database/JobQueueDatabase';
 
 
 /* eslint fp/no-this: 0, fp/no-class: 0, class-methods-use-this: 0 */
@@ -19,15 +18,20 @@ export type schemaType = {
   caniuseId: string,
 };
 
+type JobQueueType = schemaType;
+
 type whereClauseType = {
   browserName: string,
-  version: string,
-  platform?: string
-};
+  protoChainId?: string
+}
+& (
+  { caniuseId: string }
+  | { browserName: string }
+);
 
 export default class JobQueue extends AbstractDatabase {
-  constructor() {
-    super('jobs');
+  constructor(tableName: string = 'jobs') {
+    super(tableName);
   }
 
   migrate() {
@@ -41,7 +45,15 @@ export default class JobQueue extends AbstractDatabase {
       table.enu('type', ['js-api', 'css-api', 'html-api']);
       table.string('record', 1000);
       table.string('caniuseId');
+      table.enu('status', ['queued', 'running']).defaultTo('queued');
     });
+  }
+
+  markJobsStatus(whereClause: whereClauseType, status: 'running' | 'queued') {
+    return this.connection
+      .Database
+      .where(whereClause)
+      .save({ status }, { method: 'update', patch: true });
   }
 
   /**

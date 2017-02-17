@@ -1,10 +1,11 @@
-import JobQueue from '../src/database/JobQueueDatabase';
+import JobQueueDatabase from '../src/database/JobQueueDatabase';
 import Compat, {
   executeTests,
   handleFinishedTest,
   handleCapability } from '../compat-tests/Compat';
 import setup from '../compat-tests/setup';
 import * as TmpRecordDatabase from '../src/database/TmpDatabase';
+import { baseRecord } from './JobQueueDatabase.spec';
 
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 100000;
@@ -46,13 +47,13 @@ const [querySelectorJob, borderWidthJob] = jobs;
 describe('Comapt', () => {
   beforeAll(async () => {
     await TmpRecordDatabase.migrate();
-    const jobQueue = new JobQueue();
+    const jobQueue = new JobQueueDatabase();
     await jobQueue.migrate();
   });
 
   afterEach(async () => {
     await TmpRecordDatabase.migrate();
-    const jobQueue = new JobQueue();
+    const jobQueue = new JobQueueDatabase();
     await jobQueue.migrate();
   });
 
@@ -72,16 +73,14 @@ describe('Comapt', () => {
   });
 
   it('should handle finished tests', async () => {
+    const jobQueue = new JobQueueDatabase('compat-test-1');
+    await jobQueue.migrate();
+
     const [finishedTest] = await executeTests(capability, jobs);
     await handleFinishedTest(finishedTest);
 
     // There should be one newly created record
-    const count = await TmpRecordDatabase.Database.count();
-    expect(count).toEqual(1);
-
-    // There should be one job
-    const jobQueue = new JobQueue();
-    expect(await jobQueue.count()).toEqual(1);
+    expect(await TmpRecordDatabase.Database.count()).toEqual(1);
 
     const items = await TmpRecordDatabase.Database
       .fetchAll()
@@ -111,7 +110,8 @@ describe('Comapt', () => {
   });
 
   it.skip('should run e2e', async () => {
-    const jobQueue = new JobQueue();
+    const jobQueue = new JobQueueDatabase('compat-test-e2e');
+    jobQueue.migrate();
 
     // Initially, JobQueue should have no records
     expect(await jobQueue.count()).toEqual(0);
@@ -135,5 +135,44 @@ describe('Comapt', () => {
     expect(thirdRun).not.toEqual(secondRun);
   });
 
+  it.skip('should persist job on failure', async () => {
+    const jobQueue = new JobQueueDatabase();
+    expect(await jobQueue.count()).toEqual(0);
+
+    await jobQueue.insertBulk([
+      {
+        ...baseRecord,
+        version: '35.0',
+        type: 'js-api',
+        protoChainId: 'document.write',
+        record: JSON.stringify({
+          protoChain: ['document', 'write'],
+          protoChainId: 'document.write',
+          type: 'js-api'
+        })
+      }
+    ]);
+
+    expect(await jobQueue.getAll()).toEqual([{
+      id: 1,
+      name: 'chrome',
+      browserName: 'chrome',
+      platform: 'Windows 10',
+      protoChainId: 'document.write',
+      version: '35.0',
+      type: 'js-api',
+      record: '{"protoChain":["document","write"],"protoChainId":"document.write","type":"js-api"}',
+      caniuseId: 'chrome',
+      status: 'queued'
+    }]);
+
+    expect(await jobQueue.count()).toEqual(1);
+
+    await Compat();
+
+    expect(await jobQueue.count()).toEqual(1);
+  });
+
+  // @TODO
   // it.skip('should handle capabilities', () => {});
 });
