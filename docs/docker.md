@@ -10,7 +10,7 @@ Here is the list of steps to setup docker with this project.
 ## 1. Installing Docker
 
 ### Mac
-```
+```bash
 # If you're on mac and have brew
 brew cask install docker-toolbox
 # Done! 🎉🎉🎉
