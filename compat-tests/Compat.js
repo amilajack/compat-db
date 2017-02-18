@@ -9,7 +9,7 @@ import {
 import { getVersionsToMark } from '../src/helpers/GenerateVersions';
 import JobQueue from '../src/database/JobQueueDatabase';
 import setup from './setup';
-import type { RecordType } from '../src/providers/ProviderType';
+import type { RecordType } from '../src/providers/RecordType';
 import type { schemaType as JobQueueType } from '../src/database/JobQueueDatabase';
 import type { browserCapabilityType } from './setup';
 

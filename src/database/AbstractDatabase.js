@@ -3,7 +3,7 @@ import { join } from 'path';
 import Knex from 'knex';
 import bookshelf from 'bookshelf';
 import dotenv from 'dotenv';
-import type { RecordType as RType } from '../providers/ProviderType';
+import type { RecordType as RType } from '../providers/RecordType';
 
 
 /* eslint fp/no-let: 0, fp/no-this: 0, fp/no-loops: 0, fp/no-mutation: 0,

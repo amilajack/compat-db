@@ -1,7 +1,7 @@
 // @flow
 import APICatalog from './apicatalogdata.json';
 import HasPrefix from '../../helpers/HasPrefix';
-import type { RecordType } from '../ProviderType';
+import type { RecordType } from '../RecordType';
 
 
 type APICatalogType = Array<{

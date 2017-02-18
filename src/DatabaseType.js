@@ -2,7 +2,7 @@
  * This is the typing for compat-db
  * @flow
  */
-import type { RecordType } from './providers/ProviderType';
+import type { RecordType } from './providers/RecordType';
 
 
 type DBCompatRecord = RecordType

@@ -12,7 +12,7 @@
 /* eslint fp/no-throw: 0 */
 
 import APICatalogProvider from './api-catalog/APICatalogProvider';
-import type { RecordType } from './ProviderType';
+import type { RecordType } from './RecordType';
 
 
 export default APICatalogProvider;
