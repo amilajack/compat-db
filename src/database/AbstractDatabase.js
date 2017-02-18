@@ -53,7 +53,8 @@ export default class AbstractDatabase {
       pool: {
         min: 0,
         max: 30
-      }
+      },
+      acquireConnectionTimeout: 1000000
     };
 
     const sqliteConfig = {
