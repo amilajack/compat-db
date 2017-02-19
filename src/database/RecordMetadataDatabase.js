@@ -9,4 +9,13 @@ export default class RecordMetabaseDatabase extends AbstractDatabase {
   constructor() {
     super('record-metadata');
   }
+
+  migrate() {
+    return super.migrate((table) => {
+      table.increments('id').primary();
+      table.enu('protoChainId', ['MemberExpression', 'NewExpression', 'CallExpression']);
+      table.boolean('isStatic');
+      table.json('astNodeType');
+    });
+  }
 }

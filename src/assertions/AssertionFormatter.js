@@ -26,26 +26,26 @@ type AssertionFormatterType = {
 
 /**
  * Check if the JS API is defined
- * ex. ['ServiceWorker'] => 'window.ServiceWorker'
+ * ex. ['ServiceWorker'] => 'ServiceWorker'
  * @TODO: Support checking if API is 'prefixed'
- * @HACK: This method assumes that the maximum length of the protoChain is 3
  * @HACK: Method's that throw errors upon property access are usually supported
  */
 function formatJSAssertion(record: RecordType): string {
-  const firstTwoProto = record.protoChain.filter((e, i) => i < 2).join('.');
-  const formattedProtoChain = record.protoChain.join('.');
+  const remainingProtoObject = record.protoChain.filter((e, i) => i > 0);
+  const formattedStaticProtoChain = record.protoChain.join('.');
   return `
     (function () {
       try {
-        // window.a
+        // a
         if (typeof window === 'undefined') { return false }
-        // window.a
-        if (typeof ${firstTwoProto} === 'undefined') { return false }
-        // window.a.b
-        if (typeof ${formattedProtoChain} !== 'undefined')  { return false }
-        // window.a.prototype.b
-        if (typeof ${firstTwoProto}.prototype !== 'undefined') {
-          return typeof ${firstTwoProto}.prototype.${record.protoChain[2]} !== 'undefined'
+        // a
+        if (typeof ${record.protoChain[0]} === 'undefined') { return false }
+        // a.b
+        if (typeof ${formattedStaticProtoChain} !== 'undefined')  { return true }
+        // a.prototype.b
+        if (typeof ${record.protoChain[0]}.prototype !== 'undefined') {
+          if (${remainingProtoObject.length} === 0) { return false }
+          return typeof ${[record.protoChain[0], 'prototype'].concat(remainingProtoObject).join('.')} !== 'undefined'
         }
         return false
       } catch (e) {
@@ -107,13 +107,9 @@ export function determineASTNodeType(record: RecordType): string {
   return `
     (function() {
       var items = []
-      if (
-        ${length} <= 1 &&
-        typeof ${api} === 'function'
-      ) {
+      if (${length} <= 1 &&typeof ${api} === 'function') {
         items.push('CallExpression')
       }
-
       try {
         new ${api}()
         items.push('NewExpression')
@@ -122,7 +118,6 @@ export function determineASTNodeType(record: RecordType): string {
           items.push('MemberExpression')
         }
       }
-
       return items
     })()
   `;

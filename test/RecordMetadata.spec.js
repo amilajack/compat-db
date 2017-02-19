@@ -1,23 +1,23 @@
 import { expect as chaiExpect } from 'chai';
 import RecordMetadata from '../compat-tests/RecordMetadata';
-import Providers from '../src/providers/Providers';
+import { ofAPIType } from '../src/providers/Providers';
 
+
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 200000; // eslint-disable-line
 
 describe('RecordMetadata', () => {
   it('should have the expected fields', async () => {
-    const records = Providers();
-    const middle = Math.floor(records.length / 2);
-    const metadata = await RecordMetadata(0, middle);
-    // await RecordMetadata(middle + 1, records.length - 1);
+    const recordMetadata = await RecordMetadata();
 
-    chaiExpect(metadata).to.be.an('array');
+    recordMetadata.forEach(({ record, isStatic, astNodeType }) => {
+      chaiExpect(record).to.be.an('object');
+      chaiExpect(astNodeType).to.be.an('string');
+      chaiExpect(isStatic).to.be.an('boolean');
+      chaiExpect(astNodeType).to.be.oneOf(['MemberExpression', 'NewExpression', 'CallExpression']);
+    });
+  });
 
-    for (const record of metadata) {
-      chaiExpect(record).to.be.a('string');
-      chaiExpect(record).to.be.oneOf(['MemberExpression', 'NewExpression', 'CallExpression']);
-    }
-
-    // expect(metadata).toContain('NewExpression');
-    // expect(metadata).toContain('CallExpression');
+  it.skip('should have expected length', async () => {
+    expect((await RecordMetadata()).length).to.equal(ofAPIType('js').length);
   });
 });

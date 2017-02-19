@@ -54,7 +54,7 @@ export type RecordType = {
 
   /**
    * A stringified protoChain
-   * ex. ['fetch'] => 'window.fetch'
+   * ex. ['fetch'] => 'fetch'
    */
   protoChainId: string,
 
