@@ -21,17 +21,17 @@ async function testDetermineASTNodeType(protoChain: Array<string>) {
 
 describe('determineASTNodeType()', () => {
   it('should determine MemberExpressions', async () => {
-    expect(await testDetermineASTNodeType(['window', 'fetch']))
+    expect(await testDetermineASTNodeType(['fetch']))
       .toEqual(['CallExpression']);
   });
 
   it('should determine NewExpression', async () => {
-    expect(await testDetermineASTNodeType(['window', 'Array']))
+    expect(await testDetermineASTNodeType(['Array']))
       .toEqual(['CallExpression', 'NewExpression']);
   });
 
   it('should determine MemberExpression', async () => {
-    expect(await testDetermineASTNodeType(['window', 'Array', 'push']))
+    expect(await testDetermineASTNodeType(['Array', 'push']))
       .toEqual(['MemberExpression']);
   });
 });
@@ -63,7 +63,7 @@ describe('AssertionFormatter', () => {
         specNames: ['css21', 'css-background-3'],
         type: 'css-api',
         specIsFinished: false,
-        protoChain: ['window', 'CSSStyleDeclaration', 'borderWidth']
+        protoChain: ['CSSStyleDeclaration', 'borderWidth']
       },
       {
         id: 'document-querySelector',
@@ -71,7 +71,7 @@ describe('AssertionFormatter', () => {
         specNames: ['css21', 'css-background-3'],
         type: 'js-api',
         specIsFinished: false,
-        protoChain: ['window', 'Element', 'querySelector']
+        protoChain: ['Element', 'querySelector']
       },
       {
         id: 'array-push',
@@ -79,7 +79,7 @@ describe('AssertionFormatter', () => {
         specNames: ['array', 'push'],
         type: 'js-api',
         specIsFinished: false,
-        protoChain: ['window', 'Array', 'push']
+        protoChain: ['Array', 'push']
       }
     ];
 
@@ -104,7 +104,7 @@ describe('AssertionFormatter', () => {
       specNames: ['css21', 'css-background-3'],
       type: 'css-api',
       specIsFinished: false,
-      protoChain: ['window', 'CSSStyleDeclaration', 'borderWidth']
+      protoChain: ['CSSStyleDeclaration', 'borderWidth']
     };
 
     const { apiIsSupported } = AssertionFormatter(cssAPIRecord);
@@ -126,7 +126,7 @@ describe('AssertionFormatter', () => {
       specNames: ['css21', 'css-background-3'],
       type: 'css-api',
       specIsFinished: false,
-      protoChain: ['window', 'CSSStyleDeclaration', 'flex']
+      protoChain: ['CSSStyleDeclaration', 'flex']
     };
 
     const { apiIsSupported } = AssertionFormatter(cssAPIRecord);
@@ -148,7 +148,7 @@ describe('AssertionFormatter', () => {
       specNames: ['css21', 'css-background-3'],
       type: 'css-api',
       specIsFinished: false,
-      protoChain: ['window', 'CSSStyleDeclaration', 'superWidth']
+      protoChain: ['CSSStyleDeclaration', 'superWidth']
     };
 
     const { apiIsSupported } = AssertionFormatter(cssAPIRecord);
@@ -166,15 +166,15 @@ describe('AssertionFormatter', () => {
   describe('AssertionFormatter', () => {
     const assertions = [
       {
-        protoChain: ['window', 'document', 'querySelector'],
+        protoChain: ['document', 'querySelector'],
         isStatic: true
       },
       {
-        protoChain: ['window', 'Array', 'push'],
+        protoChain: ['Array', 'push'],
         isStatic: false
       },
       {
-        protoChain: ['window', 'alert'],
+        protoChain: ['alert'],
         isStatic: true
       }
     ].map(assertion => ({

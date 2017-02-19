@@ -17,15 +17,15 @@ const capability = {
 };
 const records = [
   {
-    protoChain: ['window', 'Document', 'querySelector'],
-    protoChainId: 'window.Document.querySelector',
+    protoChain: ['document', 'querySelector'],
+    protoChainId: 'document.querySelector',
     name: 'document.querySelector',
     type: 'js-api'
   },
   {
     type: 'css-api',
-    protoChainId: 'window.CSSStyleDeclaration.borderWidth',
-    protoChain: ['window', 'CSSStyleDeclaration', 'borderWidth']
+    protoChainId: 'CSSStyleDeclaration.borderWidth',
+    protoChain: ['CSSStyleDeclaration', 'borderWidth']
   }
 ];
 
@@ -89,7 +89,7 @@ describe('Comapt', () => {
     const result = [{
       id: 1,
       name: 'chrome',
-      protoChainId: 'window.Document.querySelector',
+      protoChainId: 'Document.querySelector',
       versions: '{"41.0":"y","42.0":"y","43.0":"y","44.0":"y","45.0":"y","46.0":"y","47.0":"y","48.0":"y","49.0":"y","50.0":"y","51.0":"y","52.0":"y","53.0":"y","54.0":"y","55.0":"y","56.0":"y"}',
       type: 'js-api',
       caniuseId: 'chrome'

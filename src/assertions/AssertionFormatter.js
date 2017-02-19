@@ -5,11 +5,10 @@
  *
  * @flow
  */
-
-/* eslint fp/no-throw: 0 */
-
 import type { RecordType } from '../providers/RecordType';
 
+
+/* eslint fp/no-throw: 0 */
 
 type AssertionFormatterType = {
   apiIsSupported: string
@@ -27,7 +26,7 @@ type AssertionFormatterType = {
 
 /**
  * Check if the JS API is defined
- * ex. ['window', 'ServiceWorker'] => 'window.ServiceWorker'
+ * ex. ['ServiceWorker'] => 'window.ServiceWorker'
  * @TODO: Support checking if API is 'prefixed'
  * @HACK: This method assumes that the maximum length of the protoChain is 3
  * @HACK: Method's that throw errors upon property access are usually supported
@@ -64,8 +63,8 @@ function formatJSAssertion(record: RecordType): string {
  * Takes a `protoChain` and returns bool if supported. Should only be run if
  * supported. Evaluation returns true if defined
  *
- * ex. ['window', 'Array', 'push'] => false
- * ex. ['window', 'document', 'querySelector'] => true
+ * ex. ['Array', 'push'] => false
+ * ex. ['document', 'querySelector'] => true
  */
 export function determineIsStatic(record: RecordType): string {
   return `
@@ -109,7 +108,7 @@ export function determineASTNodeType(record: RecordType): string {
     (function() {
       var items = []
       if (
-        ${length} <= 2 &&
+        ${length} <= 1 &&
         typeof ${api} === 'function'
       ) {
         items.push('CallExpression')
@@ -119,7 +118,7 @@ export function determineASTNodeType(record: RecordType): string {
         new ${api}()
         items.push('NewExpression')
       } catch (e) {
-        if (${length} > 2) {
+        if (${length} > 1) {
           items.push('MemberExpression')
         }
       }

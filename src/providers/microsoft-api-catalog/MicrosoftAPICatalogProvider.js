@@ -67,8 +67,8 @@ export default function MicrosoftAPICatalogProvider(): Array<RecordType> {
       specNames: fRecord.specNames,
       type: 'js-api',
       specIsFinished: fRecord.spec,
-      protoChain: ['window', fRecord.parentName, fRecord.name],
-      protoChainId: ['window', fRecord.parentName, fRecord.name].join('.')
+      protoChain: [fRecord.parentName, fRecord.name],
+      protoChainId: [fRecord.parentName, fRecord.name].join('.')
     }))
     .filter(record => (
       !ignoredAPIs.includes(record.name) &&
