@@ -24,19 +24,18 @@ export function validateRecords(records) {
 
 export function hasDuplicates(records) {
   records.forEach((record) => {
+    let count = 0;
     records.forEach((comparedRecord) => {
-      let count = 0;
       if (
         record.caniuseId === comparedRecord.caniuseId &&
         record.protoChainId === comparedRecord.protoChainId
       ) {
         count += 1;
       }
-      if (count > 1) {
-        throw new Error(`Duplicate record ${record.protoChainId} in ${record.caniuseId}`);
-      }
-      return true;
     });
+    if (count > 1) {
+      throw new Error(`Duplicate record ${record.protoChainId} in ${record.caniuseId}`);
+    }
   });
 }
 

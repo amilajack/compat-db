@@ -1,3 +1,4 @@
+import { expect as chaiExpect } from 'chai';
 import HasPrefix from '../src/helpers/HasPrefix';
 import {
   getAllVersionsOfTarget,
@@ -139,7 +140,7 @@ describe('validateRecords', () => {
       { name: 'opera', caniuseId: 'opera', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' },
       { name: 'opera', caniuseId: 'opera', protoChainId: 'window.AnalyserNode.getByteFrequencyData', type: 'js-api' }
     ];
-    expect(validateRecords(brokenRecords)).toThrow();
+    chaiExpect(() => validateRecords(brokenRecords)).to.throw(Error);
   });
 });
 
@@ -151,7 +152,7 @@ describe('hasDuplicates', () => {
       { name: 'opera', caniuseId: 'opera', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' },
       { name: 'opera', caniuseId: 'opera', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' }
     ];
-    expect(hasDuplicates(brokenRecords)).toThrow();
+    chaiExpect(() => hasDuplicates(brokenRecords)).to.throw(Error);
   });
 });
 
@@ -164,7 +165,7 @@ describe('isBrowserMissing', () => {
       { name: 'opera', caniuseId: 'opera', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' },
       { name: 'ie', caniuseId: 'ie', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' }
     ];
-    expect(isBrowserMissing(brokenRecords)).toThrow();
+    chaiExpect(() => isBrowserMissing(brokenRecords)).to.throw(Error);
   });
 });
 
@@ -177,7 +178,7 @@ describe('isRecordMissing', () => {
       { name: 'opera', caniuseId: 'opera', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' },
       { name: 'ie', caniuseId: 'ie', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' }
     ];
-    expect(isRecordMissing(brokenRecords)).toThrow();
+    chaiExpect(() => isRecordMissing(brokenRecords)).to.throw(Error);
   });
 });
 
@@ -190,6 +191,6 @@ describe('RecordsValidator', () => {
       { name: 'opera', caniuseId: 'opera', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' },
       { name: 'ie', caniuseId: 'ie', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' }
     ];
-    expect(RecordsValidator(brokenRecords)).toThrow();
+    chaiExpect(() => RecordsValidator(brokenRecords)).to.not.throw(Error);
   });
 });
