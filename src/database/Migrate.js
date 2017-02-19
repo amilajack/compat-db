@@ -1,10 +1,10 @@
 import { migrate } from './TmpDatabase';
-import JobQueue from '../../src/database/JobQueueDatabase';
+import JobQueueDatabase from '../../src/database/JobQueueDatabase';
 
 
 migrate();
 
-const jobQueue = new JobQueue();
+const jobQueue = new JobQueueDatabase();
 
 jobQueue
   .migrate()

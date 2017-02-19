@@ -5,9 +5,7 @@
 import AbstractDatabase from './AbstractDatabase';
 
 
-/* eslint fp/no-this: 0, fp/no-class: 0, class-methods-use-this: 0 */
-
-export type schemaType = {
+export type JobQueueType = {
   name: string,
   browserName: string,
   protoChainId: string,
@@ -17,8 +15,6 @@ export type schemaType = {
   type: 'js-api' | 'css-api' | 'html-api',
   caniuseId: string,
 };
-
-type JobQueueType = schemaType;
 
 type whereClauseType = {
   browserName: string,
@@ -57,13 +53,13 @@ export default class JobQueue extends AbstractDatabase {
   }
 
   /**
-   * Override paramater type with stricter 'Array<schemaType>'
+   * Override paramater type with stricter 'Array<JobQueueType>'
    */
-  insertBulk(recordsToInsert: Array<schemaType>) {
+  insertBulk(recordsToInsert: Array<JobQueueType>) {
     return super.insertBulk(recordsToInsert);
   }
 
-  remove(whereStatement: schemaType) {
+  remove(whereStatement: JobQueueType) {
     return super.remove(whereStatement);
   }
 

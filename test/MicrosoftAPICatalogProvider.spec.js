@@ -1,4 +1,4 @@
-import { camelCaseToHyphen } from '../src/providers/api-catalog/APICatalogProvider';
+import { camelCaseToHyphen } from '../src/providers/microsoft-api-catalog/MicrosoftAPICatalogProvider';
 
 
 describe('APICatalog', () => {

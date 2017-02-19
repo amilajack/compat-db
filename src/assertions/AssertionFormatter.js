@@ -8,7 +8,7 @@
 
 /* eslint fp/no-throw: 0 */
 
-import type { RecordType } from '../providers/ProviderType';
+import type { RecordType } from '../providers/RecordType';
 
 
 type AssertionFormatterType = {

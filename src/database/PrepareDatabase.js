@@ -2,10 +2,8 @@
 // $FlowFixMe: Flow requires type definition
 import { agents } from 'caniuse-db/fulldata-json/data-2.0.json'; // eslint-disable-line
 import { writeFileSync } from 'fs';
-import type { RecordType } from '../providers/ProviderType';
+import type { RecordType } from '../providers/RecordType';
 
-
-/* eslint fp/no-mutation: 0 */
 
 /**
  * Prepare the database for compat-tests. This includes formatting the layout of

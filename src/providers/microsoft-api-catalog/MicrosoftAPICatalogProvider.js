@@ -1,7 +1,7 @@
 // @flow
-import APICatalog from './apicatalogdata.json';
+import APICatalog from './microsoft-api-catalog-data.json';
 import HasPrefix from '../../helpers/HasPrefix';
-import type { RecordType } from '../ProviderType';
+import type { RecordType } from '../RecordType';
 
 
 type APICatalogType = Array<{
@@ -35,7 +35,7 @@ export function camelCaseToHyphen(string: string): string {
 /**
  * @TODO: Allow overriding database records
  */
-export default function APICatalogProvider(): Array<RecordType> {
+export default function MicrosoftAPICatalogProvider(): Array<RecordType> {
   const formattedRecords = [];
   const ignoredAPIs = ['arguments', 'caller', 'constructor', 'length', 'name', 'prototype'];
 

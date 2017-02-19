@@ -6,17 +6,16 @@ import { join } from 'path';
 import Knex from 'knex';
 import bookshelf from 'bookshelf';
 import dotenv from 'dotenv';
-import type { RecordType as RType } from '../providers/ProviderType';
+import type { RecordType as RType } from '../providers/RecordType';
 
 
-/* eslint fp/no-let: 0, fp/no-loops: 0, fp/no-mutation: 0, fp/no-throw: 0 */
 // @TODO: Extend AbstractDatabase
 
 dotenv.config();
 
 type str = string;
 
-export type schemaType = {
+export type TmpDatabaseType = {
   name: string,
   versions: {
     [version: string]: 'y' | 'n' | 'n/a'
@@ -87,10 +86,12 @@ export async function migrate() {
 
 export const { Database } = initializeDatabaseConnection();
 
+type sameRecordType = Promise<TmpDatabaseType>;
+
 /**
  * Find all the compatibility records for every version of the same browser
  */
-export function findSameVersionCompatRecord(record: RType, caniuseId: str): Promise<schemaType> {
+export function findSameVersionCompatRecord(record: RType, caniuseId: str): sameRecordType {
   return Database.where({
     name: caniuseId,
     type: record.type,
