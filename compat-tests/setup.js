@@ -1,6 +1,6 @@
 // @flow
 import { ofAPIType } from '../src/providers/Providers';
-import JobQueue from '../src/database/JobQueueDatabase';
+import JobQueueDatabase from '../src/database/JobQueueDatabase';
 import * as TmpRecordDatabase from '../src/database/TmpDatabase';
 import { browserNameToCaniuseMappings } from '../src/helpers/Constants';
 import {
@@ -17,7 +17,7 @@ export type browserCapabilityType = {
 };
 
 export default async function createJobsFromRecords(): Promise<Array<browserCapabilityType>> {
-  const queue = new JobQueue();
+  const queue = new JobQueueDatabase();
   const records = ofAPIType('js');
 
   // If there are jobs in the queue already, skip the following steps

@@ -6,15 +6,11 @@ import dotenv from 'dotenv';
 import type { RecordType as RType } from '../providers/RecordType';
 
 
-/* eslint fp/no-let: 0, fp/no-this: 0, fp/no-loops: 0, fp/no-mutation: 0,
-          fp/no-throw: 0, fp/no-class: 0, class-methods-use-this: 0
-*/
-
 dotenv.config();
 
 type str = string;
 
-export type schemaType = {
+export type AbstractDatabaseType = {
   name: str,
   versions: {
     [version: str]: 'y' | 'n' | 'n/a'
@@ -113,7 +109,7 @@ export default class AbstractDatabase {
   /**
    * Find all the compatibility records for every version of the same browser
    */
-  findSameVersionCompatRecord(record: RType, caniuseId: str): Promise<schemaType> {
+  findSameVersionCompatRecord(record: RType, caniuseId: str): Promise<AbstractDatabaseType> {
     return this.connection.Database.where({
       name: caniuseId,
       type: record.type,

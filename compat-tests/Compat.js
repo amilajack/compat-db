@@ -7,16 +7,16 @@ import {
   insertBulkRecords,
   findSameVersionCompatRecord } from '../src/database/TmpDatabase';
 import { getVersionsToMark } from '../src/helpers/GenerateVersions';
-import JobQueue from '../src/database/JobQueueDatabase';
+import JobQueueDatabase from '../src/database/JobQueueDatabase';
 import setup from './setup';
 import type { RecordType } from '../src/providers/RecordType';
-import type { schemaType as JobQueueType } from '../src/database/JobQueueDatabase';
+import type { JobQueueType } from '../src/database/JobQueueDatabase';
 import type { browserCapabilityType } from './setup';
 
 
 /* eslint no-console: 0 */
 
-const jobQueue = new JobQueue();
+const jobQueue = new JobQueueDatabase();
 
 dotenv.config();
 

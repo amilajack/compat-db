@@ -5,8 +5,6 @@ import { writeFileSync } from 'fs';
 import type { RecordType } from '../providers/RecordType';
 
 
-/* eslint fp/no-mutation: 0 */
-
 /**
  * Prepare the database for compat-tests. This includes formatting the layout of
  * the database to fit our 'schema'. Here' we initialize certain fields and can
