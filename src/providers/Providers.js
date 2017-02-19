@@ -11,14 +11,14 @@
 
 /* eslint fp/no-throw: 0 */
 
-import APICatalogProvider from './api-catalog/APICatalogProvider';
+import MicrosoftAPICatalogProvider from './microsoft-api-catalog/MicrosoftAPICatalogProvider';
 import type { RecordType } from './RecordType';
 
 
-export default APICatalogProvider;
+export default MicrosoftAPICatalogProvider;
 
 export function find(id: string): RecordType {
-  const foundRecord = APICatalogProvider().find(record => record.id === id);
+  const foundRecord = MicrosoftAPICatalogProvider().find(record => record.id === id);
 
   if (foundRecord) return foundRecord;
 
@@ -30,6 +30,7 @@ export function find(id: string): RecordType {
 // export function filterByProtoChain(chain: Array<string>): RecordType {}
 
 export function ofAPIType(type: 'css' | 'js' | 'html'): Array<RecordType> {
-  return APICatalogProvider()
-    .filter(record => record.type === `${type}-api`);
+  return MicrosoftAPICatalogProvider().filter(record =>
+    record.type === `${type}-api`
+  );
 }
