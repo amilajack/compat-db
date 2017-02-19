@@ -17,7 +17,7 @@ export function validateRecords(records) {
       expect(record.type).to.exist;
       return true;
     } catch (error) {
-      throw new Error(`Incompatible record: ${record}`);
+      throw new Error(`Incompatible record ${record.protoChainId} in ${record.caniuseId}`);
     }
   });
 }
@@ -33,7 +33,7 @@ export function hasDuplicates(records) {
         count += 1;
       }
       if (count > 1) {
-        throw new Error(`Duplicate record: ${record}`);
+        throw new Error(`Duplicate record ${record.protoChainId} in ${record.caniuseId}`);
       }
       return true;
     });
@@ -48,8 +48,8 @@ export function isBrowserMissing(records) {
       .filter(browserVersion => browserVersion.browserName === seleniumId);
       const recordVersions = Object.keys(record.versions);
       browserVersions.forEach((version) => {
-        if (!recordVersions.contrains(version.version)) {
-          throw new Error(`Record missing ${version.browserName} version: ${version.version}`);
+        if (!recordVersions.includes(version.version)) {
+          throw new Error(`Record ${record.protoChainId} missing in ${version.browserName} version: ${version.version}`);
         }
       });
     } else {
@@ -58,8 +58,8 @@ export function isBrowserMissing(records) {
       .filter(browserVersion => browserVersion.browserName === seleniumId);
       const recordVersions = Object.keys(record.versions);
       browserVersions.forEach((version) => {
-        if (!recordVersions.contrains(version.version)) {
-          throw new Error(`Record missing ${version.browserName} version: ${version.version}`);
+        if (!recordVersions.includes(version.version)) {
+          throw new Error(`Record ${record.protoChainId} missing in ${version.browserName} version: ${version.version}`);
         }
       });
     }
@@ -77,14 +77,14 @@ export function isRecordMissing(records) {
       }
     });
     browsers.forEach((browser) => {
-      if (!validatedRecords.contains(browser)) {
-        throw new Error(`ProtoChainId ${requiredRecord} is missing from: ${browser}`);
+      if (!validatedRecords.includes(browser)) {
+        throw new Error(`ProtoChainId ${requiredRecord.protoChainId} is missing from: ${browser}`);
       }
     });
   });
 }
 
-export default async function RecordsValidator() {
+export async function RecordsValidator() {
   const records = await TmpDatabase.getAll();
   validateRecords(records);
   hasDuplicates(records);

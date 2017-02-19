@@ -137,14 +137,14 @@ describe('validateRecords', () => {
       { name: 'opera', caniuseId: 'opera', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AbstractView.document', type: 'js-api' },
       { name: 'opera', caniuseId: 'opera', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.Animation.cancel', type: 'js-api' },
       { name: 'opera', caniuseId: 'opera', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' },
-      { name: 'opera', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AnalyserNode.getByteFrequencyData', type: 'js-api' }
+      { name: 'opera', caniuseId: 'opera', protoChainId: 'window.AnalyserNode.getByteFrequencyData', type: 'js-api' }
     ];
     expect(validateRecords(brokenRecords)).toThrow();
   });
 });
 
 describe('hasDuplicates', () => {
-  it('should throw an error if a record is missing a property', () => {
+  it('should throw an error if there are duplicated records', () => {
     const brokenRecords = [
       { name: 'opera', caniuseId: 'opera', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AbstractView.document', type: 'js-api' },
       { name: 'opera', caniuseId: 'opera', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.Animation.cancel', type: 'js-api' },
@@ -156,7 +156,7 @@ describe('hasDuplicates', () => {
 });
 
 describe('isBrowserMissing', () => {
-  it('should throw an error if a record is missing a property', () => {
+  it('should throw an error if browser is missing', () => {
     const brokenRecords = [
       { name: 'chrome', caniuseId: 'chrome', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' },
       { name: 'safari', caniuseId: 'safari', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' },
@@ -169,7 +169,7 @@ describe('isBrowserMissing', () => {
 });
 
 describe('isRecordMissing', () => {
-  it('should throw an error if a record is missing a property', () => {
+  it('should throw an error if a record is missing', () => {
     const brokenRecords = [
       { name: 'chrome', caniuseId: 'chrome', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' },
       { name: 'safari', caniuseId: 'safari', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' },
@@ -182,7 +182,7 @@ describe('isRecordMissing', () => {
 });
 
 describe('RecordsValidator', () => {
-  it('should throw an error if a record is missing a property', () => {
+  it('should throw an error if there are any any invalid records', () => {
     const brokenRecords = [
       { name: 'chrome', caniuseId: 'chrome', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' },
       { name: 'safari', caniuseId: 'safari', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' },
