@@ -1,18 +1,18 @@
 import { expect } from 'chai';
 import Providers from '../providers/Providers';
 import * as TmpDatabase from '../database/TmpDatabase';
+import { caniuseToSeleniumMappings, fixedBrowserVersions, caniuseBrowsers } from './Constants';
+import { allTargets } from './GenerateVersions';
 
 
 /* eslint no-unused-expressions: 0, fp/no-let: 0 */
 
-function validateRecords(records) {
+export function validateRecords(records) {
   records.forEach((record) => {
     try {
       expect(record.name).to.be.a('string');
-      expect(record.id).to.be.a('string');
-      expect(record.specNames).to.be.an('array');
-      expect(record.specIsFinished).to.be.a('boolean');
-      expect(record.protoChain).to.be.an('array');
+      expect(record.caniuseId).to.be.a('string');
+      expect(record.versions).to.be.an('object');
       expect(record.protoChainId).to.be.a('string');
       expect(record.type).to.exist;
       return true;
@@ -22,7 +22,7 @@ function validateRecords(records) {
   });
 }
 
-function hasDuplicates(records) {
+export function hasDuplicates(records) {
   records.forEach((record) => {
     records.forEach((comparedRecord) => {
       let count = 0;
@@ -40,12 +40,54 @@ function hasDuplicates(records) {
   });
 }
 
-function isBrowserMissing(records) {
+export function isBrowserMissing(records) {
+  records.forEach((record) => {
+    const seleniumId = caniuseToSeleniumMappings[record.caniuseId];
+    if (seleniumId !== 'chrome' || seleniumId !== 'firefox') {
+      const browserVersions = fixedBrowserVersions
+      .filter(browserVersion => browserVersion.browserName === seleniumId);
+      const recordVersions = Object.keys(record.versions);
+      browserVersions.forEach((version) => {
+        if (!recordVersions.contrains(version.version)) {
+          throw new Error(`Record missing ${version.browserName} version: ${version.version}`);
+        }
+      });
+    } else {
+      const allBrowserVersions = allTargets();
+      const browserVersions = allBrowserVersions
+      .filter(browserVersion => browserVersion.browserName === seleniumId);
+      const recordVersions = Object.keys(record.versions);
+      browserVersions.forEach((version) => {
+        if (!recordVersions.contrains(version.version)) {
+          throw new Error(`Record missing ${version.browserName} version: ${version.version}`);
+        }
+      });
+    }
+  });
+}
 
+export function isRecordMissing(records) {
+  const requiredRecords = Providers();
+  const browsers = caniuseBrowsers;
+  requiredRecords.forEach((requiredRecord) => {
+    const validatedRecords = [];
+    records.forEach((record) => {
+      if (requiredRecord.protoChainId === record.protoChainId) {
+        validateRecords.push(record.caniuseId);
+      }
+    });
+    browsers.forEach((browser) => {
+      if (!validatedRecords.contains(browser)) {
+        throw new Error(`ProtoChainId ${requiredRecord} is missing from: ${browser}`);
+      }
+    });
+  });
 }
 
 export default async function RecordsValidator() {
   const records = await TmpDatabase.getAll();
   validateRecords(records);
   hasDuplicates(records);
+  isBrowserMissing(records);
+  isRecordMissing(records);
 }

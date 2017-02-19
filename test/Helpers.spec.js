@@ -6,7 +6,13 @@ import {
   convertBrowserNametoCaniuse,
   filterDuplicateTargets,
   getVersionsToMark } from '../src/helpers/GenerateVersions';
-
+import {
+  validateRecords,
+  hasDuplicates,
+  isBrowserMissing,
+  isRecordMissing,
+  RecordsValidator
+} from '../src/helpers/RecordsValidator';
 
 describe('HasPrefix', () => {
   it('should check vendor prefixes for JS APIs', () => {
@@ -122,5 +128,68 @@ describe('GenerateVersions', () => {
   it('should should get all target versions: getAllVersionsOfTarget()', () => {
     expect(getAllVersionsOfTarget('safari'))
       .toEqual(['6.0', '7.0', '8.0', '9.0', '10.0']);
+  });
+});
+
+describe('validateRecords', () => {
+  it('should throw an error if a record is missing a property', () => {
+    const brokenRecords = [
+      { name: 'opera', caniuseId: 'opera', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AbstractView.document', type: 'js-api' },
+      { name: 'opera', caniuseId: 'opera', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.Animation.cancel', type: 'js-api' },
+      { name: 'opera', caniuseId: 'opera', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' },
+      { name: 'opera', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AnalyserNode.getByteFrequencyData', type: 'js-api' }
+    ];
+    expect(validateRecords(brokenRecords)).toThrow();
+  });
+});
+
+describe('hasDuplicates', () => {
+  it('should throw an error if a record is missing a property', () => {
+    const brokenRecords = [
+      { name: 'opera', caniuseId: 'opera', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AbstractView.document', type: 'js-api' },
+      { name: 'opera', caniuseId: 'opera', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.Animation.cancel', type: 'js-api' },
+      { name: 'opera', caniuseId: 'opera', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' },
+      { name: 'opera', caniuseId: 'opera', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' }
+    ];
+    expect(hasDuplicates(brokenRecords)).toThrow();
+  });
+});
+
+describe('isBrowserMissing', () => {
+  it('should throw an error if a record is missing a property', () => {
+    const brokenRecords = [
+      { name: 'chrome', caniuseId: 'chrome', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' },
+      { name: 'safari', caniuseId: 'safari', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' },
+      { name: 'firefox', caniuseId: 'firefox', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' },
+      { name: 'opera', caniuseId: 'opera', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' },
+      { name: 'ie', caniuseId: 'ie', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' }
+    ];
+    expect(isBrowserMissing(brokenRecords)).toThrow();
+  });
+});
+
+describe('isRecordMissing', () => {
+  it('should throw an error if a record is missing a property', () => {
+    const brokenRecords = [
+      { name: 'chrome', caniuseId: 'chrome', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' },
+      { name: 'safari', caniuseId: 'safari', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' },
+      { name: 'firefox', caniuseId: 'firefox', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' },
+      { name: 'opera', caniuseId: 'opera', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' },
+      { name: 'ie', caniuseId: 'ie', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' }
+    ];
+    expect(isRecordMissing(brokenRecords)).toThrow();
+  });
+});
+
+describe('RecordsValidator', () => {
+  it('should throw an error if a record is missing a property', () => {
+    const brokenRecords = [
+      { name: 'chrome', caniuseId: 'chrome', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' },
+      { name: 'safari', caniuseId: 'safari', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' },
+      { name: 'firefox', caniuseId: 'firefox', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' },
+      { name: 'opera', caniuseId: 'opera', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' },
+      { name: 'ie', caniuseId: 'ie', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' }
+    ];
+    expect(RecordsValidator(brokenRecords)).toThrow();
   });
 });

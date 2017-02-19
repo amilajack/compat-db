@@ -20,6 +20,24 @@ export const browserNameToCaniuseMappings = {
   // '': 'samsung'
 };
 
+export const caniuseToSeleniumMappings = {
+  chrome: 'chrome',
+  firefox: 'firefox',
+  opera: 'opera',
+  safari: 'safari',
+  ie: 'internet explorer',
+  edge: 'MicrosoftEdge'
+};
+
+export const caniuseBrowsers = [
+  'chrome',
+  'firefox',
+  'opera',
+  'safari',
+  'ie',
+  'edge'
+];
+
 export const fixedBrowserVersions = [
   // Opera: 2 versions
   { browserName: 'opera', platform: 'Windows 7', version: '12.12' },
