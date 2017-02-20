@@ -6,16 +6,28 @@ import AbstractDatabase from './AbstractDatabase';
 
 
 export default class RecordMetabaseDatabase extends AbstractDatabase {
-  constructor() {
-    super('record-metadata');
+  constructor(name: string = 'record-metadata') {
+    super(name);
   }
 
   migrate() {
     return super.migrate((table) => {
       table.increments('id').primary();
-      table.enu('protoChainId', ['MemberExpression', 'NewExpression', 'CallExpression']);
+      table.string('protoChainId');
+      table.enu('astNodeType', ['MemberExpression', 'NewExpression', 'CallExpression']);
       table.boolean('isStatic');
-      table.json('astNodeType');
+      table.enu('type', ['js-api', 'css-api', 'html-api']);
     });
+  }
+
+  getAll(): Promise<Array<Object>> {
+    return this.connection.Database
+      .forge()
+      .fetchAll()
+      .then(records => records.toJSON())
+      .then(records => records.map(each => ({
+        ...each,
+        isStatic: Boolean(each.isStatic)
+      })));
   }
 }

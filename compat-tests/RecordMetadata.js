@@ -3,11 +3,19 @@ import { expect as chaiExpect } from 'chai';
 import Nightmare from 'nightmare';
 import { ofAPIType } from '../src/providers/Providers';
 import AssertionFormatter from '../src/assertions/AssertionFormatter';
+import RecordMetadataDatabase from '../src/database/RecordMetadataDatabase';
+import type { RecordType } from '../src/providers/RecordType';
 
 
-/* eslint no-eval: 0 */
+/* eslint no-eval: 0, max-len: ['error', 120] */
 
-export default async function RecordMetadata(startIndex: number = 0, endIndex: number) {
+type RecordMetadataType = Promise<Array<{
+  astNodeType: 'MemberExpression' | 'CallExpression' | 'NewExpression',
+  isStatic: bool,
+  record: RecordType
+}>>;
+
+async function RecordMetadata(startIndex: number = 0, endIndex?: number): RecordMetadataType {
   const filteredRecords =
     ofAPIType('js')
       .filter(record => !record.protoChain.includes('RegExp'));
@@ -91,4 +99,26 @@ export default async function RecordMetadata(startIndex: number = 0, endIndex: n
     !!each.isStatic &&
     !!each.record
   );
+}
+
+export default RecordMetadata;
+
+/**
+ * Migrate the 'record-metadata' table and write the records to it
+ */
+export async function writeRecordMetadataToDB() {
+  const metadata = await RecordMetadata();
+
+  const recordMetadataDatabase = new RecordMetadataDatabase();
+  await recordMetadataDatabase.migrate();
+
+  const metadataToInsert = metadata.map(each => ({
+    protoChainId: each.record.protoChainId,
+    astNodeType: each.astNodeType,
+    isStatic: each.isStatic
+  }));
+
+  await recordMetadataDatabase.insertBulk(metadataToInsert);
+
+  return metadataToInsert;
 }
