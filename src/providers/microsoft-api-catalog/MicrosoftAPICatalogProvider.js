@@ -17,7 +17,7 @@ type MicrosoftAPICatalogProviderType = Array<{
 export function interceptAndFormat(parentObjectId: string): string {
   const APIsToLowercase = new Set([
     'Console', 'Window', 'Document', 'External', 'History', 'Location', 'Navigator', 'Performance',
-    'Screen'
+    'Screen', 'defaultStatus'
   ]);
 
   return APIsToLowercase.has(parentObjectId)
@@ -52,15 +52,25 @@ export default function MicrosoftAPICatalogProvider(): Array<RecordType> {
 
   // Convert two dimentional records to single dimentional array
   (MicrosoftAPICatalog: MicrosoftAPICatalogProviderType)
-    .forEach(record => record.apis.forEach(api =>
-      // @TODO: Properly strip vendor prefixes and check if non-prefixed API
-      //        exists. If not, create the record for it
+    .forEach(record => {
       formattedRecords.push({
-        ...api,
+        ...record,
         spec: record.spec || false,
+        protoChain: [interceptAndFormat(record.name)],
+        protoChainId: interceptAndFormat(record.name),
         parentName: record.name
-      })
-    ));
+      });
+
+      record.apis.forEach(api =>
+        // @TODO: Properly strip vendor prefixes and check if non-prefixed API
+        //        exists. If not, create the record for it
+        formattedRecords.push({
+          ...api,
+          spec: record.spec || false,
+          parentName: record.name
+        })
+      );
+    });
 
   const JSAPIs = formattedRecords
     // Filter all CSS records. For some reason reason, MicrosoftAPICatalog does not report
@@ -78,10 +88,17 @@ export default function MicrosoftAPICatalogProvider(): Array<RecordType> {
       specNames: fRecord.specNames,
       type: 'js-api',
       specIsFinished: fRecord.spec,
-      protoChain: [interceptAndFormat(fRecord.parentName), fRecord.name],
-      protoChainId: [interceptAndFormat(fRecord.parentName), fRecord.name].join('.')
+      protoChain: fRecord.protoChain || [interceptAndFormat(fRecord.parentName), fRecord.name]
+    }))
+    // Remove 'window' from the protochain
+    .map(record => ({
+      ...record,
+      protoChain: record.protoChain.filter(e => e !== 'window'),
+      protoChainId: record.protoChain.filter(e => e !== 'window').join('.')
     }))
     .filter(record => (
+      record.name !== 'defaultStatus' &&
+      record.protoChain.length !== 0 &&
       !ignoredAPIs.includes(record.name) &&
       !HasPrefix(record.name) &&
       !HasPrefix(record.protoChainId) &&

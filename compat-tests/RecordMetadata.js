@@ -16,6 +16,11 @@ type RecordMetadataType = Promise<Array<{
   type: 'js-api' | 'css-api' | 'html-api'
 }>>;
 
+/**
+ * @HACK: Tests wont run unless the tests are parallelized across browsers
+ *        This is a temporary solution that creates two browser sessions and
+ *        runs tests on them
+ */
 export function parallelizeBrowserTests(tests: Array<string>) {
   const middle = Math.floor(tests.length / 2);
 
@@ -40,8 +45,17 @@ export function parallelizeBrowserTests(tests: Array<string>) {
       .end()
   ])
   .then(res => res.reduce((p, c) => [...c, ...p]));
+  // .then(([first, second]) => first.concat(second));
 }
 
+/**
+ * Find all the records that are supported by our local testing browser (nightmare)
+ * For every supported API, determine it's ast node type and if it is static or
+ * an instance method or property
+ *
+ * @TODO; Determine if an API is polyfillable
+ * @TODO; Determine if type of the api (ex. number, string, function, etc)
+ */
 async function RecordMetadata(startIndex: number = 0, endIndex?: number): RecordMetadataType {
   const filteredRecords =
     ofAPIType('js')
@@ -94,7 +108,7 @@ async function RecordMetadata(startIndex: number = 0, endIndex?: number): Record
 
   const astNodeTypeResults =
     await parallelizeBrowserTests(determineASTNodeTypeTests).then(finishedTests =>
-      finishedTests.map(each => each[0])
+      finishedTests.map(JSON.stringify)
     );
 
   const isStaticResults =
@@ -103,6 +117,7 @@ async function RecordMetadata(startIndex: number = 0, endIndex?: number): Record
   chaiExpect(determineASTNodeTypeTests.length).to.equal(astNodeTypeResults.length);
   chaiExpect(determineIsStaticTests.length).to.equal(isStaticResults.length);
   chaiExpect(isStaticResults.length).to.equal(astNodeTypeResults.length);
+  chaiExpect(tests.length).to.equal(astNodeTypeResults.length);
 
   console.log(`${astNodeTypeResults.length} ast node types found`);
   console.log(`${isStaticResults.length} static apis`);

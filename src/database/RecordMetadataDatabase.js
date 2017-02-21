@@ -14,8 +14,9 @@ export default class RecordMetabaseDatabase extends AbstractDatabase {
     return super.migrate((table) => {
       table.increments('id').primary();
       table.string('protoChainId');
-      table.enu('astNodeType', ['MemberExpression', 'NewExpression', 'CallExpression']);
+      table.string('astNodeType');
       table.boolean('isStatic');
+      table.boolean('polyfillable');
       table.enu('type', ['js-api', 'css-api', 'html-api']);
     });
   }

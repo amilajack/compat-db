@@ -20,7 +20,7 @@ describe('Providers', () => {
       expect(ofAPIType('css').length).toBeGreaterThan(300);
       expect(ofAPIType('js').length).toBeGreaterThan(10000);
       expect(ofAPIType('css').length).toBeLessThan(2000);
-      expect(ofAPIType('js').length).toBeLessThan(12000);
+      expect(ofAPIType('js').length).toBeLessThan(13000);
     });
   });
 
@@ -102,7 +102,7 @@ describe('Providers', () => {
           expect(record.protoChain).toContain('requestAnimationFrame');
         });
 
-        it.skip('should contain currentScript record', () => {
+        it('should contain currentScript record', () => {
           const record = find('currentScript');
           expect(record).toBeDefined();
           expect(record.protoChain).toContain('document');
@@ -175,7 +175,7 @@ describe('Providers', () => {
           expect(record.protoChain).toContain('requestIdleCallback');
         });
 
-        it.skip('should contain IntersectionObserver record', () => {
+        it('should contain IntersectionObserver record', () => {
           const record = find('IntersectionObserver');
           expect(record).toBeDefined();
           expect(record.protoChain).toContain('IntersectionObserver');
@@ -189,7 +189,7 @@ describe('Providers', () => {
 
         it('should contain navigator.serviceWorker record', () => {
           expect(records.find(record =>
-            record.protoChain.includes('Navigator') &&
+            record.protoChain.includes('navigator') &&
             record.protoChain.includes('serviceWorker')
           )).toBeDefined();
 

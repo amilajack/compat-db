@@ -19,12 +19,13 @@ async function testDetermineASTNodeType(protoChain: Array<string>) {
 }
 
 describe('determineASTNodeType()', () => {
-  it('should determine MemberExpressions', async () => {
+  it('should determine CallExpression', async () => {
     expect(await testDetermineASTNodeType(['fetch'])).toEqual(['CallExpression']);
   });
 
   it('should determine NewExpression', async () => {
     expect(await testDetermineASTNodeType(['Array'])).toEqual(['CallExpression', 'NewExpression']);
+    expect(await testDetermineASTNodeType(['IntersectionObserver'])).toEqual(['CallExpression', 'NewExpression']);
   });
 
   it('should determine MemberExpression', async () => {

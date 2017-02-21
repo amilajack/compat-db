@@ -34,7 +34,9 @@ function formatJSAssertion(record: RecordType): string {
   const remainingProtoObject = record.protoChain.filter((e, i) => i > 0);
   const formattedStaticProtoChain = record.protoChain.join('.');
   const lowercaseParentObject = record.protoChain[0].toLowerCase();
+
   const exceptions = new Set(['crypto', 'Crypto']);
+
   const lowercaseSupportTest = `
     if (${String(lowercaseParentObject !== 'function' && !exceptions.has(record.protoChain[0]))}) {
       ${lowercaseParentObject === 'function' || lowercaseParentObject === record.protoChain[0]
@@ -44,6 +46,7 @@ function formatJSAssertion(record: RecordType): string {
         }`}
     }
   `;
+
   return `
     (function () {
       ${lowercaseSupportTest}
@@ -119,16 +122,19 @@ export function determineASTNodeType(record: RecordType): string {
   return `
     (function() {
       var items = []
-      if (${length} <= 1 &&typeof ${api} === 'function') {
+      if (${length} === 1 && typeof ${api} === 'function') {
         items.push('CallExpression')
-      }
-      try {
-        new ${api}()
-        items.push('NewExpression')
-      } catch (e) {
-        if (${length} > 1) {
-          items.push('MemberExpression')
+        try {
+          new ${api}
+          items.push('NewExpression')
+        } catch (e) {
+          if (!e.message.includes('not a constructor')) {
+            items.push('NewExpression')
+          }
         }
+      }
+      else {
+        items.push('MemberExpression')
       }
       return items
     })()

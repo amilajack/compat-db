@@ -14,7 +14,6 @@ describe('RecordMetadata', () => {
       chaiExpect(record).to.be.an('object');
       chaiExpect(isStatic).to.be.a('boolean');
       chaiExpect(astNodeType).to.be.a('string');
-      chaiExpect(astNodeType).to.be.oneOf(['MemberExpression', 'NewExpression', 'CallExpression']);
     });
   });
 
