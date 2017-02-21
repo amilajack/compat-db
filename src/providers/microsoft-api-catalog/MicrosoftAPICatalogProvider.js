@@ -1,10 +1,10 @@
 // @flow
-import APICatalog from './microsoft-api-catalog-data.json';
+import MicrosoftAPICatalog from './microsoft-api-catalog-data.json';
 import HasPrefix from '../../helpers/HasPrefix';
 import type { RecordType } from '../RecordType';
 
 
-type APICatalogType = Array<{
+type MicrosoftAPICatalogProviderType = Array<{
   name: string,
   spec: bool,
   specNames: Array<string>,
@@ -13,6 +13,17 @@ type APICatalogType = Array<{
     specNames: Array<string>
   }>
 }>;
+
+export function interceptAndFormat(parentObjectId: string): string {
+  const APIsToLowercase = new Set([
+    'Console', 'Window', 'Document', 'External', 'History', 'Location', 'Navigator', 'Performance',
+    'Screen'
+  ]);
+
+  return APIsToLowercase.has(parentObjectId)
+    ? parentObjectId.toLowerCase()
+    : parentObjectId;
+}
 
 /**
  * Comvert camelcase phrases to hypen-separated words
@@ -40,7 +51,7 @@ export default function MicrosoftAPICatalogProvider(): Array<RecordType> {
   const ignoredAPIs = ['arguments', 'caller', 'constructor', 'length', 'name', 'prototype'];
 
   // Convert two dimentional records to single dimentional array
-  (APICatalog: APICatalogType)
+  (MicrosoftAPICatalog: MicrosoftAPICatalogProviderType)
     .forEach(record => record.apis.forEach(api =>
       // @TODO: Properly strip vendor prefixes and check if non-prefixed API
       //        exists. If not, create the record for it
@@ -52,7 +63,7 @@ export default function MicrosoftAPICatalogProvider(): Array<RecordType> {
     ));
 
   const JSAPIs = formattedRecords
-    // Filter all CSS records. For some reason reason, APICatalog does not report
+    // Filter all CSS records. For some reason reason, MicrosoftAPICatalog does not report
     // the correctly. Validate that the record's name is a string. Some record
     // names are numbers from some odd reason
     .filter(fRecord =>
@@ -67,8 +78,8 @@ export default function MicrosoftAPICatalogProvider(): Array<RecordType> {
       specNames: fRecord.specNames,
       type: 'js-api',
       specIsFinished: fRecord.spec,
-      protoChain: [fRecord.parentName, fRecord.name],
-      protoChainId: [fRecord.parentName, fRecord.name].join('.')
+      protoChain: [interceptAndFormat(fRecord.parentName), fRecord.name],
+      protoChainId: [interceptAndFormat(fRecord.parentName), fRecord.name].join('.')
     }))
     .filter(record => (
       !ignoredAPIs.includes(record.name) &&

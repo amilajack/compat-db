@@ -33,8 +33,20 @@ type AssertionFormatterType = {
 function formatJSAssertion(record: RecordType): string {
   const remainingProtoObject = record.protoChain.filter((e, i) => i > 0);
   const formattedStaticProtoChain = record.protoChain.join('.');
+  const lowercaseParentObject = record.protoChain[0].toLowerCase();
+  const exceptions = new Set(['crypto', 'Crypto']);
+  const lowercaseSupportTest = `
+    if (${String(lowercaseParentObject !== 'function' && !exceptions.has(record.protoChain[0]))}) {
+      ${lowercaseParentObject === 'function' || lowercaseParentObject === record.protoChain[0]
+        ? ''
+        : `if (typeof ${lowercaseParentObject} !== 'undefined') {
+          throw new Error('${record.protoChain[0]} is not supported but ${lowercaseParentObject} is supported')
+        }`}
+    }
+  `;
   return `
     (function () {
+      ${lowercaseSupportTest}
       try {
         // a
         if (typeof window === 'undefined') { return false }

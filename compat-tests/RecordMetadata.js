@@ -12,8 +12,35 @@ import type { RecordType } from '../src/providers/RecordType';
 type RecordMetadataType = Promise<Array<{
   astNodeType: 'MemberExpression' | 'CallExpression' | 'NewExpression',
   isStatic: bool,
-  record: RecordType
+  record: RecordType,
+  type: 'js-api' | 'css-api' | 'html-api'
 }>>;
+
+export function parallelizeBrowserTests(tests: Array<string>) {
+  const middle = Math.floor(tests.length / 2);
+
+  return Promise.all([
+    Nightmare()
+      .goto('https://example.com')
+      .evaluate(
+        (compatTest) => eval(compatTest),
+        `(function() {
+          return [${tests.slice(0, middle).join(',')}];
+        })()`
+      )
+      .end(),
+    Nightmare()
+      .goto('https://example.com')
+      .evaluate(
+        (compatTest) => eval(compatTest),
+        `(function() {
+          return [${tests.slice(middle).join(',')}];
+        })()`
+      )
+      .end()
+  ])
+  .then(res => res.reduce((p, c) => [...c, ...p]));
+}
 
 async function RecordMetadata(startIndex: number = 0, endIndex?: number): RecordMetadataType {
   const filteredRecords =
@@ -22,32 +49,31 @@ async function RecordMetadata(startIndex: number = 0, endIndex?: number): Record
 
   const records = filteredRecords.slice(startIndex, endIndex || filteredRecords.length - 1);
 
-  const isSupportedTests = await Nightmare()
-    .goto('https://example.com')
-    .evaluate(
-      (compatTest) => eval(compatTest),
-      `(function() {
-        return [${records.map(record => AssertionFormatter(record).apiIsSupported).join(',')}];
-      })()`
-    )
-    .end();
+  const supportedAPITests = (await parallelizeBrowserTests(
+    records.map(record => AssertionFormatter(record).apiIsSupported)
+  ))
+  .map((each, index) => ({
+    record: records[index],
+    isSupported: each
+  }))
+  .filter(each => each.isSupported === true);
 
-  const tests = isSupportedTests
-    .map((each, index) => ({
-      record: records[index],
-      isSupported: each
-    }))
-    .filter(each => each.isSupported === true)
-    .map(({ record }) => ({
-      assertions: AssertionFormatter(record),
-      record
-    }));
+  console.log(`${records.length} records`);
+  console.log(`${supportedAPITests.length} apis are supported`);
+
+  const tests = supportedAPITests.map(({ record }) => ({
+    assertions: AssertionFormatter(record),
+    record
+  }));
 
   const determineASTNodeTypeTests: Array<string> =
     tests.map(test => test.assertions.determineASTNodeType); // eslint-disable-line
 
   const determineIsStaticTests: Array<string> =
     tests.map(test => test.assertions.determineIsStatic); // eslint-disable-line
+
+  chaiExpect(determineASTNodeTypeTests.length).to.equal(supportedAPITests.length);
+  chaiExpect(determineIsStaticTests.length).to.equal(supportedAPITests.length);
 
   determineASTNodeTypeTests.forEach((test) => {
     chaiExpect(test).to.be.a('string');
@@ -66,39 +92,27 @@ async function RecordMetadata(startIndex: number = 0, endIndex?: number): Record
     }
   });
 
-  const astNodeTypeResults = await Nightmare()
-    .goto('https://example.com')
-    .evaluate(
-      (compatTest) => eval(compatTest),
-      `(function() {
-        return [${determineASTNodeTypeTests.join(',')}];
-      })()`
-    )
-    .end()
-    .then(finishedTests => finishedTests.map(each => each[0]));
+  const astNodeTypeResults =
+    await parallelizeBrowserTests(determineASTNodeTypeTests).then(finishedTests =>
+      finishedTests.map(each => each[0])
+    );
 
-  const isStaticResults = await Nightmare()
-    .goto('https://example.com')
-    .evaluate(
-      (compatTest) => eval(compatTest),
-      `(function() {
-        return [${determineIsStaticTests.join(',')}];
-      })()`
-    )
-    .end();
+  const isStaticResults =
+    await parallelizeBrowserTests(determineIsStaticTests);
 
+  chaiExpect(determineASTNodeTypeTests.length).to.equal(astNodeTypeResults.length);
+  chaiExpect(determineIsStaticTests.length).to.equal(isStaticResults.length);
   chaiExpect(isStaticResults.length).to.equal(astNodeTypeResults.length);
 
-  return records.map((record, index) => ({
-    record,
+  console.log(`${astNodeTypeResults.length} ast node types found`);
+  console.log(`${isStaticResults.length} static apis`);
+
+  return tests.map((record, index) => ({
+    record: record.record,
     astNodeType: astNodeTypeResults[index],
-    isStatic: isStaticResults[index]
-  }))
-  .filter(each =>
-    !!each.astNodeType &&
-    !!each.isStatic &&
-    !!each.record
-  );
+    isStatic: isStaticResults[index],
+    type: 'js-api'
+  }));
 }
 
 export default RecordMetadata;
@@ -115,7 +129,8 @@ export async function writeRecordMetadataToDB() {
   const metadataToInsert = metadata.map(each => ({
     protoChainId: each.record.protoChainId,
     astNodeType: each.astNodeType,
-    isStatic: each.isStatic
+    isStatic: each.isStatic,
+    type: each.type
   }));
 
   await recordMetadataDatabase.insertBulk(metadataToInsert);
