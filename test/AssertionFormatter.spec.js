@@ -25,7 +25,8 @@ describe('determineASTNodeType()', () => {
 
   it('should determine NewExpression', async () => {
     expect(await testDetermineASTNodeType(['Array'])).toEqual(['CallExpression', 'NewExpression']);
-    expect(await testDetermineASTNodeType(['IntersectionObserver'])).toEqual(['CallExpression', 'NewExpression']);
+    expect(await testDetermineASTNodeType(['IntersectionObserver'])).toEqual(['NewExpression']);
+    expect(await testDetermineASTNodeType(['DocumentFragment'])).toEqual(['NewExpression']);
   });
 
   it('should determine MemberExpression', async () => {

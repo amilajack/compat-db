@@ -44,8 +44,7 @@ export function parallelizeBrowserTests(tests: Array<string>) {
       )
       .end()
   ])
-  .then(res => res.reduce((p, c) => [...c, ...p]));
-  // .then(([first, second]) => first.concat(second));
+  .then(([first, second]) => first.concat(second));
 }
 
 /**
@@ -72,8 +71,8 @@ async function RecordMetadata(startIndex: number = 0, endIndex?: number): Record
   }))
   .filter(each => each.isSupported === true);
 
-  console.log(`${records.length} records`);
-  console.log(`${supportedAPITests.length} apis are supported`);
+  console.log(`${records.length - 1} records`);
+  console.log(`${supportedAPITests.length - 1} apis are supported`);
 
   const tests = supportedAPITests.map(({ record }) => ({
     assertions: AssertionFormatter(record),
@@ -89,23 +88,6 @@ async function RecordMetadata(startIndex: number = 0, endIndex?: number): Record
   chaiExpect(determineASTNodeTypeTests.length).to.equal(supportedAPITests.length);
   chaiExpect(determineIsStaticTests.length).to.equal(supportedAPITests.length);
 
-  determineASTNodeTypeTests.forEach((test) => {
-    chaiExpect(test).to.be.a('string');
-    try {
-      eval(test);
-    } catch (error) {
-      console.log(error, test);
-    }
-  });
-  determineIsStaticTests.forEach((test) => {
-    chaiExpect(test).to.be.a('string');
-    try {
-      eval(test);
-    } catch (error) {
-      console.log(error, test);
-    }
-  });
-
   const astNodeTypeResults =
     await parallelizeBrowserTests(determineASTNodeTypeTests).then(finishedTests =>
       finishedTests.map(JSON.stringify)
@@ -119,8 +101,8 @@ async function RecordMetadata(startIndex: number = 0, endIndex?: number): Record
   chaiExpect(isStaticResults.length).to.equal(astNodeTypeResults.length);
   chaiExpect(tests.length).to.equal(astNodeTypeResults.length);
 
-  console.log(`${astNodeTypeResults.length} ast node types found`);
-  console.log(`${isStaticResults.length} static apis`);
+  console.log(`${astNodeTypeResults.length - 1} ast node types found`);
+  console.log(`${isStaticResults.length - 1} static apis`);
 
   return tests.map((record, index) => ({
     record: record.record,

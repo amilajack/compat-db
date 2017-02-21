@@ -123,7 +123,14 @@ export function determineASTNodeType(record: RecordType): string {
     (function() {
       var items = []
       if (${length} === 1 && typeof ${api} === 'function') {
-        items.push('CallExpression')
+        try {
+          ${api}()
+          items.push('CallExpression')
+        } catch (e) {
+          if (!e.message.includes("Please use the 'new' operator")) {
+            items.push('CallExpression')
+          }
+        }
         try {
           new ${api}
           items.push('NewExpression')

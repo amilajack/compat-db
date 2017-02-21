@@ -1,5 +1,7 @@
 import { expect as chaiExpect } from 'chai';
-import RecordMetadata, { writeRecordMetadataToDB } from '../compat-tests/RecordMetadata';
+import RecordMetadata, {
+  writeRecordMetadataToDB,
+  parallelizeBrowserTests } from '../compat-tests/RecordMetadata';
 import { ofAPIType } from '../src/providers/Providers';
 import RecordMetadataDatabase from '../src/database/RecordMetadataDatabase';
 
@@ -36,6 +38,15 @@ describe('RecordMetadata', () => {
 
     expect(insertedMetadata.length).toEqual(metadata.length);
     expect(await database.count()).toEqual(metadata.length);
+  });
+
+  it('should parallelize tests across browsers and retain order of test results', async () => {
+    const tests = await parallelizeBrowserTests([
+      true, false, false, true, false, true, false, false
+    ]);
+    expect(tests).toEqual([
+      true, false, false, true, false, true, false, false
+    ]);
   });
 
   it.skip('should have exact match', async () => {
