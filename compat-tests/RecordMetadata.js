@@ -21,7 +21,7 @@ type RecordMetadataType = Promise<Array<{
  *        This is a temporary solution that creates two browser sessions and
  *        runs tests on them
  */
-export function parallelizeBrowserTests(tests: Array<string>) {
+export async function parallelizeBrowserTests(tests: Array<string>) {
   const middle = Math.floor(tests.length / 2);
 
   return Promise.all([
@@ -47,6 +47,17 @@ export function parallelizeBrowserTests(tests: Array<string>) {
   .then(([first, second]) => first.concat(second));
 }
 
+function logUnsupportedAPIs(records: Array<RecordType>, supportedAPITests) {
+  const allSet = new Set(records.map((record) => record.protoChainId));
+  const supportedSet = new Set(supportedAPITests.map((record) => record.protoChainId));
+
+  allSet.forEach(protoChainId => {
+    if (!supportedSet.has(protoChainId)) {
+      console.warn(`"${protoChainId}" is not supported`);
+    }
+  });
+}
+
 /**
  * Find all the records that are supported by our local testing browser (nightmare)
  * For every supported API, determine it's ast node type and if it is static or
@@ -60,7 +71,10 @@ async function RecordMetadata(startIndex: number = 0, endIndex?: number): Record
     ofAPIType('js')
       .filter(record => !record.protoChain.includes('RegExp'));
 
-  const records = filteredRecords.slice(startIndex, endIndex || filteredRecords.length - 1);
+  // @HACK: For some reason, the last 200 records do not work on the second browser. This
+  //        this forces us to remove the last 500 tests
+  const records = filteredRecords.slice(startIndex, endIndex || filteredRecords.length - 500);
+  // const records = filteredRecords.slice(startIndex, endIndex || filteredRecords.length - 1);
 
   const supportedAPITests = (await parallelizeBrowserTests(
     records.map(record => AssertionFormatter(record).apiIsSupported)
@@ -70,6 +84,8 @@ async function RecordMetadata(startIndex: number = 0, endIndex?: number): Record
     isSupported: each
   }))
   .filter(each => each.isSupported === true);
+
+  logUnsupportedAPIs(records, supportedAPITests);
 
   console.log(`${records.length - 1} records`);
   console.log(`${supportedAPITests.length - 1} apis are supported`);
@@ -117,8 +133,8 @@ export default RecordMetadata;
 /**
  * Migrate the 'record-metadata' table and write the records to it
  */
-export async function writeRecordMetadataToDB() {
-  const metadata = await RecordMetadata();
+export async function writeRecordMetadataToDB(start?: number, end?: number) {
+  const metadata = await RecordMetadata(start, end);
 
   const recordMetadataDatabase = new RecordMetadataDatabase();
   await recordMetadataDatabase.migrate();

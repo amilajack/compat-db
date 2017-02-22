@@ -78,7 +78,7 @@ export default function MicrosoftAPICatalogProvider(): Array<RecordType> {
     // names are numbers from some odd reason
     .filter(fRecord =>
       !fRecord.name.includes('-') &&
-      fRecord.parentName !== ('CSS2Properties') &&
+      fRecord.parentName !== 'CSS2Properties' &&
       Number.isNaN(parseInt(fRecord.name, 10)) &&
       typeof fRecord.spec !== 'undefined'
     )
