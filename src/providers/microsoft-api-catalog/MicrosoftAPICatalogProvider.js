@@ -1,10 +1,10 @@
 // @flow
-import APICatalog from './microsoft-api-catalog-data.json';
+import MicrosoftAPICatalog from './microsoft-api-catalog-data.json';
 import HasPrefix from '../../helpers/HasPrefix';
 import type { RecordType } from '../RecordType';
 
 
-type APICatalogType = Array<{
+type MicrosoftAPICatalogProviderType = Array<{
   name: string,
   spec: bool,
   specNames: Array<string>,
@@ -13,6 +13,17 @@ type APICatalogType = Array<{
     specNames: Array<string>
   }>
 }>;
+
+export function interceptAndFormat(parentObjectId: string): string {
+  const APIsToLowercase = new Set([
+    'Console', 'Window', 'Document', 'External', 'History', 'Location', 'Navigator', 'Performance',
+    'Screen', 'defaultStatus'
+  ]);
+
+  return APIsToLowercase.has(parentObjectId)
+    ? parentObjectId.toLowerCase()
+    : parentObjectId;
+}
 
 /**
  * Comvert camelcase phrases to hypen-separated words
@@ -40,24 +51,34 @@ export default function MicrosoftAPICatalogProvider(): Array<RecordType> {
   const ignoredAPIs = ['arguments', 'caller', 'constructor', 'length', 'name', 'prototype'];
 
   // Convert two dimentional records to single dimentional array
-  (APICatalog: APICatalogType)
-    .forEach(record => record.apis.forEach(api =>
-      // @TODO: Properly strip vendor prefixes and check if non-prefixed API
-      //        exists. If not, create the record for it
+  (MicrosoftAPICatalog: MicrosoftAPICatalogProviderType)
+    .forEach(record => {
       formattedRecords.push({
-        ...api,
+        ...record,
         spec: record.spec || false,
+        protoChain: [interceptAndFormat(record.name)],
+        protoChainId: interceptAndFormat(record.name),
         parentName: record.name
-      })
-    ));
+      });
+
+      record.apis.forEach(api =>
+        // @TODO: Properly strip vendor prefixes and check if non-prefixed API
+        //        exists. If not, create the record for it
+        formattedRecords.push({
+          ...api,
+          spec: record.spec || false,
+          parentName: record.name
+        })
+      );
+    });
 
   const JSAPIs = formattedRecords
-    // Filter all CSS records. For some reason reason, APICatalog does not report
+    // Filter all CSS records. For some reason reason, MicrosoftAPICatalog does not report
     // the correctly. Validate that the record's name is a string. Some record
     // names are numbers from some odd reason
     .filter(fRecord =>
       !fRecord.name.includes('-') &&
-      fRecord.parentName !== ('CSS2Properties') &&
+      fRecord.parentName !== 'CSS2Properties' &&
       Number.isNaN(parseInt(fRecord.name, 10)) &&
       typeof fRecord.spec !== 'undefined'
     )
@@ -67,10 +88,17 @@ export default function MicrosoftAPICatalogProvider(): Array<RecordType> {
       specNames: fRecord.specNames,
       type: 'js-api',
       specIsFinished: fRecord.spec,
-      protoChain: ['window', fRecord.parentName, fRecord.name],
-      protoChainId: ['window', fRecord.parentName, fRecord.name].join('.')
+      protoChain: fRecord.protoChain || [interceptAndFormat(fRecord.parentName), fRecord.name]
+    }))
+    // Remove 'window' from the protochain
+    .map(record => ({
+      ...record,
+      protoChain: record.protoChain.filter(e => e !== 'window'),
+      protoChainId: record.protoChain.filter(e => e !== 'window').join('.')
     }))
     .filter(record => (
+      record.name !== 'defaultStatus' &&
+      record.protoChain.length !== 0 &&
       !ignoredAPIs.includes(record.name) &&
       !HasPrefix(record.name) &&
       !HasPrefix(record.protoChainId) &&

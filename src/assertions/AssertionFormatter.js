@@ -5,11 +5,10 @@
  *
  * @flow
  */
-
-/* eslint fp/no-throw: 0 */
-
 import type { RecordType } from '../providers/RecordType';
 
+
+/* eslint fp/no-throw: 0 */
 
 type AssertionFormatterType = {
   apiIsSupported: string
@@ -27,26 +26,41 @@ type AssertionFormatterType = {
 
 /**
  * Check if the JS API is defined
- * ex. ['window', 'ServiceWorker'] => 'window.ServiceWorker'
+ * ex. ['ServiceWorker'] => 'ServiceWorker'
  * @TODO: Support checking if API is 'prefixed'
- * @HACK: This method assumes that the maximum length of the protoChain is 3
  * @HACK: Method's that throw errors upon property access are usually supported
  */
 function formatJSAssertion(record: RecordType): string {
-  const firstTwoProto = record.protoChain.filter((e, i) => i < 2).join('.');
-  const formattedProtoChain = record.protoChain.join('.');
+  const remainingProtoObject = record.protoChain.filter((e, i) => i > 0);
+  const formattedStaticProtoChain = record.protoChain.join('.');
+  const lowercaseParentObject = record.protoChain[0].toLowerCase();
+
+  const exceptions = new Set(['crypto', 'Crypto']);
+
+  const lowercaseSupportTest = `
+    if (${String(lowercaseParentObject !== 'function' && !exceptions.has(record.protoChain[0]))}) {
+      ${lowercaseParentObject === 'function' || lowercaseParentObject === record.protoChain[0]
+        ? ''
+        : `if (typeof ${lowercaseParentObject} !== 'undefined') {
+          throw new Error('${record.protoChain[0]} is not supported but ${lowercaseParentObject} is supported')
+        }`}
+    }
+  `;
+
   return `
     (function () {
+      ${lowercaseSupportTest}
       try {
-        // window.a
+        // a
         if (typeof window === 'undefined') { return false }
-        // window.a
-        if (typeof ${firstTwoProto} === 'undefined') { return false }
-        // window.a.b
-        if (typeof ${formattedProtoChain} !== 'undefined')  { return false }
-        // window.a.prototype.b
-        if (typeof ${firstTwoProto}.prototype !== 'undefined') {
-          return typeof ${firstTwoProto}.prototype.${record.protoChain[2]} !== 'undefined'
+        // a
+        if (typeof ${record.protoChain[0]} === 'undefined') { return false }
+        // a.b
+        if (typeof ${formattedStaticProtoChain} !== 'undefined')  { return true }
+        // a.prototype.b
+        if (typeof ${record.protoChain[0]}.prototype !== 'undefined') {
+          if (${remainingProtoObject.length} === 0) { return false }
+          return typeof ${[record.protoChain[0], 'prototype'].concat(remainingProtoObject).join('.')} !== 'undefined'
         }
         return false
       } catch (e) {
@@ -64,8 +78,8 @@ function formatJSAssertion(record: RecordType): string {
  * Takes a `protoChain` and returns bool if supported. Should only be run if
  * supported. Evaluation returns true if defined
  *
- * ex. ['window', 'Array', 'push'] => false
- * ex. ['window', 'document', 'querySelector'] => true
+ * ex. ['Array', 'push'] => false
+ * ex. ['document', 'querySelector'] => true
  */
 export function determineIsStatic(record: RecordType): string {
   return `
@@ -108,22 +122,27 @@ export function determineASTNodeType(record: RecordType): string {
   return `
     (function() {
       var items = []
-      if (
-        ${length} <= 2 &&
-        typeof ${api} === 'function'
-      ) {
-        items.push('CallExpression')
-      }
-
-      try {
-        new ${api}()
-        items.push('NewExpression')
-      } catch (e) {
-        if (${length} > 2) {
-          items.push('MemberExpression')
+      if (${length} === 1 && typeof ${api} === 'function') {
+        try {
+          ${api}()
+          items.push('CallExpression')
+        } catch (e) {
+          if (!e.message.includes("Please use the 'new' operator")) {
+            items.push('CallExpression')
+          }
+        }
+        try {
+          new ${api}
+          items.push('NewExpression')
+        } catch (e) {
+          if (!e.message.includes('not a constructor')) {
+            items.push('NewExpression')
+          }
         }
       }
-
+      else {
+        items.push('MemberExpression')
+      }
       return items
     })()
   `;

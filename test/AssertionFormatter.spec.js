@@ -2,8 +2,7 @@ import Nightmare from 'nightmare';
 import CSSProperties from './CSSProperties.json';
 import AssertionFormatter, {
   determineASTNodeType,
-  getAllSupportCSSProperties,
-  determineIsStatic } from '../src/assertions/AssertionFormatter';
+  getAllSupportCSSProperties } from '../src/assertions/AssertionFormatter';
 
 
 /* eslint no-await-in-loop: 0 */
@@ -20,31 +19,32 @@ async function testDetermineASTNodeType(protoChain: Array<string>) {
 }
 
 describe('determineASTNodeType()', () => {
-  it('should determine MemberExpressions', async () => {
-    expect(await testDetermineASTNodeType(['window', 'fetch']))
-      .toEqual(['CallExpression']);
+  it('should determine CallExpression', async () => {
+    expect(await testDetermineASTNodeType(['fetch'])).toEqual(['CallExpression']);
   });
 
   it('should determine NewExpression', async () => {
-    expect(await testDetermineASTNodeType(['window', 'Array']))
-      .toEqual(['CallExpression', 'NewExpression']);
+    expect(await testDetermineASTNodeType(['Array'])).toEqual(['CallExpression', 'NewExpression']);
+    expect(await testDetermineASTNodeType(['IntersectionObserver'])).toEqual(['NewExpression']);
+    expect(await testDetermineASTNodeType(['DocumentFragment'])).toEqual(['NewExpression']);
   });
 
   it('should determine MemberExpression', async () => {
-    expect(await testDetermineASTNodeType(['window', 'Array', 'push']))
-      .toEqual(['MemberExpression']);
+    expect(await testDetermineASTNodeType(['Array', 'push'])).toEqual(['MemberExpression']);
   });
 });
 
 describe('getAllSupportCSSProperties()', () => {
   it('should get all supported css properties', async () => {
     const nightmare = Nightmare();
+
     const supportedCSSProperties = new Set(
       await nightmare
         .goto('https://example.com')
         .evaluate((compatTest) => eval(compatTest), getAllSupportCSSProperties())
         .end()
     );
+
     for (const property of new Set(CSSProperties)) {
       expect(supportedCSSProperties).toContain(property);
     }
@@ -55,48 +55,6 @@ describe('getAllSupportCSSProperties()', () => {
  * @TODO: Refactor, add additional tests
  */
 describe('AssertionFormatter', () => {
-  it('should test against multiple records', async () => {
-    const records = [
-      {
-        id: 'border-width',
-        name: 'border-width',
-        specNames: ['css21', 'css-background-3'],
-        type: 'css-api',
-        specIsFinished: false,
-        protoChain: ['window', 'CSSStyleDeclaration', 'borderWidth']
-      },
-      {
-        id: 'document-querySelector',
-        name: 'document-querySelector',
-        specNames: ['css21', 'css-background-3'],
-        type: 'js-api',
-        specIsFinished: false,
-        protoChain: ['window', 'Element', 'querySelector']
-      },
-      {
-        id: 'array-push',
-        name: 'array-push',
-        specNames: ['array', 'push'],
-        type: 'js-api',
-        specIsFinished: false,
-        protoChain: ['window', 'Array', 'push']
-      }
-    ];
-
-    for (const record of records) {
-      const { apiIsSupported } = AssertionFormatter(record);
-      const nightmare = Nightmare();
-
-      expect(
-        await nightmare
-          .goto('https://example.com')
-          .evaluate((compatTest) => eval(compatTest), apiIsSupported)
-          .end()
-      )
-      .toEqual(true);
-    }
-  });
-
   it('should create assertions for CSS property API records', async () => {
     const cssAPIRecord = {
       id: 'border-width',
@@ -104,16 +62,15 @@ describe('AssertionFormatter', () => {
       specNames: ['css21', 'css-background-3'],
       type: 'css-api',
       specIsFinished: false,
-      protoChain: ['window', 'CSSStyleDeclaration', 'borderWidth']
+      protoChain: ['CSSStyleDeclaration', 'borderWidth']
     };
 
-    const { apiIsSupported } = AssertionFormatter(cssAPIRecord);
     const nightmare = Nightmare();
 
     expect(
       await nightmare
         .goto('https://example.com')
-        .evaluate((compatTest) => eval(compatTest), apiIsSupported)
+        .evaluate((compatTest) => eval(compatTest), AssertionFormatter(cssAPIRecord).apiIsSupported)
         .end()
     )
     .toEqual(true);
@@ -126,16 +83,15 @@ describe('AssertionFormatter', () => {
       specNames: ['css21', 'css-background-3'],
       type: 'css-api',
       specIsFinished: false,
-      protoChain: ['window', 'CSSStyleDeclaration', 'flex']
+      protoChain: ['CSSStyleDeclaration', 'flex']
     };
 
-    const { apiIsSupported } = AssertionFormatter(cssAPIRecord);
     const nightmare = Nightmare();
 
     expect(
       await nightmare
         .goto('https://example.com')
-        .evaluate((compatTest) => eval(compatTest), apiIsSupported)
+        .evaluate((compatTest) => eval(compatTest), AssertionFormatter(cssAPIRecord).apiIsSupported)
         .end()
     )
     .toEqual(true);
@@ -148,46 +104,72 @@ describe('AssertionFormatter', () => {
       specNames: ['css21', 'css-background-3'],
       type: 'css-api',
       specIsFinished: false,
-      protoChain: ['window', 'CSSStyleDeclaration', 'superWidth']
+      protoChain: ['CSSStyleDeclaration', 'superWidth']
     };
 
-    const { apiIsSupported } = AssertionFormatter(cssAPIRecord);
     const nightmare = Nightmare();
 
     expect(
       await nightmare
         .goto('https://example.com')
-        .evaluate((compatTest) => eval(compatTest), apiIsSupported)
+        .evaluate((compatTest) => eval(compatTest), AssertionFormatter(cssAPIRecord).apiIsSupported)
         .end()
     )
     .toEqual(false);
   });
 
   describe('AssertionFormatter', () => {
-    const assertions = [
-      {
-        protoChain: ['window', 'document', 'querySelector'],
-        isStatic: true
-      },
-      {
-        protoChain: ['window', 'Array', 'push'],
-        isStatic: false
-      },
-      {
-        protoChain: ['window', 'alert'],
-        isStatic: true
-      }
-    ].map(assertion => ({
-      ...assertion,
-      assertions: Nightmare()
+    type assertionType = {
+      protoChain: Array<string>,
+      isSupported: bool,
+      isStatic: bool,
+      type: string
+    };
+
+    const isStaticTests: Array<assertionType> = [
+      { protoChain: ['document', 'querySelector'], isStatic: true, isSupported: true, type: 'js-api' },
+      { protoChain: ['document', 'currentScript'], isStatic: true, isSupported: true, type: 'js-api' },
+      { protoChain: ['alert'], isStatic: true, isSupported: true, type: 'js-api' },
+      { protoChain: ['navigator', 'serviceWorker'], isStatic: true, isSupported: true, type: 'js-api' },
+      { protoChain: ['Array', 'push'], isStatic: false, isSupported: true, type: 'js-api' },
+      { protoChain: ['Array', 'from'], isStatic: true, isSupported: true, type: 'js-api' },
+      { protoChain: ['Array', 'of'], isStatic: true, isSupported: true, type: 'js-api' },
+      { protoChain: ['Array', 'reduce'], isStatic: false, isSupported: true, type: 'js-api' },
+      { protoChain: ['Array', 'map'], isStatic: false, isSupported: true, type: 'js-api' },
+      { protoChain: ['IDBMutableFile', 'getFile'], isStatic: false, isSupported: false, type: 'js-api' },
+      { protoChain: ['MessageEvent', 'data'], isStatic: false, isSupported: true, type: 'js-api' },
+      { protoChain: ['Uint8ClampedArray', 'values'], isStatic: false, isSupported: true, type: 'js-api' },
+      { protoChain: ['WebGL2RenderingContext', 'VERTEX_ATTRIB_ARRAY_ENABLED'], isStatic: true, isSupported: true, type: 'js-api' },
+      { protoChain: ['alert'], isStatic: true, isSupported: true, type: 'js-api' },
+      { protoChain: ['CSSStyleDeclaration', 'borderWidth'], isStatic: true, isSupported: true, type: 'css-api' },
+      { protoChain: ['document', 'querySelector'], isStatic: true, isSupported: true, type: 'js-api' },
+      { protoChain: ['Array', 'push'], isStatic: false, isSupported: true, type: 'js-api' }
+    ]
+    .map(record => ({
+      ...record,
+      assertion: Nightmare()
         .goto('https://example.com')
-        .evaluate((compatTest) => eval(compatTest), determineIsStatic(assertion))
+        .evaluate((compatTest) => eval(compatTest), AssertionFormatter(record).determineIsStatic)
         .end()
     }));
 
-    for (const assertion of assertions) {
+    const isSupportedTests = isStaticTests.map(record => ({
+      ...record,
+      assertion: Nightmare()
+        .goto('https://example.com')
+        .evaluate((compatTest) => eval(compatTest), AssertionFormatter(record).apiIsSupported)
+        .end()
+    }));
+
+    for (const assertion of isStaticTests.filter(test => test.type === 'js-api')) {
       it(`should determine ${assertion.protoChain.join('.')} is static or non-static`, async () => {
-        expect(await assertion.assertions).toEqual(assertion.isStatic);
+        expect(await assertion.assertion).toEqual(assertion.isStatic);
+      });
+    }
+
+    for (const assertion of isSupportedTests) {
+      it(`should determine ${assertion.protoChain.join('.')} is support or not`, async () => {
+        expect(await assertion.assertion).toEqual(assertion.isSupported);
       });
     }
   });

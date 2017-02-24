@@ -5,8 +5,8 @@ export const browserNameToCaniuseMappings = {
   firefox: 'firefox',
   opera: 'opera',
   safari: 'safari',
-  'internet explorer': 'ie',
-  MicrosoftEdge: 'edge'
+  MicrosoftEdge: 'edge',
+  'internet explorer': 'ie'
   // @TODO @NOTE: Mobile devices require Appium
   // '': 'ios_saf',
   // '': 'and_chr',
