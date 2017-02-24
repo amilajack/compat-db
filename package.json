@@ -19,7 +19,8 @@
     "test": "cross-env NODE_ENV=development npm run lint && npm run spec",
     "update-catalog-api-db": "download https://raw.githubusercontent.com/MicrosoftEdge/APICatalogData/master/apicatalogdata.json && mkdir -p src/providers/api-catalog && mv apicatalogdata.json src/providers/microsoft-api-catalog/microsoft-api-catalog-data.json",
     "validate-tmp-records": "node -r babel-register compat-tests/PostChecks.js",
-    "version": "npm run build-compat-db && npm run build"
+    "version": "npm run build-compat-db && npm run build",
+    "wdio": "wdio wdio.conf.js"
   },
   "jest": {
     "testEnvironment": "node"
@@ -55,25 +56,30 @@
     "babel-preset-stage-0": "^6.22.0",
     "babel-register": "^6.23.0",
     "bookshelf": "^0.10.3",
-    "caniuse-db": "1.0.30000623",
+    "caniuse-db": "1.0.30000626",
     "chai": "^3.5.0",
     "cross-env": "^3.1.4",
     "dotenv": "^4.0.0",
     "download-cli": "^1.0.1",
-    "eslint": "^3.15.0",
+    "eslint": "^3.16.1",
     "eslint-config-bliss": "^0.0.7",
     "eslint-formatter-pretty": "^1.1.0",
-    "flow-bin": "^0.39.0",
+    "flow-bin": "^0.40.0",
     "flow-runtime": "^0.5.0",
     "flow-typed": "^2.0.0",
-    "jest-cli": "^18.1.0",
+    "jest-cli": "^19.0.2",
     "knex": "^0.12.7",
+    "mocha": "^3.2.0",
     "mysql": "^2.13.0",
-    "nightmare": "^2.9.1",
+    "nightmare": "^2.10.0",
     "selenium-webdriver": "^3.1.0",
     "sequelize": "^3.30.2",
     "sqlite3": "^3.1.8",
-    "tcomb": "^3.2.16"
+    "tcomb": "^3.2.17",
+    "wdio-mocha-framework": "^0.5.8",
+    "wdio-sauce-service": "^0.3.1",
+    "wdio-selenium-standalone-service": "^0.0.8",
+    "webdriverio": "^4.6.2"
   },
   "engines": {
     "node": ">=4.x",
@@ -82,5 +88,8 @@
   "devEngines": {
     "node": ">=6.x",
     "npm": ">=4.x"
+  },
+  "dependencies": {
+    "chromedriver": "^2.27.3"
   }
 }

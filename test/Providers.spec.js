@@ -20,7 +20,7 @@ describe('Providers', () => {
       expect(ofAPIType('css').length).toBeGreaterThan(300);
       expect(ofAPIType('js').length).toBeGreaterThan(10000);
       expect(ofAPIType('css').length).toBeLessThan(2000);
-      expect(ofAPIType('js').length).toBeLessThan(12000);
+      expect(ofAPIType('js').length).toBeLessThan(13000);
     });
   });
 
@@ -99,46 +99,38 @@ describe('Providers', () => {
         it('should contain requestAnimationFrame record', () => {
           const record = find('requestAnimationFrame');
           expect(record).toBeDefined();
-          expect(record.protoChain).toContain('window');
           expect(record.protoChain).toContain('requestAnimationFrame');
         });
 
-        it.skip('should contain currentScript record', () => {
+        it('should contain currentScript record', () => {
           const record = find('currentScript');
           expect(record).toBeDefined();
-          expect(record.protoChain).toContain('window');
           expect(record.protoChain).toContain('document');
           expect(record.protoChain).toContain('currentScript');
         });
 
         it('should contain PaymentRequest record', () => {
           const [record] = records
-            .filter(e => e.protoChain.includes('window'))
             .filter(e => e.protoChain.includes('PaymentRequest'));
 
           expect(record).toBeDefined();
-          expect(record.protoChain).toContain('window');
           expect(record.protoChain).toContain('PaymentRequest');
         });
 
         it.skip('should contain WebAssembly record', () => {
           const [record] = records
-            .filter(e => e.protoChain.includes('window'))
             .filter(e => e.protoChain.includes('WebAssembly'));
 
           expect(record).toBeDefined();
-          expect(record.protoChain).toContain('window');
           expect(record.protoChain).toContain('WebAssembly');
         });
 
         it.skip('should contain WebAssembly.compile record', () => {
           const [record] = records
-            .filter(e => e.protoChain.includes('window'))
             .filter(e => e.protoChain.includes('WebAssembly'))
             .filter(e => e.protoChain.includes('compile'));
 
           expect(record).toBeDefined();
-          expect(record.protoChain).toContain('window');
           expect(record.protoChain).toContain('WebAssembly');
           expect(record.protoChain).toContain('compile');
         });
@@ -149,29 +141,21 @@ describe('Providers', () => {
             .filter(e => e.protoChain.includes('supports'));
 
           expect(record).toBeDefined();
-          expect(record.protoChain).toContain('window');
           expect(record.protoChain).toContain('CSS');
           expect(record.protoChain).toContain('supports');
         });
 
         it('should contain fetch record', () => {
           const [record] = records
-            .filter(e => e.protoChain.includes('window'))
             .filter(e => e.protoChain.includes('fetch'));
 
           expect(record).toBeDefined();
-          expect(record.protoChain).toContain('window');
           expect(record.protoChain).toContain('fetch');
-        });
-
-        it('description', () => {
-
         });
 
         it('should contain applicationCache record', () => {
           const record = find('applicationCache');
           expect(record).toBeDefined();
-          expect(record.protoChain).toContain('window');
           expect(record.protoChain).toContain('applicationCache');
         });
 
@@ -188,56 +172,47 @@ describe('Providers', () => {
         it('should contain requestIdleCallback record', () => {
           const record = find('requestIdleCallback');
           expect(record).toBeDefined();
-          expect(record.protoChain).toContain('window');
           expect(record.protoChain).toContain('requestIdleCallback');
         });
 
-        it.skip('should contain IntersectionObserver record', () => {
+        it('should contain IntersectionObserver record', () => {
           const record = find('IntersectionObserver');
           expect(record).toBeDefined();
-          expect(record.protoChain).toContain('window');
           expect(record.protoChain).toContain('IntersectionObserver');
         });
 
         it('should contain createImageBitmap record', () => {
           const record = find('createImageBitmap');
           expect(record).toBeDefined();
-          expect(record.protoChain).toContain('window');
           expect(record.protoChain).toContain('createImageBitmap');
         });
 
         it('should contain navigator.serviceWorker record', () => {
           expect(records.find(record =>
-            record.protoChain.includes('window') &&
-            record.protoChain.includes('Navigator') &&
+            record.protoChain.includes('navigator') &&
             record.protoChain.includes('serviceWorker')
           )).toBeDefined();
 
           expect(records.find(record =>
-            record.protoChain.includes('window') &&
             record.protoChain.includes('requestAnimationFrame')
           )).toBeDefined();
 
           expect(records.find(record =>
-            record.protoChain.includes('window') &&
             record.protoChain.includes('ServiceWorkerRegistration') &&
             record.protoChain.includes('getNotifications')
           )).toBeDefined();
 
           expect(records.find(record =>
-            record.protoChain.includes('window') &&
             record.protoChain.includes('ServiceWorkerRegistration') &&
             record.protoChain.includes('getNotifications')
           )).toBeDefined();
 
           expect(records.find(record =>
-            record.protoChain.includes('window') &&
             record.protoChain.includes('ServiceWorkerMessageEvent') &&
             record.protoChain.includes('ports')
           )).toBeDefined();
 
           expect(records.find(record =>
-            record.protoChain.includes('window') &&
             record.protoChain.includes('ServiceWorkerMessageEvent') &&
             record.protoChain.includes('source')
           )).toBeDefined();
@@ -260,8 +235,8 @@ describe('Providers', () => {
           specNames: ['css-background-3'],
           type: 'js-api',
           specIsFinished: false,
-          protoChainId: 'window.CSSStyleDeclaration.borderTopRightRadius',
-          protoChain: ['window', 'CSSStyleDeclaration', 'borderTopRightRadius']
+          protoChainId: 'CSSStyleDeclaration.borderTopRightRadius',
+          protoChain: ['CSSStyleDeclaration', 'borderTopRightRadius']
         });
       });
 
@@ -272,8 +247,8 @@ describe('Providers', () => {
           specNames: ['css-background-3'],
           type: 'css-api',
           specIsFinished: false,
-          protoChain: ['window', 'CSSStyleDeclaration', 'borderTopRightRadius'],
-          protoChainId: 'window.CSSStyleDeclaration.borderTopRightRadius'
+          protoChain: ['CSSStyleDeclaration', 'borderTopRightRadius'],
+          protoChainId: 'CSSStyleDeclaration.borderTopRightRadius'
         });
       });
 
@@ -284,8 +259,8 @@ describe('Providers', () => {
           specNames: ['css-flexbox-1'],
           type: 'css-api',
           specIsFinished: false,
-          protoChain: ['window', 'CSSStyleDeclaration', 'flex'],
-          protoChainId: 'window.CSSStyleDeclaration.flex'
+          protoChain: ['CSSStyleDeclaration', 'flex'],
+          protoChainId: 'CSSStyleDeclaration.flex'
         });
       });
 
@@ -296,8 +271,8 @@ describe('Providers', () => {
           specNames: ['css-flexbox-1'],
           type: 'js-api',
           specIsFinished: false,
-          protoChain: ['window', 'CSSStyleDeclaration', 'flex'],
-          protoChainId: 'window.CSSStyleDeclaration.flex'
+          protoChain: ['CSSStyleDeclaration', 'flex'],
+          protoChainId: 'CSSStyleDeclaration.flex'
         });
       });
     });

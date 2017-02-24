@@ -1,4 +1,6 @@
-import { camelCaseToHyphen } from '../src/providers/microsoft-api-catalog/MicrosoftAPICatalogProvider';
+import {
+  camelCaseToHyphen,
+  interceptAndFormat } from '../src/providers/microsoft-api-catalog/MicrosoftAPICatalogProvider';
 
 
 describe('APICatalog', () => {
@@ -7,6 +9,12 @@ describe('APICatalog', () => {
       expect(camelCaseToHyphen('fontSize')).toEqual('font-size');
       expect(camelCaseToHyphen('font')).toEqual('font');
       expect(camelCaseToHyphen('backgroundImage')).toEqual('background-image');
+    });
+
+    it('should intercept and format protoChain IDs', () => {
+      expect(interceptAndFormat('Window')).toEqual('window');
+      expect(interceptAndFormat('Console')).toEqual('console');
+      expect(interceptAndFormat('Atomics')).toEqual('Atomics');
     });
   });
 });

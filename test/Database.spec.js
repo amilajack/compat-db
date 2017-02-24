@@ -64,7 +64,7 @@ describe('TmpDatabase', () => {
 
     await insertBulkRecords(
       {
-        protoChainId: 'window.alert()',
+        protoChainId: 'alert',
         type: 'js-api'
       },
       'chrome',
@@ -76,13 +76,13 @@ describe('TmpDatabase', () => {
 
     expect(
       await findSameVersionCompatRecord({
-        protoChainId: 'window.alert()',
+        protoChainId: 'alert',
         type: 'js-api'
       },
       'chrome')
     )
     .toEqual({
-      protoChainId: 'window.alert()',
+      protoChainId: 'alert',
       caniuseId: 'chrome',
       name: 'chrome',
       versions: {
@@ -101,7 +101,7 @@ describe('TmpDatabase', () => {
 
     await insertBulkRecords(
       {
-        protoChainId: 'window.alert()',
+        protoChainId: 'alert',
         type: 'js-api'
       },
       'chrome',
@@ -111,7 +111,7 @@ describe('TmpDatabase', () => {
 
     await insertBulkRecords(
       {
-        protoChainId: 'window.foo()',
+        protoChainId: 'foo()',
         type: 'js-api'
       },
       'chrome',
@@ -123,11 +123,11 @@ describe('TmpDatabase', () => {
 
     const items = (await Promise.all([
       findSameVersionCompatRecord({
-        protoChainId: 'window.alert()',
+        protoChainId: 'alert',
         type: 'js-api'
       }, 'chrome'),
       findSameVersionCompatRecord({
-        protoChainId: 'window.foo()',
+        protoChainId: 'foo()',
         type: 'js-api'
       }, 'chrome')
     ]))
@@ -135,7 +135,7 @@ describe('TmpDatabase', () => {
 
     expect(items).toEqual([
       {
-        protoChainId: 'window.alert()',
+        protoChainId: 'alert',
         versions: {
           '6.0': 'n',
           '11.0': 'n',
@@ -143,7 +143,7 @@ describe('TmpDatabase', () => {
         }
       },
       {
-        protoChainId: 'window.foo()',
+        protoChainId: 'foo()',
         versions: {
           '21.0': 'y',
           '11.0': 'y',

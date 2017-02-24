@@ -134,7 +134,7 @@ describe('JobQueueDatabase', () => {
 
     expect(await jobQueue.count()).toEqual(2);
 
-    jobQueue.remove({
+    await jobQueue.remove({
       name: 'chrome',
       protoChainId: 'document.write'
     });

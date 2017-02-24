@@ -46,18 +46,15 @@ export type RecordType = {
   /**
    * Prototype chain/method list
    *
-   * ex. ['window']                               <= default
+   * ex. ['document', 'querySelector']  <= Ex. of `querySelector`'s protoChain
    *
-   * ex. ['window', 'document', 'querySelector']  <= Ex. of `querySelector`'s
-   *                                                 protoChain
-   *
-   * ex. ['window', 'Array', 'prototype', 'push']   <= Example of `push` protoChain
+   * ex. ['Array', 'prototype', 'push']   <= Example of `push` protoChain
    */
   protoChain: Array<string>,
 
   /**
    * A stringified protoChain
-   * ex. ['window', 'fetch'] => 'window.fetch'
+   * ex. ['fetch'] => 'fetch'
    */
   protoChainId: string,
 
