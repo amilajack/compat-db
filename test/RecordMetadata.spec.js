@@ -8,6 +8,10 @@ import RecordMetadataDatabase from '../src/database/RecordMetadataDatabase';
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 2000000; // eslint-disable-line
 
+const experimentalAPIsToSupport = [
+  'VRDisplay', 'Atomics', 'WebAssembly', 'SharedArrayBuffer', 'WebGL2RenderingContext'
+];
+
 describe('RecordMetadata', () => {
   it('should have objects with the expected properties', async () => {
     const recordMetadata = await RecordMetadata();
@@ -41,10 +45,23 @@ describe('RecordMetadata', () => {
   });
 
   it('should parallelize tests across browsers and retain order of test results', async () => {
-    const tests = await parallelizeBrowserTests([
-      true, false, false, true, false, true, false, false
-    ]);
-    expect(tests).toEqual([
+    // If not running in CI, run against local chrome installation
+    if (!process.env.CI) {
+      expect(await parallelizeBrowserTests([
+        true, false, false, true, false, true, false, false
+      ]))
+      .toEqual([
+        true, false, false, true, false, true, false, false
+      ]);
+    }
+
+    expect(
+      await parallelizeBrowserTests([
+        true, false, false, true, false, true, false, false
+      ]),
+      true
+    )
+    .toEqual([
       true, false, false, true, false, true, false, false
     ]);
   });
@@ -78,6 +95,12 @@ describe('RecordMetadata', () => {
 
     for (const item of metadataSet) {
       expect(insertedMetadataSet.has(item)).toEqual(true);
+    }
+
+    const protoChainIDs = metadata.map(each => each.protoChainId);
+
+    for (const api of experimentalAPIsToSupport) {
+      expect(protoChainIDs).toContain(api);
     }
   });
 });

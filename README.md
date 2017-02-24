@@ -45,6 +45,12 @@ npm run spec
 
 # Run all tests
 npm test
+
+# If you want to run tests on your local chrome canary installation, install
+# and start selenium server
+npm install -g selenium-standalone@latest
+selenium-standalone install
+selenium-standalone start
 ```
 
 ## Roadmap

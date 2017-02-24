@@ -39,3 +39,5 @@ errorShots
 tmp-db-records
 capabilities.json
 compat-tests-webdriver/jobs.json
+compat-tests/test-results
+compat-tests/tests

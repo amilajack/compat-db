@@ -1,5 +1,8 @@
 // @flow
 import { expect as chaiExpect } from 'chai';
+import { join } from 'path';
+import { execSync } from 'child_process';
+import { writeFileSync, readFileSync } from 'fs';
 import Nightmare from 'nightmare';
 import { ofAPIType } from '../src/providers/Providers';
 import AssertionFormatter from '../src/assertions/AssertionFormatter';
@@ -21,30 +24,45 @@ type RecordMetadataType = Promise<Array<{
  *        This is a temporary solution that creates two browser sessions and
  *        runs tests on them
  */
-export async function parallelizeBrowserTests(tests: Array<string>) {
-  const middle = Math.floor(tests.length / 2);
+export async function parallelizeBrowserTests(tests: Array<string>, useNightmare: bool = true) {
+  if (useNightmare) {
+    const middle = Math.floor(tests.length / 2);
 
-  return Promise.all([
-    Nightmare()
-      .goto('https://example.com')
-      .evaluate(
-        (compatTest) => eval(compatTest),
-        `(function() {
-          return [${tests.slice(0, middle).join(',')}];
-        })()`
-      )
-      .end(),
-    Nightmare()
-      .goto('https://example.com')
-      .evaluate(
-        (compatTest) => eval(compatTest),
-        `(function() {
-          return [${tests.slice(middle).join(',')}];
-        })()`
-      )
-      .end()
-  ])
-  .then(([first, second]) => first.concat(second));
+    return Promise.all([
+      Nightmare()
+        .goto('https://example.com')
+        .evaluate(
+          (compatTest) => eval(compatTest),
+          `(function() {
+            return [${tests.slice(0, middle).join(',')}];
+          })()`
+        )
+        .end(),
+      Nightmare()
+        .goto('https://example.com')
+        .evaluate(
+          (compatTest) => eval(compatTest),
+          `(function() {
+            return [${tests.slice(middle).join(',')}];
+          })()`
+        )
+        .end()
+    ])
+    .then(([first, second]) => first.concat(second));
+  }
+
+  writeFileSync(
+    join(__dirname, 'tests'),
+    `return (function() {
+      return [${tests.join(',')}];
+    })()`
+  );
+
+  try {
+    execSync('npm run wdio');
+  } catch (err) {} // eslint-disable-line
+
+  return JSON.parse(readFileSync(join(__dirname, 'test-results')).toString());
 }
 
 function logUnsupportedAPIs(records: Array<RecordType>, supportedAPITests) {
@@ -69,12 +87,12 @@ function logUnsupportedAPIs(records: Array<RecordType>, supportedAPITests) {
 async function RecordMetadata(startIndex: number = 0, endIndex?: number): RecordMetadataType {
   const filteredRecords =
     ofAPIType('js')
-      .filter(record => !record.protoChain.includes('RegExp'));
+      .filter(record => !record.protoChain.includes('RegExp')); // @HACK: Dont hardcode 'RegExp'
 
   // @HACK: For some reason, the last 200 records do not work on the second browser. This
   //        this forces us to remove the last 500 tests
   const records = filteredRecords.slice(startIndex, endIndex || filteredRecords.length - 500);
-  // const records = filteredRecords.slice(startIndex, endIndex || filteredRecords.length - 1);
+  // const records = filteredRecords.slice(startIndex, endIndex || filteredRecords.length);
 
   const supportedAPITests = (await parallelizeBrowserTests(
     records.map(record => AssertionFormatter(record).apiIsSupported)
@@ -87,8 +105,8 @@ async function RecordMetadata(startIndex: number = 0, endIndex?: number): Record
 
   logUnsupportedAPIs(records, supportedAPITests);
 
-  console.log(`${records.length - 1} records`);
-  console.log(`${supportedAPITests.length - 1} apis are supported`);
+  console.log(`${records.length} records`);
+  console.log(`${supportedAPITests.length} apis are supported`);
 
   const tests = supportedAPITests.map(({ record }) => ({
     assertions: AssertionFormatter(record),
@@ -96,11 +114,12 @@ async function RecordMetadata(startIndex: number = 0, endIndex?: number): Record
   }));
 
   const determineASTNodeTypeTests: Array<string> =
-    tests.map(test => test.assertions.determineASTNodeType); // eslint-disable-line
+    tests.map(test => test.assertions.determineASTNodeType);
 
   const determineIsStaticTests: Array<string> =
-    tests.map(test => test.assertions.determineIsStatic); // eslint-disable-line
+    tests.map(test => test.assertions.determineIsStatic);
 
+  // Test length of test arrays
   chaiExpect(determineASTNodeTypeTests.length).to.equal(supportedAPITests.length);
   chaiExpect(determineIsStaticTests.length).to.equal(supportedAPITests.length);
 
@@ -112,13 +131,14 @@ async function RecordMetadata(startIndex: number = 0, endIndex?: number): Record
   const isStaticResults =
     await parallelizeBrowserTests(determineIsStaticTests);
 
+  // Test length of result arrays
   chaiExpect(determineASTNodeTypeTests.length).to.equal(astNodeTypeResults.length);
   chaiExpect(determineIsStaticTests.length).to.equal(isStaticResults.length);
   chaiExpect(isStaticResults.length).to.equal(astNodeTypeResults.length);
   chaiExpect(tests.length).to.equal(astNodeTypeResults.length);
 
-  console.log(`${astNodeTypeResults.length - 1} ast node types found`);
-  console.log(`${isStaticResults.length - 1} static apis`);
+  console.log(`${astNodeTypeResults.length} ast node types found`);
+  console.log(`${isStaticResults.length} static apis`);
 
   return tests.map((record, index) => ({
     record: record.record,
@@ -150,3 +170,5 @@ export async function writeRecordMetadataToDB(start?: number, end?: number) {
 
   return metadataToInsert;
 }
+
+writeRecordMetadataToDB();
