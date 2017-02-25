@@ -34,8 +34,10 @@ export function initializeDatabaseConnection() {
     },
     pool: {
       min: 0,
-      max: 30
-    }
+      max: 50,
+      requestTimeout: 10000
+    },
+    acquireConnectionTimeout: 10000
   };
   const sqliteConfig = {
     client: 'sqlite3',

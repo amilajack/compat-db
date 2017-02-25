@@ -1,6 +1,7 @@
 // @flow
 import { ofAPIType } from '../src/providers/Providers';
 import JobQueueDatabase from '../src/database/JobQueueDatabase';
+import RecordMetadataDatabase from '../src/database/RecordMetadataDatabase';
 import * as TmpRecordDatabase from '../src/database/TmpDatabase';
 import { browserNameToCaniuseMappings } from '../src/helpers/Constants';
 import {
@@ -18,10 +19,15 @@ export type browserCapabilityType = {
 
 export default async function createJobsFromRecords(): Promise<Array<browserCapabilityType>> {
   const queue = new JobQueueDatabase();
+  const recordMetadata = new RecordMetadataDatabase();
   const records = ofAPIType('js');
 
   // If there are jobs in the queue already, skip the following steps
   if ((await queue.count()) === 0) {
+    const metadata: Set<string> = await recordMetadata
+      .getAll()
+      .then(res => new Set(res.map(each => each.protoChainId)));
+
     const caniuseIds: Array<string> = Object.values(browserNameToCaniuseMappings); // eslint-disable-line
     const jobs = [];
 
@@ -30,7 +36,8 @@ export default async function createJobsFromRecords(): Promise<Array<browserCapa
     // Make sure not to make jobs for records that are already in the database
     records
       .filter(record =>
-        !existingRecords.has(JSON.stringify(record))
+        !existingRecords.has(JSON.stringify(record)) &&
+        metadata.has(record.protoChainId)
       )
       .slice(
         parseInt(process.env.PROVIDERS_INDEX_START, 10) || 0,

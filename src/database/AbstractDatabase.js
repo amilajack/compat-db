@@ -48,9 +48,10 @@ export default class AbstractDatabase {
       },
       pool: {
         min: 0,
-        max: 30
+        max: 5,
+        requestTimeout: 10 ** 5
       },
-      acquireConnectionTimeout: 1000000
+      acquireConnectionTimeout: 10 ** 10
     };
 
     const sqliteConfig = {
@@ -125,7 +126,15 @@ export default class AbstractDatabase {
    * handled natively by knex and bookshelf
    */
   insertBulk(recordsToInsert: Array<Object>) {
-    return this.connection.knex
-      .batchInsert(this.tableName, recordsToInsert).returning('id');
+    return this.connection.knex.transaction(
+      (tr) => this.connection.knex.batchInsert(
+        this.tableName,
+        recordsToInsert,
+        30
+      )
+      .transacting(tr)
+    );
+    // return this.connection.knex
+    //   .batchInsert(this.tableName, recordsToInsert, 30).returning('id');
   }
 }
