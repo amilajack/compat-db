@@ -67,6 +67,7 @@ describe('RecordMetadata', () => {
   });
 
   it('should have exact match', async () => {
+    const testExperimentalAPIs = false;
     const database = new RecordMetadataDatabase();
     await database.migrate();
 
@@ -99,8 +100,10 @@ describe('RecordMetadata', () => {
 
     const protoChainIDs = metadata.map(each => each.protoChainId);
 
-    for (const api of experimentalAPIsToSupport) {
-      expect(protoChainIDs).toContain(api);
+    if (testExperimentalAPIs) {
+      for (const api of experimentalAPIsToSupport) {
+        expect(protoChainIDs).toContain(api);
+      }
     }
   });
 });
