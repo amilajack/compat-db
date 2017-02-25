@@ -61,25 +61,33 @@ export async function executeTests(capability: capabilityType, jobs: JobQueueTyp
 
   console.log(`Executing ${jobs.length} tests in parallel on ${platform} ${browserName} ${version}`);
 
-  const items = await Promise.all(
-    jobs.map(job => {
-      const record: RecordType = JSON.parse(job.record);
-      const { apiIsSupported } = AssertionFormatter(record);
-
-      return driver
-        .executeScript(`return (${apiIsSupported})`)
-        .then(isSupported => {
-          if (typeof isSupported !== 'boolean') {
-            throw new Error([
-              'Invalid JS execution value returned from Sauce Labs.',
-              `Received ${isSupported} and expected boolean`
-            ].join((' ')));
-          }
-          return { record, isSupported, job };
-        })
-        .catch(console.log);
-    })
+  const tests = jobs.map(job =>
+    AssertionFormatter(JSON.parse(job.record)).apiIsSupported
   );
+
+  const items = await driver
+    .executeScript(
+      `return (function() {
+        return [${tests.join(',')}];
+      })()`
+    )
+    .then(testResults => testResults.map((testResult, index) => {
+      if (typeof testResult !== 'boolean') {
+        throw new Error([
+          'Invalid JS execution value returned from Sauce Labs.',
+          `Received ${testResult} and expected boolean`
+        ].join((' ')));
+      }
+
+      const job = jobs[index];
+      const record: RecordType = JSON.parse(job.record);
+
+      return {
+        record,
+        job,
+        isSupported: testResult
+      };
+    }));
 
   await driver.quit();
 
