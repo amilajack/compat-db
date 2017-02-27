@@ -1,92 +1,94 @@
+// @flow
 import { expect } from 'chai';
-import Providers from '../providers/Providers';
+import { execSync } from 'child_process';
 import * as TmpDatabase from '../database/TmpDatabase';
-import { caniuseToSeleniumMappings, fixedBrowserVersions, caniuseBrowsers } from './Constants';
+import { caniuseToSeleniumMappings } from './Constants';
 import { allTargets } from './GenerateVersions';
 
 
 /* eslint no-unused-expressions: 0, fp/no-let: 0 */
 
-export function validateRecords(records) {
-  records.forEach((record) => {
+type tmpRecordType = {
+  name: string,
+  protoChainId: string,
+  caniuseId: string,
+  type: string,
+  versions: string
+};
+
+export function validateRecordTypes(tmpRecords: Array<tmpRecordType>) {
+  tmpRecords.forEach((record) => {
     try {
       expect(record.name).to.be.a('string');
       expect(record.caniuseId).to.be.a('string');
-      expect(record.versions).to.be.an('object');
+      expect(JSON.parse(record.versions)).to.be.an('object');
       expect(record.protoChainId).to.be.a('string');
       expect(record.type).to.exist;
-      return true;
     } catch (error) {
-      throw new Error(`Incompatible record ${record.protoChainId} in ${record.caniuseId}`);
+      console.log(error);
+      throw new Error(`Invalid record "${record.protoChainId}" in "${record.caniuseId}", ${error}`);
     }
   });
 }
 
-export function hasDuplicates(records) {
-  records.forEach((record) => {
-    let count = 0;
-    records.forEach((comparedRecord) => {
+export function checkHasDuplicates(tmpRecords: Array<tmpRecordType>) {
+  const duplicates: Array<{
+    protoChainId: string,
+    caniuseId: string
+  }> = [];
+
+  tmpRecords.forEach((record, recordIndex) => {
+    tmpRecords.forEach((comparedRecord, comparedRecordIndex) => {
       if (
         record.caniuseId === comparedRecord.caniuseId &&
-        record.protoChainId === comparedRecord.protoChainId
+        record.protoChainId === comparedRecord.protoChainId &&
+        recordIndex !== comparedRecordIndex
       ) {
-        count += 1;
+        duplicates.push({
+          protoChainId: record.protoChainId,
+          caniuseId: record.caniuseId
+        });
       }
     });
-    if (count > 1) {
-      throw new Error(`Duplicate record ${record.protoChainId} in ${record.caniuseId}`);
-    }
   });
+
+  if (duplicates.length > 0) {
+    duplicates.forEach(duplicate =>
+      console.log(`Duplicate record "${duplicate.protoChainId}" in "${duplicate.caniuseId}"`)
+    );
+    throw new Error('Duplicate records found');
+  }
 }
 
-export function isBrowserMissing(records) {
-  records.forEach((record) => {
-    const seleniumId = caniuseToSeleniumMappings[record.caniuseId];
-    if (seleniumId !== 'chrome' || seleniumId !== 'firefox') {
-      const browserVersions = fixedBrowserVersions
-      .filter(browserVersion => browserVersion.browserName === seleniumId);
-      const recordVersions = Object.keys(record.versions);
-      browserVersions.forEach((version) => {
-        if (!recordVersions.includes(version.version)) {
-          throw new Error(`Record ${record.protoChainId} missing in ${version.browserName} version: ${version.version}`);
-        }
-      });
-    } else {
-      const allBrowserVersions = allTargets();
-      const browserVersions = allBrowserVersions
-      .filter(browserVersion => browserVersion.browserName === seleniumId);
-      const recordVersions = Object.keys(record.versions);
-      browserVersions.forEach((version) => {
-        if (!recordVersions.includes(version.version)) {
-          throw new Error(`Record ${record.protoChainId} missing in ${version.browserName} version: ${version.version}`);
-        }
-      });
-    }
-  });
-}
+export function checkBrowserMissing(tmpRecords: Array<tmpRecordType>) {
+  tmpRecords.forEach((record) => {
+    const browserName = caniuseToSeleniumMappings[record.caniuseId];
+    const recordVersions: Array<string> = Object.keys(JSON.parse(record.versions));
+    const browserNameVersions = allTargets
+      .filter(browserVersion =>
+        browserVersion.browserName === browserName
+      )
+      .map(each => each.version);
 
-export function isRecordMissing(records) {
-  const requiredRecords = Providers();
-  const browsers = caniuseBrowsers;
-  requiredRecords.forEach((requiredRecord) => {
-    const validatedRecords = [];
-    records.forEach((record) => {
-      if (requiredRecord.protoChainId === record.protoChainId) {
-        validateRecords.push(record.caniuseId);
-      }
-    });
-    browsers.forEach((browser) => {
-      if (!validatedRecords.includes(browser)) {
-        throw new Error(`ProtoChainId ${requiredRecord.protoChainId} is missing from: ${browser}`);
+    browserNameVersions.forEach((version) => {
+      if (!recordVersions.includes(String(version))) {
+        throw new Error(`Record "${record.protoChainId}" missing in ${browserName}@${version}`);
       }
     });
   });
 }
 
-export async function RecordsValidator() {
-  const records = await TmpDatabase.getAll();
-  validateRecords(records);
-  hasDuplicates(records);
-  isBrowserMissing(records);
-  isRecordMissing(records);
+export async function RecordsValidator(defaultTmpDatabaseRecords?: Array<tmpRecordType>) {
+  const tmpDatabaseRecords = defaultTmpDatabaseRecords || await TmpDatabase.getAll();
+
+  execSync('npm run build-compat-db');
+
+  expect(tmpDatabaseRecords).to.have.length.above(1);
+  console.log(`Testing ${tmpDatabaseRecords.length} temporary database records`);
+
+  validateRecordTypes(tmpDatabaseRecords);
+  checkHasDuplicates(tmpDatabaseRecords);
+  checkBrowserMissing(tmpDatabaseRecords);
+
+  console.log('✅   No validation errors found');
 }

@@ -8,12 +8,11 @@ import {
   filterDuplicateTargets,
   getVersionsToMark } from '../src/helpers/GenerateVersions';
 import {
-  validateRecords,
-  hasDuplicates,
-  isBrowserMissing,
-  isRecordMissing,
-  RecordsValidator
-} from '../src/helpers/RecordsValidator';
+  validateRecordTypes,
+  checkHasDuplicates,
+  checkBrowserMissing,
+  RecordsValidator } from '../src/helpers/RecordsValidator';
+
 
 describe('HasPrefix', () => {
   it('should check vendor prefixes for JS APIs', () => {
@@ -132,65 +131,62 @@ describe('GenerateVersions', () => {
   });
 });
 
-describe('validateRecords', () => {
-  it('should throw an error if a record is missing a property', () => {
-    const brokenRecords = [
-      { name: 'opera', caniuseId: 'opera', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AbstractView.document', type: 'js-api' },
-      { name: 'opera', caniuseId: 'opera', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.Animation.cancel', type: 'js-api' },
-      { name: 'opera', caniuseId: 'opera', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' },
-      { name: 'opera', caniuseId: 'opera', protoChainId: 'window.AnalyserNode.getByteFrequencyData', type: 'js-api' }
-    ];
-    chaiExpect(() => validateRecords(brokenRecords)).to.throw(Error);
-  });
-});
-
-describe('hasDuplicates', () => {
-  it('should throw an error if there are duplicated records', () => {
-    const brokenRecords = [
-      { name: 'opera', caniuseId: 'opera', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AbstractView.document', type: 'js-api' },
-      { name: 'opera', caniuseId: 'opera', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.Animation.cancel', type: 'js-api' },
-      { name: 'opera', caniuseId: 'opera', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' },
-      { name: 'opera', caniuseId: 'opera', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' }
-    ];
-    chaiExpect(() => hasDuplicates(brokenRecords)).to.throw(Error);
-  });
-});
-
-describe('isBrowserMissing', () => {
-  it('should throw an error if browser is missing', () => {
-    const brokenRecords = [
-      { name: 'chrome', caniuseId: 'chrome', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' },
-      { name: 'safari', caniuseId: 'safari', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' },
-      { name: 'firefox', caniuseId: 'firefox', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' },
-      { name: 'opera', caniuseId: 'opera', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' },
-      { name: 'ie', caniuseId: 'ie', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' }
-    ];
-    chaiExpect(() => isBrowserMissing(brokenRecords)).to.throw(Error);
-  });
-});
-
-describe('isRecordMissing', () => {
-  it('should throw an error if a record is missing', () => {
-    const brokenRecords = [
-      { name: 'chrome', caniuseId: 'chrome', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' },
-      { name: 'safari', caniuseId: 'safari', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' },
-      { name: 'firefox', caniuseId: 'firefox', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' },
-      { name: 'opera', caniuseId: 'opera', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' },
-      { name: 'ie', caniuseId: 'ie', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' }
-    ];
-    chaiExpect(() => isRecordMissing(brokenRecords)).to.throw(Error);
-  });
-});
-
 describe('RecordsValidator', () => {
-  it('should throw an error if there are any any invalid records', () => {
-    const brokenRecords = [
-      { name: 'chrome', caniuseId: 'chrome', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' },
-      { name: 'safari', caniuseId: 'safari', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' },
-      { name: 'firefox', caniuseId: 'firefox', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' },
-      { name: 'opera', caniuseId: 'opera', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' },
-      { name: 'ie', caniuseId: 'ie', versions: { 11.64: 'n', 12.12: 'n' }, protoChainId: 'window.AmbientLightSensorReading.illuminance', type: 'js-api' }
-    ];
-    chaiExpect(() => RecordsValidator(brokenRecords)).to.not.throw(Error);
+  const protoChainId = {
+    protoChainId: 'AmbientLightSensorReading.illuminance',
+    type: 'js-api'
+  };
+  const brokenRecords = [
+    { name: 13, caniuseId: 2, versions: '{ "11.64": "n", "12.12": "n"}', ...protoChainId },
+    { name: 'chrome', caniuseId: 'chrome', versions: '{"11.64":"n","12.12":"n"}', ...protoChainId },
+    { name: 'chrome', caniuseId: 'chrome', versions: '{"11.64":"n","12.12":"n"}', ...protoChainId },
+    { name: 'safari', caniuseId: 'safari', versions: '{"9.0":"n","10.0":"n"}', ...protoChainId },
+    { name: 'firefox', caniuseId: 'firefox', versions: '{"11.64":"n","12.12":"n"}', ...protoChainId },
+    { name: 'opera', caniuseId: 'opera', versions: '{"11.64":"n","12.12":"n"}', ...protoChainId },
+    { name: 'ie', caniuseId: 'ie', versions: '{"11.64":"n","12.12":"n"}', ...protoChainId }
+  ];
+
+  describe('validateRecordTypes', () => {
+    it('should throw if record is missing property', () => {
+      chaiExpect(() => validateRecordTypes(brokenRecords)).to.throw(
+        Error,
+        'Invalid record "AmbientLightSensorReading.illuminance" in "2", AssertionError: expected 13 to be a string'
+      );
+      chaiExpect(() => validateRecordTypes(brokenRecords.slice(1)))
+        .to.not.throw();
+    });
+  });
+
+  describe('checkHasDuplicates', () => {
+    it('should throw if there are duplicated records', () => {
+      chaiExpect(() => checkHasDuplicates(brokenRecords))
+        .to.throw(Error, 'Duplicate records found');
+      chaiExpect(() => checkHasDuplicates(brokenRecords.filter(e => e.name !== 'chrome')))
+        .to.not.throw();
+    });
+  });
+
+  describe('checkBrowserMissing', () => {
+    it('should throw if browser is missing', () => {
+      chaiExpect(() => checkBrowserMissing(brokenRecords.filter(e => e.name === 'safari')))
+        .to.throw(Error, 'Record "AmbientLightSensorReading.illuminance" missing in safari@8.0');
+      chaiExpect(() => checkBrowserMissing(brokenRecords))
+        .to.throw(Error, 'Record "AmbientLightSensorReading.illuminance" missing in chrome@26.0');
+      chaiExpect(() => checkBrowserMissing([{
+        name: 'safari',
+        caniuseId: 'safari',
+        versions: '{"6.0":"n","7.0":"n","8.0":"n","9.0":"n","10.0":"n"}',
+        ...protoChainId
+      }]))
+      .to.not.throw();
+    });
+  });
+
+  describe('RecordsValidator', () => {
+    it('should throw if there are any any invalid records', async () => {
+      chaiExpect(async () => {
+        (await RecordsValidator(brokenRecords)).to.throw(Error);
+      });
+    });
   });
 });

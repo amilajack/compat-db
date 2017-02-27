@@ -45,7 +45,7 @@ export const fixedBrowserVersions = [
   // Edge: 2 versions
   { browserName: 'MicrosoftEdge', platform: 'Windows 10', version: '14.14393' },
   { browserName: 'MicrosoftEdge', platform: 'Windows 10', version: '13.10586' },
-  // Safari: 6 versions
+  // Safari: 5 versions
   { browserName: 'safari', platform: 'OS X 10.12', version: '10.0' },
   { browserName: 'safari', platform: 'OS X 10.11', version: '9.0' },
   { browserName: 'safari', platform: 'OS X 10.10', version: '8.0' },

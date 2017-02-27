@@ -17,7 +17,7 @@ type MicrosoftAPICatalogProviderType = Array<{
 export function interceptAndFormat(parentObjectId: string): string {
   const APIsToLowercase = new Set([
     'Console', 'Window', 'Document', 'External', 'History', 'Location', 'Navigator', 'Performance',
-    'Screen', 'defaultStatus'
+    'Screen', 'defaultStatus', 'Controllers'
   ]);
 
   return APIsToLowercase.has(parentObjectId)
