@@ -446,9 +446,9 @@ babel-plugin-check-es2015-constants@^6.22.0:
   dependencies:
     babel-runtime "^6.22.0"
 
-babel-plugin-flow-runtime@^0.5.0:
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/babel-plugin-flow-runtime/-/babel-plugin-flow-runtime-0.5.0.tgz#854ef8d902847daab20ac1d80de63c7bea8ba8bd"
+babel-plugin-flow-runtime@^0.6.0:
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/babel-plugin-flow-runtime/-/babel-plugin-flow-runtime-0.6.0.tgz#d99a2a36c30966bb454c63d9efd89e51ea3316fa"
   dependencies:
     babel-generator "^6.21.0"
     babel-traverse "^6.20.0"
@@ -1092,7 +1092,11 @@ camelcase@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/camelcase/-/camelcase-3.0.0.tgz#32fc4b9fcdaf845fcdf7e73bb97cac2261f0ab0a"
 
-caniuse-db@1.0.30000626, caniuse-db@^1.0.30000624:
+caniuse-db@1.0.30000628:
+  version "1.0.30000628"
+  resolved "https://registry.yarnpkg.com/caniuse-db/-/caniuse-db-1.0.30000628.tgz#3d010e2a8e2537a8d135792e90e4f2ce0eb838cc"
+
+caniuse-db@^1.0.30000624:
   version "1.0.30000626"
   resolved "https://registry.yarnpkg.com/caniuse-db/-/caniuse-db-1.0.30000626.tgz#44363dc86857efaf758fea9faef6a15ed93d8f33"
 
@@ -2139,9 +2143,9 @@ flow-config-parser@^0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/flow-config-parser/-/flow-config-parser-0.3.0.tgz#704916efba88cd2518ab4d8f933079571276138f"
 
-flow-runtime@^0.5.0:
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/flow-runtime/-/flow-runtime-0.5.0.tgz#ee941a9d54f6eee22dd86441633d1a307386790a"
+flow-runtime@^0.6.0:
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/flow-runtime/-/flow-runtime-0.6.0.tgz#faa3e940e0f7821a68cd40dbd446037764264c6e"
 
 flow-typed@^2.0.0:
   version "2.0.0"

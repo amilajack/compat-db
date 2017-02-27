@@ -1,3 +1,4 @@
+import { expect as chaiExpect } from 'chai';
 import HasPrefix from '../src/helpers/HasPrefix';
 import {
   getAllVersionsOfTarget,
@@ -6,6 +7,11 @@ import {
   convertBrowserNametoCaniuse,
   filterDuplicateTargets,
   getVersionsToMark } from '../src/helpers/GenerateVersions';
+import {
+  validateRecordTypes,
+  checkHasDuplicates,
+  checkBrowserMissing,
+  RecordsValidator } from '../src/helpers/RecordsValidator';
 
 
 describe('HasPrefix', () => {
@@ -122,5 +128,65 @@ describe('GenerateVersions', () => {
   it('should should get all target versions: getAllVersionsOfTarget()', () => {
     expect(getAllVersionsOfTarget('safari'))
       .toEqual(['6.0', '7.0', '8.0', '9.0', '10.0']);
+  });
+});
+
+describe('RecordsValidator', () => {
+  const protoChainId = {
+    protoChainId: 'AmbientLightSensorReading.illuminance',
+    type: 'js-api'
+  };
+  const brokenRecords = [
+    { name: 13, caniuseId: 2, versions: '{ "11.64": "n", "12.12": "n"}', ...protoChainId },
+    { name: 'chrome', caniuseId: 'chrome', versions: '{"11.64":"n","12.12":"n"}', ...protoChainId },
+    { name: 'chrome', caniuseId: 'chrome', versions: '{"11.64":"n","12.12":"n"}', ...protoChainId },
+    { name: 'safari', caniuseId: 'safari', versions: '{"9.0":"n","10.0":"n"}', ...protoChainId },
+    { name: 'firefox', caniuseId: 'firefox', versions: '{"11.64":"n","12.12":"n"}', ...protoChainId },
+    { name: 'opera', caniuseId: 'opera', versions: '{"11.64":"n","12.12":"n"}', ...protoChainId },
+    { name: 'ie', caniuseId: 'ie', versions: '{"11.64":"n","12.12":"n"}', ...protoChainId }
+  ];
+
+  describe('validateRecordTypes', () => {
+    it('should throw if record is missing property', () => {
+      chaiExpect(() => validateRecordTypes(brokenRecords)).to.throw(
+        Error,
+        'Invalid record "AmbientLightSensorReading.illuminance" in "2", AssertionError: expected 13 to be a string'
+      );
+      chaiExpect(() => validateRecordTypes(brokenRecords.slice(1)))
+        .to.not.throw();
+    });
+  });
+
+  describe('checkHasDuplicates', () => {
+    it('should throw if there are duplicated records', () => {
+      chaiExpect(() => checkHasDuplicates(brokenRecords))
+        .to.throw(Error, 'Duplicate records found');
+      chaiExpect(() => checkHasDuplicates(brokenRecords.filter(e => e.name !== 'chrome')))
+        .to.not.throw();
+    });
+  });
+
+  describe('checkBrowserMissing', () => {
+    it('should throw if browser is missing', () => {
+      chaiExpect(() => checkBrowserMissing(brokenRecords.filter(e => e.name === 'safari')))
+        .to.throw(Error, 'Record "AmbientLightSensorReading.illuminance" missing in safari@8.0');
+      chaiExpect(() => checkBrowserMissing(brokenRecords))
+        .to.throw(Error, 'Record "AmbientLightSensorReading.illuminance" missing in chrome@26.0');
+      chaiExpect(() => checkBrowserMissing([{
+        name: 'safari',
+        caniuseId: 'safari',
+        versions: '{"6.0":"n","7.0":"n","8.0":"n","9.0":"n","10.0":"n"}',
+        ...protoChainId
+      }]))
+      .to.not.throw();
+    });
+  });
+
+  describe('RecordsValidator', () => {
+    it('should throw if there are any any invalid records', async () => {
+      chaiExpect(async () => {
+        (await RecordsValidator(brokenRecords)).to.throw(Error);
+      });
+    });
   });
 });
