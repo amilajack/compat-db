@@ -170,5 +170,3 @@ export async function writeRecordMetadataToDB(start?: number, end?: number) {
 
   return metadataToInsert;
 }
-
-writeRecordMetadataToDB();
