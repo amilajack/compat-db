@@ -71,7 +71,9 @@ function logUnsupportedAPIs(records: Array<RecordType>, supportedAPITests) {
 
   allSet.forEach(protoChainId => {
     if (!supportedSet.has(protoChainId)) {
-      console.warn(`"${protoChainId}" is not supported`);
+      if (process.env.NODE_ENV !== 'test') {
+        console.warn(`"${protoChainId}" is not supported`);
+      }
     }
   });
 }
@@ -105,8 +107,10 @@ async function RecordMetadata(startIndex: number = 0, endIndex?: number): Record
 
   logUnsupportedAPIs(records, supportedAPITests);
 
-  console.log(`${records.length} records`);
-  console.log(`${supportedAPITests.length} apis are supported`);
+  if (process.env.NODE_ENV !== 'test' || !process.env.CI) {
+    console.log(`${records.length} records`);
+    console.log(`${supportedAPITests.length} apis are supported`);
+  }
 
   const tests = supportedAPITests.map(({ record }) => ({
     assertions: AssertionFormatter(record),
@@ -155,7 +159,6 @@ export default RecordMetadata;
  */
 export async function writeRecordMetadataToDB(start?: number, end?: number) {
   const metadata = await RecordMetadata(start, end);
-
   const recordMetadataDatabase = new RecordMetadataDatabase();
   await recordMetadataDatabase.migrate();
 
@@ -170,5 +173,3 @@ export async function writeRecordMetadataToDB(start?: number, end?: number) {
 
   return metadataToInsert;
 }
-
-writeRecordMetadataToDB();

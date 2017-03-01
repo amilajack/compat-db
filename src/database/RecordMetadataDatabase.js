@@ -5,6 +5,15 @@
 import AbstractDatabase from './AbstractDatabase';
 
 
+type RecordMetadataType = {
+  protoChainId: string,
+  astNodeType: string,
+  isStatic: bool,
+  polyfillable: bool,
+  type: 'js-api' | 'css-api' | 'html-api'
+};
+
+
 export default class RecordMetabaseDatabase extends AbstractDatabase {
   constructor(name: string = 'record-metadata') {
     super(name);
@@ -21,7 +30,7 @@ export default class RecordMetabaseDatabase extends AbstractDatabase {
     });
   }
 
-  getAll(): Promise<Array<Object>> {
+  getAll(): Promise<Array<RecordMetadataType>> {
     return this.connection.Database
       .forge()
       .fetchAll()

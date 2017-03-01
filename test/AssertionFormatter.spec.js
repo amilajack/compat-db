@@ -137,6 +137,7 @@ describe('AssertionFormatter', () => {
       { protoChain: ['Array', 'reduce'], isStatic: false, isSupported: true, type: 'js-api' },
       { protoChain: ['Array', 'map'], isStatic: false, isSupported: true, type: 'js-api' },
       { protoChain: ['IDBMutableFile', 'getFile'], isStatic: false, isSupported: false, type: 'js-api' },
+      { protoChain: ['SVGPointList'], isStatic: true, isSupported: true, type: 'js-api' },
       { protoChain: ['MessageEvent', 'data'], isStatic: false, isSupported: true, type: 'js-api' },
       { protoChain: ['Uint8ClampedArray', 'values'], isStatic: false, isSupported: true, type: 'js-api' },
       { protoChain: ['WebGL2RenderingContext', 'VERTEX_ATTRIB_ARRAY_ENABLED'], isStatic: true, isSupported: true, type: 'js-api' },
