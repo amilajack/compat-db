@@ -25,18 +25,16 @@ type finishedTestType = {
   record: RecordType,
   isSupported: bool
 };
+
 type capabilityType = {
   browserName: string,
   version: string,
   platform: string,
 };
-type exTestType = Promise<finishedTestType[]>;
 
-/**
- * Take an array of records, generate and run tests, and return the results
- * @TODO: Optimization: Batch tests
- */
-export async function executeTests(capability: capabilityType, jobs: JobQueueType[]): exTestType {
+type exTestType = Promise<Array<finishedTestType>>;
+
+export async function executeTestsParallel(capability: capabilityType, tests: Array<string>) {
   const { browserName, platform, version } = capability;
   const username = process.env.SAUCE_USERNAME;
   const accessKey = process.env.SAUCE_ACCESS_KEY;
@@ -59,31 +57,43 @@ export async function executeTests(capability: capabilityType, jobs: JobQueueTyp
     )
     .build();
 
-  console.log(`Executing ${jobs.length} tests in parallel on ${platform} ${browserName} ${version}`);
-
-  const items = await Promise.all(
-    jobs.map(job => {
-      const record: RecordType = JSON.parse(job.record);
-      const { apiIsSupported } = AssertionFormatter(record);
-
-      return driver
-        .executeScript(`return (${apiIsSupported})`)
-        .then(isSupported => {
-          if (typeof isSupported !== 'boolean') {
-            throw new Error([
-              'Invalid JS execution value returned from Sauce Labs.',
-              `Received ${isSupported} and expected boolean`
-            ].join((' ')));
-          }
-          return { record, isSupported, job };
-        })
-        .catch(console.log);
-    })
+  const items = await driver.executeScript(
+    `return (function() {
+      return [${tests.join(',')}];
+    })()`
   );
 
   await driver.quit();
 
   return items;
+}
+
+/**
+ * Take an array of records, generate and run tests, and return the results
+ * @TODO: Optimization: Batch tests
+ */
+export async function executeTests(capability: capabilityType, jobs: JobQueueType[]): exTestType {
+  const { browserName, platform, version } = capability;
+
+  console.log(`Executing ${jobs.length} tests in parallel on ${platform} ${browserName} ${version}`);
+
+  return executeTestsParallel(
+    capability,
+    jobs.map(job => AssertionFormatter(JSON.parse(job.record)).apiIsSupported)
+  )
+  .then((testResults: Array<bool>) => testResults.map((isSupported, index) => {
+    const job = jobs[index];
+    const record: RecordType = JSON.parse(job.record);
+
+    if (typeof isSupported !== 'boolean') {
+      throw new Error([
+        'Invalid JS execution value returned from Sauce Labs.',
+        `Received ${isSupported} and expected boolean`
+      ].join((' ')));
+    }
+    return { record, isSupported, job };
+  }))
+  .catch(console.log);
 }
 
 function log(browserName, version, platform, record: Object, isSupported: bool) {

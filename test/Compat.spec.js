@@ -1,6 +1,7 @@
 import JobQueueDatabase from '../src/database/JobQueueDatabase';
 import Compat, {
   executeTests,
+  executeTestsParallel,
   handleFinishedTest,
   handleCapability } from '../compat-tests/Compat';
 import setup from '../compat-tests/setup';
@@ -71,6 +72,32 @@ describe('Comapt', () => {
         isSupported: true
       }
     ]);
+  });
+
+  it('should execute tests in parallel', async () => {
+    expect(await executeTestsParallel(
+      {
+        browserName: 'chrome',
+        version: '48.0',
+        platform: 'Windows 10'
+      },
+      [true, false, true, true, false, true]
+    ))
+    .toEqual([true, false, true, true, false, true]);
+
+    const exampleTest = `(function exampleTest() {
+      return 'some';
+    })()`;
+
+    expect(await executeTestsParallel(
+      {
+        browserName: 'firefox',
+        version: '42.0',
+        platform: 'Windows 10'
+      },
+      [exampleTest, exampleTest, exampleTest, exampleTest, exampleTest, exampleTest]
+    ))
+    .toEqual(['some', 'some', 'some', 'some', 'some', 'some']);
   });
 
   it('should handle finished tests', async () => {
