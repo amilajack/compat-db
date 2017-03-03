@@ -11,7 +11,7 @@ import type { RecordType } from '../providers/RecordType';
  * remove unnecessary ones
  *
  * @TODO: Remove vendor-prefixed records
- * @TODO: Implement `DatabaseType` type
+ * @TODO: Implement `DatabaseRecordType` type
  */
 export default function PrepareDatabase(records: Array<RecordType>, databasePath: string) {
   const database = {

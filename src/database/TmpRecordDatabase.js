@@ -15,7 +15,7 @@ dotenv.config();
 
 type str = string;
 
-export type TmpDatabaseType = {
+export type TmpRecordDatabaseRecordType = {
   name: string,
   versions: {
     [version: string]: 'y' | 'n' | 'n/a'
@@ -41,7 +41,7 @@ export function initializeDatabaseConnection() {
     client: 'sqlite3',
     useNullAsDefault: true,
     connection: {
-      filename: join(__dirname, '..', '..', 'tmp-db-records', 'database.sqlite')
+      filename: join(__dirname, '..', '..', 'tmp-records', 'database.sqlite')
     }
   };
 
@@ -51,7 +51,7 @@ export function initializeDatabaseConnection() {
       : sqliteConfig
   );
   const Bookshelf = bookshelf(knex);
-  const Database = Bookshelf.Model.extend({ tableName: 'records' });
+  const Database = Bookshelf.Model.extend({ tableName: 'tmp-records' });
 
   return { knex, Database, Bookshelf };
 }
@@ -61,7 +61,7 @@ export async function migrate() {
 
   /* eslint-disable */
   // $FlowFixMe: Flow definition issue
-  await knex.schema.dropTableIfExists('records').createTable('records', (table) => {
+  await knex.schema.dropTableIfExists('tmp-records').createTable('tmp-records', (table) => {
     table.increments('id').primary();
     table.string('name');
     table.string('protoChainId');
@@ -86,12 +86,17 @@ export async function migrate() {
 
 export const { Database } = initializeDatabaseConnection();
 
-type sameRecordType = Promise<TmpDatabaseType>;
+type sameRecordType = Promise<TmpRecordDatabaseRecordType>;
+
+type rQueryType = {
+  type: 'js-api' | 'css-api' | 'html-api',
+  protoChainId: string,
+};
 
 /**
  * Find all the compatibility records for every version of the same browser
  */
-export function findSameVersionCompatRecord(record: RType, caniuseId: str): sameRecordType {
+export function findSameVersionCompatRecord(record: rQueryType, caniuseId: str): sameRecordType {
   return Database.where({
     name: caniuseId,
     type: record.type,

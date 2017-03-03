@@ -1,9 +1,9 @@
-import * as TmpDatabase from './TmpDatabase';
+import * as TmpRecordDatabase from './TmpRecordDatabase';
 import JobQueueDatabase from '../../src/database/JobQueueDatabase';
 import RecordMetadataDatabase from '../../src/database/RecordMetadataDatabase';
 
 
-TmpDatabase.migrate();
+TmpRecordDatabase.migrate();
 
 const jobQueue = new JobQueueDatabase();
 jobQueue

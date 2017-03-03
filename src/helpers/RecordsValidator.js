@@ -1,7 +1,7 @@
 // @flow
 import { expect } from 'chai';
 import { execSync } from 'child_process';
-import * as TmpDatabase from '../database/TmpDatabase';
+import * as TmpRecordDatabase from '../database/TmpRecordDatabase';
 import { caniuseToSeleniumMappings } from './Constants';
 import { allTargets } from './GenerateVersions';
 
@@ -78,17 +78,17 @@ export function checkBrowserMissing(tmpRecords: Array<tmpRecordType>) {
   });
 }
 
-export async function RecordsValidator(defaultTmpDatabaseRecords?: Array<tmpRecordType>) {
-  const tmpDatabaseRecords = defaultTmpDatabaseRecords || await TmpDatabase.getAll();
+export async function RecordsValidator(defaultTmpRecordDatabaseRecords?: Array<tmpRecordType>) {
+  const TmpRecordDatabaseRecords = defaultTmpRecordDatabaseRecords || await TmpRecordDatabase.getAll();
 
   execSync('npm run build-compat-db');
 
-  expect(tmpDatabaseRecords).to.have.length.above(1);
-  console.log(`Testing ${tmpDatabaseRecords.length} temporary database records`);
+  expect(TmpRecordDatabaseRecords).to.have.length.above(1);
+  console.log(`Testing ${TmpRecordDatabaseRecords.length} temporary database records`);
 
-  validateRecordTypes(tmpDatabaseRecords);
-  checkHasDuplicates(tmpDatabaseRecords);
-  checkBrowserMissing(tmpDatabaseRecords);
+  validateRecordTypes(TmpRecordDatabaseRecords);
+  checkHasDuplicates(TmpRecordDatabaseRecords);
+  checkBrowserMissing(TmpRecordDatabaseRecords);
 
   console.log('✅   No validation errors found');
 }

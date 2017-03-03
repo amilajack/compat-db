@@ -5,7 +5,7 @@ import Compat, {
   handleFinishedTest,
   handleCapability } from '../compat-tests/Compat';
 import setup from '../compat-tests/setup';
-import * as TmpRecordDatabase from '../src/database/TmpDatabase';
+import * as TmpRecordDatabase from '../src/database/TmpRecordDatabase';
 import { baseRecord } from './JobQueueDatabase.spec';
 
 

@@ -10,7 +10,7 @@ dotenv.config();
 
 type str = string;
 
-export type AbstractDatabaseType = {
+export type AbstractDatabaseRecordType = {
   name: str,
   versions: {
     [version: str]: 'y' | 'n' | 'n/a'
@@ -57,7 +57,7 @@ export default class AbstractDatabase {
       client: 'sqlite3',
       useNullAsDefault: true,
       connection: {
-        filename: join(__dirname, '..', '..', 'tmp-db-records', 'database.sqlite')
+        filename: join(__dirname, '..', '..', 'tmp-records', 'database.sqlite')
       }
     };
 
@@ -109,7 +109,7 @@ export default class AbstractDatabase {
   /**
    * Find all the compatibility records for every version of the same browser
    */
-  findSameVersionCompatRecord(record: RType, caniuseId: str): Promise<AbstractDatabaseType> {
+  findSameVersionCompatRecord(record: RType, caniuseId: str): Promise<AbstractDatabaseRecordType> {
     return this.connection.Database.where({
       name: caniuseId,
       type: record.type,

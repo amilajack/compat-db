@@ -36,7 +36,7 @@ lib
 compat-db.json
 .env
 errorShots
-tmp-db-records
+tmp-records
 capabilities.json
 compat-tests-webdriver/jobs.json
 compat-tests/test-results

@@ -5,7 +5,7 @@ import webdriver from 'selenium-webdriver';
 import AssertionFormatter from '../src/assertions/AssertionFormatter';
 import {
   insertBulkRecords,
-  findSameVersionCompatRecord } from '../src/database/TmpDatabase';
+  findSameVersionCompatRecord } from '../src/database/TmpRecordDatabase';
 import { getVersionsToMark } from '../src/helpers/GenerateVersions';
 import JobQueueDatabase from '../src/database/JobQueueDatabase';
 import setup from './setup';
@@ -143,7 +143,7 @@ export async function handleFinishedTest(finishedTest: finishedTestType) {
 
   log(browserName, version, platform, record, isSupported);
 
-  // Fetch the updated records from the TmpDatabase
+  // Fetch the updated records from the TmpRecordDatabase
   const newExistingRecordTargetVersions =
     await findSameVersionCompatRecord(record, caniuseId);
 

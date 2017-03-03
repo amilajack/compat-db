@@ -12,9 +12,20 @@ import {
   checkHasDuplicates,
   checkBrowserMissing,
   RecordsValidator } from '../src/helpers/RecordsValidator';
+import {
+  browserNameToCaniuseMappings,
+  caniuseBrowsers,
+  caniuseToSeleniumMappings } from '../src/helpers/Constants';
 
 
 describe('HasPrefix', () => {
+  it('should have mappings of the same length', () => {
+    expect(Object.keys(browserNameToCaniuseMappings).length)
+      .toEqual(Object.keys(caniuseToSeleniumMappings).length);
+    expect(caniuseBrowsers.length)
+      .toEqual(Object.keys(caniuseToSeleniumMappings).length);
+  });
+
   it('should check vendor prefixes for JS APIs', () => {
     expect(HasPrefix('document.mozFullscreen()')).toEqual(true);
     expect(HasPrefix('document.webkitFullscreen()')).toEqual(true);

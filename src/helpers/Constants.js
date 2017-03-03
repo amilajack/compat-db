@@ -29,14 +29,7 @@ export const caniuseToSeleniumMappings = {
   edge: 'MicrosoftEdge'
 };
 
-export const caniuseBrowsers = [
-  'chrome',
-  'firefox',
-  'opera',
-  'safari',
-  'ie',
-  'edge'
-];
+export const caniuseBrowsers = Object.keys(browserNameToCaniuseMappings);
 
 export const fixedBrowserVersions = [
   // Opera: 2 versions

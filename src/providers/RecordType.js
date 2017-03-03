@@ -14,7 +14,7 @@ export type RecordType = {
   /**
    * The unique id that is used to search for the property
    */
-  id: string,
+  id?: string,
 
   /**
    * An object containing information about the spec. This information is not
@@ -35,13 +35,15 @@ export type RecordType = {
 
   /**
    * The official name of the specification
+   * @TODO
    */
-  specNames: Array<string>,
+  specNames?: Array<string>,
 
   /**
    * Determine if the spec has finished being written
+   * @TODO
    */
-  specIsFinished: bool,
+  specIsFinished?: bool,
 
   /**
    * Prototype chain/method list

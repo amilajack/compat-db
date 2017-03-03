@@ -6,6 +6,7 @@
     "fp/no-throw": 0,
     "import/no-extraneous-dependencies": 0,
     "no-let": 0,
-    "no-plusplus": 0
+    "no-plusplus": 0,
+    "flowtype-errors/show-errors": 0
   }
 }
