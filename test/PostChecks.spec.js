@@ -46,7 +46,7 @@ describe('PostChecks', () => {
     expect(await TmpRecordDatabase.count()).toEqual(2);
     expect(await recordMetadataDatabase.count()).toEqual(1);
 
-    const finalRecords = await PostChecks();
+    const finalRecords = await PostChecks('test-post-checks-record-metadata');
 
     // expect the result to be deduped and of correct format
     expect(finalRecords).toEqual({

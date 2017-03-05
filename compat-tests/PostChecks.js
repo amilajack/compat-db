@@ -17,8 +17,8 @@ type targetsType = {
   }
 };
 
-export default async function PostChecks(): Promise<DatabaseRecordType> {
-  const recordMetadataDatabase = new RecordMetadataDatabase();
+export default async function PostChecks(rMTableName?: string): Promise<DatabaseRecordType> {
+  const recordMetadataDatabase = new RecordMetadataDatabase(rMTableName);
 
   const tmpRecords = await TmpRecordDatabase.getAll();
   const recordMetadata = await recordMetadataDatabase.getAll();
