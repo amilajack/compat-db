@@ -21,7 +21,7 @@ export default class RecordMetabaseDatabase extends AbstractDatabase {
 
   migrate() {
     return super.migrate((table) => {
-      table.increments('id').primary();
+      table.increments('id');
       table.string('protoChainId');
       table.string('astNodeType');
       table.boolean('isStatic');

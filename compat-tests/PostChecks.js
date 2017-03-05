@@ -3,7 +3,6 @@
  * Autocorrect the records if any errors are found
  * @flow
  */
-import { RecordsValidator } from '../src/helpers/RecordsValidator';
 import * as TmpRecordDatabase from '../src/database/TmpRecordDatabase';
 import RecordMetadataDatabase from '../src/database/RecordMetadataDatabase';
 import type { DatabaseRecordType } from '../src/database/DatabaseRecordType';
@@ -19,14 +18,13 @@ type targetsType = {
 };
 
 export default async function PostChecks(): Promise<DatabaseRecordType> {
-  await RecordsValidator();
   const recordMetadataDatabase = new RecordMetadataDatabase();
 
   const tmpRecords = await TmpRecordDatabase.getAll();
   const recordMetadata = await recordMetadataDatabase.getAll();
   const dedupedRecordsMap: Map<string, targetsType> = new Map();
 
-  // @HACK: Merge all the duplicated records
+  // Merge all the duplicated records
   // For every record in RecordMetadata and for each caniuse database
   // in TmpRecordDatabase and compile them into a single record
   recordMetadata.forEach((record) => {
@@ -37,7 +35,7 @@ export default async function PostChecks(): Promise<DatabaseRecordType> {
           tmpRecord.caniuseId === caniuseBrowser
         )
         .map(tmpRecord => JSON.parse(tmpRecord.versions))
-        .reduce((p, c) => ({ ...p, ...c }));
+        .reduce((p, c) => ({ ...p, ...c }), {});
 
       if (dedupedRecordsMap.has(record.protoChainId)) {
         const item = dedupedRecordsMap.get(record.protoChainId);

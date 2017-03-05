@@ -59,27 +59,14 @@ export function initializeDatabaseConnection() {
 export async function migrate() {
   const { knex, Database } = initializeDatabaseConnection();
 
-  /* eslint-disable */
-  // $FlowFixMe: Flow definition issue
   await knex.schema.dropTableIfExists('tmp-records').createTable('tmp-records', (table) => {
-    table.increments('id').primary();
+    table.increments('id');
     table.string('name');
     table.string('protoChainId');
     table.string('versions', 1000);
     table.enu('type', ['js-api', 'css-api', 'html-api']);
     table.string('caniuseId');
   });
-  await knex.schema.dropTableIfExists('jobs').createTable('jobs', (table) => {
-    table.increments('id').primary();
-    table.string('name');
-    table.string('browserName');
-    table.string('protoChainId');
-    table.string('version');
-    table.enu('type', ['js-api', 'css-api', 'html-api']);
-    table.string('record', 1000);
-    table.string('caniuseId');
-  });
-  /* eslint-enable */
 
   return Database;
 }

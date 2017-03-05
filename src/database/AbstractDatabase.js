@@ -57,7 +57,7 @@ export default class AbstractDatabase {
       client: 'sqlite3',
       useNullAsDefault: true,
       connection: {
-        filename: join(__dirname, '..', '..', 'tmp-records', 'database.sqlite')
+        filename: join(__dirname, '..', '..', this.tableName, 'database.sqlite')
       }
     };
 
@@ -99,9 +99,8 @@ export default class AbstractDatabase {
   async migrate(createTable: (table: Object) => void) {
     const { knex, Database } = this.initializeDatabaseConnection(this.tableName);
 
-    await knex.schema
-      .dropTableIfExists(this.tableName)
-      .createTable(this.tableName, createTable);
+    await knex.schema.dropTableIfExists(this.tableName);
+    await knex.schema.createTable(this.tableName, createTable);
 
     return Database;
   }
