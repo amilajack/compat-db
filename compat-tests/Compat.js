@@ -1,5 +1,6 @@
 // @flow
 import 'babel-polyfill';
+import bluebird from 'bluebird';
 import dotenv from 'dotenv';
 import webdriver from 'selenium-webdriver';
 import AssertionFormatter from '../src/assertions/AssertionFormatter';
@@ -12,6 +13,12 @@ import setup from './setup';
 import type { RecordType } from '../src/providers/RecordType';
 import type { JobQueueType } from '../src/database/JobQueueDatabase';
 import type { browserCapabilityType } from './setup';
+
+global.Promise = bluebird;
+
+global.Promise.config({
+  longStackTraces: true
+});
 
 
 /* eslint no-console: 0 */
@@ -51,11 +58,14 @@ export async function executeTestsParallel(capability: capabilityType, tests: Ar
       version,
       username,
       accessKey
+      // 'idle-timeout': 30000
     })
     .usingServer(
       `http://${username}:${accessKey}@ondemand.saucelabs.com:80/wd/hub`
     )
     .build();
+
+  await driver.get('http://example.com');
 
   const items = await driver.executeScript(
     `return (function() {
@@ -191,7 +201,10 @@ export async function handleCapability(capability: browserCapabilityType): handl
   // Find all the jobs that match the current capability's browserName, version,
   // and platform
   const allJobs: Array<JobQueueType> = (await jobQueue.find({
-    status: 'queued',
+    // @TODO @HACK: Jobs that fail do not change their status back to 'queued'
+    //              For the timebeing, lets ignore the status when querying
+    //              the job queue
+    // status: 'queued',
     browserName,
     version
   }))

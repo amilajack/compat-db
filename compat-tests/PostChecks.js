@@ -3,6 +3,8 @@
  * Autocorrect the records if any errors are found
  * @flow
  */
+import { join } from 'path';
+import { writeFileSync } from 'fs';
 import * as TmpRecordDatabase from '../src/database/TmpRecordDatabase';
 import RecordMetadataDatabase from '../src/database/RecordMetadataDatabase';
 import type { DatabaseRecordType } from '../src/database/DatabaseRecordType';
@@ -66,7 +68,7 @@ export default async function PostChecks(rMTableName?: string): Promise<Database
     records: Array.from(dedupedRecordsMap)
   };
 
-  // @TODO: Store the finalRecords
+  writeFileSync(join(__dirname, '..', 'lib', 'all.json'), JSON.stringify(finalRecords));
 
   return finalRecords;
 }

@@ -1,4 +1,3 @@
-// @flow
 import { expect as chaiExpect } from 'chai';
 import RecordMetadata, {
   writeRecordMetadataToDB,
