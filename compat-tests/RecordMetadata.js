@@ -24,7 +24,7 @@ type RecordMetadataType = Promise<Array<{
  *        This is a temporary solution that creates two browser sessions and
  *        runs tests on them
  */
-export async function parallelizeBrowserTests(tests: Array<string>, useNightmare: bool = true) {
+export async function parallelizeBrowserTests(tests: Array<string | bool>, useNightmare: bool = true) {
   if (useNightmare) {
     const middle = Math.floor(tests.length / 2);
 
@@ -157,9 +157,9 @@ export default RecordMetadata;
 /**
  * Migrate the 'record-metadata' table and write the records to it
  */
-export async function writeRecordMetadataToDB(start?: number, end?: number) {
+export async function writeRecordMetadataToDB(start?: number, end?: number, tableName: string = 'record-metadata') {
   const metadata = await RecordMetadata(start, end);
-  const recordMetadataDatabase = new RecordMetadataDatabase();
+  const recordMetadataDatabase = new RecordMetadataDatabase(tableName);
   await recordMetadataDatabase.migrate();
 
   const metadataToInsert = metadata.map(each => ({

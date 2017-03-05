@@ -12,7 +12,7 @@ describe('PostChecks', () => {
       protoChainId: 'Array.push'
     };
 
-    const recordMetadataDatabase = new RecordMetadataDatabase();
+    const recordMetadataDatabase = new RecordMetadataDatabase('test-post-checks-record-metadata');
 
     await TmpRecordDatabase.migrate();
     await recordMetadataDatabase.migrate();
