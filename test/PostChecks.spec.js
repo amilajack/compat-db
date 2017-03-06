@@ -51,7 +51,13 @@ describe('PostChecks', () => {
     // expect the result to be deduped and of correct format
     expect(finalRecords).toEqual({
       records: [
-        ['Array.push', {
+        {
+          id: 1,
+          protoChainId: 'Array.push',
+          astNodeType: 'MemberExpression',
+          isStatic: false,
+          polyfillable: 1,
+          type: 'js-api',
           targets: {
             'internet explorer': {},
             MicrosoftEdge: {},
@@ -59,14 +65,8 @@ describe('PostChecks', () => {
             opera: {},
             firefox: {},
             chrome: {}
-          },
-          id: 1,
-          protoChainId: 'Array.push',
-          astNodeType: 'MemberExpression',
-          isStatic: false,
-          polyfillable: 1,
-          type: 'js-api'
-        }]
+          }
+        }
       ]
     });
   });

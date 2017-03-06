@@ -25,7 +25,7 @@ export default class RecordMetabaseDatabase extends AbstractDatabase {
       table.string('protoChainId');
       table.string('astNodeType');
       table.boolean('isStatic');
-      table.boolean('polyfillable');
+      table.boolean('polyfillable').defaultTo(false);
       table.enu('type', ['js-api', 'css-api', 'html-api']);
     });
   }

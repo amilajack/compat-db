@@ -12,7 +12,8 @@ const jobQueueDatabase = new JobQueueDatabase();
 
   while (await jobQueueDatabase.count() > 0) {
     iteration++;
-    console.log(`On iteration #${iteration}...`);
-    execSync('npm run build-compat-db');
+    console.log(`On iteration #${iteration} ...`);
+    const result = execSync('npm run build-compat-db').toString();
+    console.log(result);
   }
 }());

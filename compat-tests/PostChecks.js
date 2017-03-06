@@ -26,6 +26,11 @@ export default async function PostChecks(rMTableName?: string): Promise<Database
   const recordMetadata = await recordMetadataDatabase.getAll();
   const dedupedRecordsMap: Map<string, targetsType> = new Map();
 
+  console.log(
+    `${recordMetadata.length} Metadata Records`,
+    `${tmpRecords.length} Tmp Records`
+  );
+
   // Merge all the duplicated records
   // For every record in RecordMetadata and for each caniuse database
   // in TmpRecordDatabase and compile them into a single record
@@ -65,10 +70,13 @@ export default async function PostChecks(rMTableName?: string): Promise<Database
   });
 
   const finalRecords: DatabaseRecordType = {
-    records: Array.from(dedupedRecordsMap)
+    records: Array.from(dedupedRecordsMap.values())
   };
 
-  writeFileSync(join(__dirname, '..', 'lib', 'all.json'), JSON.stringify(finalRecords));
+  writeFileSync(
+    join(__dirname, '..', 'lib', 'all.json'),
+    JSON.stringify(finalRecords)
+  );
 
   return finalRecords;
 }

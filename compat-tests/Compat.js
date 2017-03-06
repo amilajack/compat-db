@@ -20,7 +20,6 @@ global.Promise.config({
   longStackTraces: true
 });
 
-
 /* eslint no-console: 0 */
 
 const jobQueue = new JobQueueDatabase();
@@ -57,8 +56,8 @@ export async function executeTestsParallel(capability: capabilityType, tests: Ar
       platform,
       version,
       username,
-      accessKey
-      // 'idle-timeout': 30000
+      accessKey,
+      'idle-timeout': 3000
     })
     .usingServer(
       `http://${username}:${accessKey}@ondemand.saucelabs.com:80/wd/hub`
@@ -85,7 +84,9 @@ export async function executeTestsParallel(capability: capabilityType, tests: Ar
 export async function executeTests(capability: capabilityType, jobs: JobQueueType[]): exTestType {
   const { browserName, platform, version } = capability;
 
-  console.log(`Executing ${jobs.length} tests in parallel on ${platform} ${browserName} ${version}`);
+  const logMessage = `Executing ${jobs.length} tests in parallel on ${platform} ${browserName} ${version}`;
+  console.log(logMessage);
+  console.log(logMessage.split('').map(() => '-').join(''));
 
   return executeTestsParallel(
     capability,
@@ -208,8 +209,7 @@ export async function handleCapability(capability: browserCapabilityType): handl
     browserName,
     version
   }))
-  // @HACK: Temporarily avoid running on IE because of bugs with IE webdriver
-  .filter(job => job.caniuseId !== 'ie');
+  .filter(each => each.browserName !== 'safari');
 
   const jobs = allJobs.slice(
     parseInt(process.env.JOBS_INDEX_START, 10) || 0,

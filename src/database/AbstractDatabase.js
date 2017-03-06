@@ -35,6 +35,9 @@ export default class AbstractDatabase {
   /**
    * Initialize a database connection to either sqlite or mysql. Defaults to
    * sqlite for easier out-of-the-box setup.
+   *
+   * @NOTE: If you get the error 'connection.query is not a function',
+   *        this is probably because the mysql server has not been started
    */
   initializeDatabaseConnection() {
     const mysqlConfig = {
