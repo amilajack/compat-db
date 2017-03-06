@@ -8,11 +8,13 @@ type targetType = {
   version: string,
   platform: string
 };
+
 type capabilityType = {
   browserName: string,
   minVersion: number,
   maxVersion: number
 };
+
 export function getCapabilities(object: capabilityType): Array<targetType> {
   const numberOfVersions = object.maxVersion - object.minVersion + 1;
   return Array(numberOfVersions).fill({}).map((each, i) => ({
@@ -75,6 +77,7 @@ type versionsToMarkType = {
   right: Array<string>,
   middle: string
 };
+
 /**
  * Given the a list of the marked versions, find versions that haven't been marked
  * yet and find the 'povit'. If middle is supported, mark 'right' elements as supported.

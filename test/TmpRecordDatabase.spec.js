@@ -2,10 +2,10 @@ import {
   insertBulkRecords,
   findSameVersionCompatRecord,
   initializeDatabaseConnection,
-  migrate } from '../src/database/TmpDatabase';
+  migrate } from '../src/database/TmpRecordDatabase';
 
 
-describe('TmpDatabase', () => {
+describe('TmpRecordDatabase', () => {
   beforeEach(async () => {
     await migrate();
   });
@@ -39,17 +39,13 @@ describe('TmpDatabase', () => {
 
     expect(
       await findSameVersionCompatRecord({
-        protoChainId: 'some',
-        caniuseId: 'chrome',
-        type: 'js-api',
-        name: 'chrome'
+        protoChainId: 'some-protochain-id',
+        type: 'js-api'
       }, 'chrome')
     )
     .toEqual({
-      protoChainId: 'some',
-      caniuseId: 'chrome',
+      protoChainId: 'some-protochain-id',
       type: 'js-api',
-      name: 'chrome',
       id: 1,
       versions: {
         50: 'y',

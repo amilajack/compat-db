@@ -5,7 +5,7 @@ import Compat, {
   handleFinishedTest,
   handleCapability } from '../compat-tests/Compat';
 import setup from '../compat-tests/setup';
-import * as TmpRecordDatabase from '../src/database/TmpDatabase';
+import * as TmpRecordDatabase from '../src/database/TmpRecordDatabase';
 import { baseRecord } from './JobQueueDatabase.spec';
 
 
@@ -47,18 +47,6 @@ const jobs = [
 const [querySelectorJob, borderWidthJob] = jobs;
 
 describe('Comapt', () => {
-  beforeAll(async () => {
-    await TmpRecordDatabase.migrate();
-    const jobQueue = new JobQueueDatabase();
-    await jobQueue.migrate();
-  });
-
-  afterEach(async () => {
-    await TmpRecordDatabase.migrate();
-    const jobQueue = new JobQueueDatabase();
-    await jobQueue.migrate();
-  });
-
   it('should execute tests', async () => {
     expect(await executeTests(capability, jobs)).toEqual([
       {

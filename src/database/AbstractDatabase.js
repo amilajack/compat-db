@@ -10,7 +10,7 @@ dotenv.config();
 
 type str = string;
 
-export type AbstractDatabaseType = {
+export type AbstractDatabaseRecordType = {
   name: str,
   versions: {
     [version: str]: 'y' | 'n' | 'n/a'
@@ -35,6 +35,9 @@ export default class AbstractDatabase {
   /**
    * Initialize a database connection to either sqlite or mysql. Defaults to
    * sqlite for easier out-of-the-box setup.
+   *
+   * @NOTE: If you get the error 'connection.query is not a function',
+   *        this is probably because the mysql server has not been started
    */
   initializeDatabaseConnection() {
     const mysqlConfig = {
@@ -57,7 +60,7 @@ export default class AbstractDatabase {
       client: 'sqlite3',
       useNullAsDefault: true,
       connection: {
-        filename: join(__dirname, '..', '..', 'tmp-db-records', 'database.sqlite')
+        filename: join(__dirname, 'database.sqlite')
       }
     };
 
@@ -99,9 +102,8 @@ export default class AbstractDatabase {
   async migrate(createTable: (table: Object) => void) {
     const { knex, Database } = this.initializeDatabaseConnection(this.tableName);
 
-    await knex.schema
-      .dropTableIfExists(this.tableName)
-      .createTable(this.tableName, createTable);
+    await knex.schema.dropTableIfExists(this.tableName);
+    await knex.schema.createTable(this.tableName, createTable);
 
     return Database;
   }
@@ -109,7 +111,7 @@ export default class AbstractDatabase {
   /**
    * Find all the compatibility records for every version of the same browser
    */
-  findSameVersionCompatRecord(record: RType, caniuseId: str): Promise<AbstractDatabaseType> {
+  findSameVersionCompatRecord(record: RType, caniuseId: str): Promise<AbstractDatabaseRecordType> {
     return this.connection.Database.where({
       name: caniuseId,
       type: record.type,

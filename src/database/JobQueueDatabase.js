@@ -32,14 +32,14 @@ export default class JobQueue extends AbstractDatabase {
 
   migrate() {
     return super.migrate((table) => {
-      table.increments('id').primary();
+      table.increments('id');
       table.string('name');
       table.string('browserName');
       table.string('platform');
       table.string('protoChainId');
       table.string('version');
       table.enu('type', ['js-api', 'css-api', 'html-api']);
-      table.string('record', 1000);
+      table.string('record', 5000);
       table.string('caniuseId');
       table.enu('status', ['queued', 'running']).defaultTo('queued');
     });

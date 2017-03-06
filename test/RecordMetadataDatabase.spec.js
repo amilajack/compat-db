@@ -12,7 +12,7 @@ const experimentalAPIsToSupport = [
   'VRDisplay', 'Atomics', 'WebAssembly', 'SharedArrayBuffer', 'WebGL2RenderingContext'
 ];
 
-describe('RecordMetadata', () => {
+describe('RecordMetadataDatabase', () => {
   it('should have objects with the expected properties', async () => {
     const recordMetadata = await RecordMetadata();
 
@@ -27,21 +27,22 @@ describe('RecordMetadata', () => {
    * @TODO: Check that we have at least a certain amount of record metadata
    */
   it('should have expected length', async () => {
-    expect((await RecordMetadata()).length).toBeLessThan(ofAPIType('js').length);
-    expect((await RecordMetadata()).length).toBeGreaterThan(ofAPIType('js').length / 2);
+    const recordMetadata = await RecordMetadata();
+    expect(recordMetadata.length).toBeLessThan(ofAPIType('js').length);
+    expect(recordMetadata.length).toBeGreaterThan(ofAPIType('js').length / 2);
   });
 
   it('should write metadata records to database', async () => {
-    const database = new RecordMetadataDatabase();
-    await database.migrate();
+    const recordMetadataDatabase = new RecordMetadataDatabase('test-record-metadata-1');
+    await recordMetadataDatabase.migrate();
 
-    expect(await database.count()).toEqual(0);
+    expect(await recordMetadataDatabase.count()).toEqual(0);
 
-    const metadata = await writeRecordMetadataToDB();
-    const insertedMetadata = await database.getAll();
+    const metadata = await writeRecordMetadataToDB(undefined, undefined, 'test-record-metadata-1');
+    const insertedMetadata = await recordMetadataDatabase.getAll();
 
     expect(insertedMetadata.length).toEqual(metadata.length);
-    expect(await database.count()).toEqual(metadata.length);
+    expect(await recordMetadataDatabase.count()).toEqual(metadata.length);
   });
 
   it('should parallelize tests across browsers and retain order of test results', async () => {
@@ -68,16 +69,16 @@ describe('RecordMetadata', () => {
 
   it('should have exact match', async () => {
     const testExperimentalAPIs = false;
-    const database = new RecordMetadataDatabase();
-    await database.migrate();
+    const recordMetadataDatabase = new RecordMetadataDatabase('test-record-metadata-2');
+    await recordMetadataDatabase.migrate();
 
-    expect(await database.count()).toEqual(0);
+    expect(await recordMetadataDatabase.count()).toEqual(0);
 
-    const metadata = await writeRecordMetadataToDB();
-    const insertedMetadata = await database.getAll();
+    const metadata = await writeRecordMetadataToDB(undefined, undefined, 'test-record-metadata-2');
+    const insertedMetadata = await recordMetadataDatabase.getAll();
 
     expect(insertedMetadata.length).toEqual(metadata.length);
-    expect(await database.count()).toEqual(metadata.length);
+    expect(await recordMetadataDatabase.count()).toEqual(metadata.length);
 
     // String escapes in astNodeType prevent us from doing an elegant
     // equality comparison. For now, lets remove the astNodeType from the

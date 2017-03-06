@@ -2,10 +2,10 @@
  * This is the typing for compat-db
  * @flow
  */
-import type { RecordType } from './providers/RecordType';
+import type { RecordType } from '../providers/RecordType';
 
 
-export type DatabaseType = {
+export type DatabaseRecordType = {
   // The same 'agents' property from caniuse
   agents?: {
     [name: string]: {

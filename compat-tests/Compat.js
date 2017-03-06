@@ -1,11 +1,12 @@
 // @flow
 import 'babel-polyfill';
+import bluebird from 'bluebird';
 import dotenv from 'dotenv';
 import webdriver from 'selenium-webdriver';
 import AssertionFormatter from '../src/assertions/AssertionFormatter';
 import {
   insertBulkRecords,
-  findSameVersionCompatRecord } from '../src/database/TmpDatabase';
+  findSameVersionCompatRecord } from '../src/database/TmpRecordDatabase';
 import { getVersionsToMark } from '../src/helpers/GenerateVersions';
 import JobQueueDatabase from '../src/database/JobQueueDatabase';
 import setup from './setup';
@@ -13,6 +14,11 @@ import type { RecordType } from '../src/providers/RecordType';
 import type { JobQueueType } from '../src/database/JobQueueDatabase';
 import type { browserCapabilityType } from './setup';
 
+global.Promise = bluebird;
+
+global.Promise.config({
+  longStackTraces: true
+});
 
 /* eslint no-console: 0 */
 
@@ -50,12 +56,15 @@ export async function executeTestsParallel(capability: capabilityType, tests: Ar
       platform,
       version,
       username,
-      accessKey
+      accessKey,
+      'idle-timeout': 3000
     })
     .usingServer(
       `http://${username}:${accessKey}@ondemand.saucelabs.com:80/wd/hub`
     )
     .build();
+
+  await driver.get('http://example.com');
 
   const items = await driver.executeScript(
     `return (function() {
@@ -75,7 +84,9 @@ export async function executeTestsParallel(capability: capabilityType, tests: Ar
 export async function executeTests(capability: capabilityType, jobs: JobQueueType[]): exTestType {
   const { browserName, platform, version } = capability;
 
-  console.log(`Executing ${jobs.length} tests in parallel on ${platform} ${browserName} ${version}`);
+  const logMessage = `Executing ${jobs.length} tests in parallel on ${platform} ${browserName} ${version}`;
+  console.log(logMessage);
+  console.log(logMessage.split('').map(() => '-').join(''));
 
   return executeTestsParallel(
     capability,
@@ -143,7 +154,7 @@ export async function handleFinishedTest(finishedTest: finishedTestType) {
 
   log(browserName, version, platform, record, isSupported);
 
-  // Fetch the updated records from the TmpDatabase
+  // Fetch the updated records from the TmpRecordDatabase
   const newExistingRecordTargetVersions =
     await findSameVersionCompatRecord(record, caniuseId);
 
@@ -191,12 +202,14 @@ export async function handleCapability(capability: browserCapabilityType): handl
   // Find all the jobs that match the current capability's browserName, version,
   // and platform
   const allJobs: Array<JobQueueType> = (await jobQueue.find({
-    status: 'queued',
+    // @TODO @HACK: Jobs that fail do not change their status back to 'queued'
+    //              For the timebeing, lets ignore the status when querying
+    //              the job queue
+    // status: 'queued',
     browserName,
     version
   }))
-  // @HACK: Temporarily avoid running on IE because of bugs with IE webdriver
-  .filter(job => job.caniuseId !== 'ie');
+  .filter(each => each.browserName !== 'safari');
 
   const jobs = allJobs.slice(
     parseInt(process.env.JOBS_INDEX_START, 10) || 0,
