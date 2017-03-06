@@ -35,8 +35,8 @@ node_modules
 compat-db.json
 .env
 errorShots
-tmp-records
 capabilities.json
 compat-tests-webdriver/jobs.json
 compat-tests/test-results
 compat-tests/tests
+src/database/database.sqlite

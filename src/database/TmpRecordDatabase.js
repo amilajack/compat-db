@@ -41,7 +41,7 @@ export function initializeDatabaseConnection() {
     client: 'sqlite3',
     useNullAsDefault: true,
     connection: {
-      filename: join(__dirname, '..', '..', 'tmp-records', 'database.sqlite')
+      filename: join(__dirname, 'database.sqlite')
     }
   };
 

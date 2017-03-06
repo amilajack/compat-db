@@ -10,7 +10,7 @@
   "scripts": {
     "build": "cross-env NODE_ENV=production rm -rf lib && mkdir lib && babel src/index.js --out-file lib/index.js",
     "build-compat-db": "node -r babel-register compat-tests/setup.js && node -r babel-register compat-tests/Compat.js",
-    "dir-remove": "rm -rf tmp-records && mkdir tmp-records && touch tmp-records/database.sqlite",
+    "dir-remove": "rm src/database/database.sqlite || true && touch src/database/database.sqlite",
     "flow": "flow check",
     "flow-typed": "flow-typed install",
     "lint": "eslint --cache --format=node_modules/eslint-formatter-pretty .",

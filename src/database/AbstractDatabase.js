@@ -60,7 +60,7 @@ export default class AbstractDatabase {
       client: 'sqlite3',
       useNullAsDefault: true,
       connection: {
-        filename: join(__dirname, '..', '..', this.tableName, 'database.sqlite')
+        filename: join(__dirname, 'database.sqlite')
       }
     };
 
