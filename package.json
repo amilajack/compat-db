@@ -39,7 +39,7 @@
     "url": "https://github.com/amilajack/compat-db/issues"
   },
   "files": [
-    "databases"
+    "lib"
   ],
   "homepage": "https://github.com/amilajack/compat-db#readme",
   "devDependencies": {
