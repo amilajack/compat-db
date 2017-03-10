@@ -1,5 +1,6 @@
 /**
  * @TODO: Move this to helpers or separate test-runners directory
+ * @flow
  */
 import { writeFileSync, readFileSync } from 'fs';
 import { join } from 'path';

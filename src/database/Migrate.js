@@ -1,3 +1,4 @@
+// @flow
 import * as TmpRecordDatabase from './TmpRecordDatabase';
 import JobQueueDatabase from '../../src/database/JobQueueDatabase';
 import RecordMetadataDatabase from '../../src/database/RecordMetadataDatabase';
