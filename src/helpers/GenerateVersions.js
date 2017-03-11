@@ -1,7 +1,8 @@
 // @flow
-/* eslint no-mixed-operators: 0, max-len: ['error', 120], no-restricted-syntax: 0, fp/no-loops: 0 */
 import { browserNameToCaniuseMappings, fixedBrowserVersions } from './Constants';
 
+
+/* eslint no-mixed-operators: 0, max-len: ['error', 120], no-restricted-syntax: 0, fp/no-loops: 0 */
 
 type targetType = {
   browserName: string,
