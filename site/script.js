@@ -17,6 +17,7 @@ function mapItems(record) {
   return `
     <li>
       <h2>${record.protoChainId}</h2>
+      <h4>Expression Type/s: ${record.astNodeType}</h4>
       <h4>API Type: ${record.isStatic ? 'static' : 'instance'}</h4>
       <br>
       ${listElementArray.join('')}
