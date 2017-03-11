@@ -5,10 +5,11 @@ function mapItems(record) {
   const listElementArray = [];
 
   browsers.forEach(browser => {
-    listElementArray.push(`${browser}: `);
+    listElementArray.push(`<b>${browser}: </b>`);
     // eslint-disable-next-line
     for (const version in record.targets[browser]) {
-      listElementArray.push(`${version} ${record.targets[browser][version] === 'y' ? '✅' : '❌'}`);
+      listElementArray
+        .push(`${version} ${record.targets[browser][version] === 'y' ? '✅' : '❌'}`);
     }
     listElementArray.push('<br>');
   });
@@ -16,6 +17,7 @@ function mapItems(record) {
   return `
     <li>
       <h2>${record.protoChainId}</h2>
+      <h4>API Type: ${record.isStatic ? 'static' : 'instance'}</h4>
       <br>
       ${listElementArray.join('')}
     </li>

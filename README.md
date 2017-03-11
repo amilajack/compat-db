@@ -51,6 +51,9 @@ npm test
 npm install -g selenium-standalone@latest
 selenium-standalone install
 selenium-standalone start
+
+# Serve the front-end browser UI for compat-db
+npm run view-compat-db
 ```
 
 ## Roadmap
