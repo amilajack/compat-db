@@ -5,10 +5,10 @@
   ],
   "plugins": [
     "syntax-flow",
-    /*["flow-runtime", {
+    ["flow-runtime", {
       "assert": true,
-      "decorate": false
-    }],*/
+      "annotate": true
+    }],
     "transform-flow-strip-types",
 		"transform-runtime",
     "add-module-exports",
