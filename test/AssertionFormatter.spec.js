@@ -134,6 +134,7 @@ describe('AssertionFormatter', () => {
       { protoChain: ['Array', 'push'], isStatic: false, isSupported: true, type: 'js-api' },
       { protoChain: ['Array', 'from'], isStatic: true, isSupported: true, type: 'js-api' },
       { protoChain: ['Array', 'of'], isStatic: true, isSupported: true, type: 'js-api' },
+      { protoChain: ['RemotePlayback', 'state'], isStatic: false, isSupported: true, type: 'js-api' },
       { protoChain: ['Array', 'reduce'], isStatic: false, isSupported: true, type: 'js-api' },
       { protoChain: ['Array', 'map'], isStatic: false, isSupported: true, type: 'js-api' },
       { protoChain: ['IDBMutableFile', 'getFile'], isStatic: false, isSupported: false, type: 'js-api' },
