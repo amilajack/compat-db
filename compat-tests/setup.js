@@ -40,7 +40,7 @@ export default async function createJobsFromRecords(): Promise<Array<browserCapa
 
     // Make sure not to make jobs for records that are already in the database
     records
-      // Keep only the records that have not had their compatability determined yet
+      // Keep only the records that have not had their compatibility determined yet
       // and whose metadata we have determined
       .filter(record =>
         !existingRecords.has(JSON.stringify(record)) &&
