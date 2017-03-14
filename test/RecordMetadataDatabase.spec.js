@@ -6,15 +6,21 @@ import { ofAPIType } from '../src/providers/Providers';
 import RecordMetadataDatabase from '../src/database/RecordMetadataDatabase';
 
 
+/* eslint fp/no-this: 0 */
+
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 2000000; // eslint-disable-line
 
 const experimentalAPIsToSupport = [
   'VRDisplay', 'Atomics', 'WebAssembly', 'SharedArrayBuffer', 'WebGL2RenderingContext'
 ];
 
-describe('RecordMetadataDatabase', () => {
+describe('RecordMetadataDatabase', function testRecordMetadataDatabase() {
+  beforeAll(async () => {
+    this.recordMetadata = await RecordMetadata();
+  });
+
   it('should have objects with the expected properties', async () => {
-    const recordMetadata = await RecordMetadata();
+    const recordMetadata = this.recordMetadata;
 
     recordMetadata.forEach(({ record, isStatic, astNodeType }) => {
       chaiExpect(record).to.be.an('object');
@@ -27,7 +33,7 @@ describe('RecordMetadataDatabase', () => {
    * @TODO: Check that we have at least a certain amount of record metadata
    */
   it('should have expected length', async () => {
-    const recordMetadata = await RecordMetadata();
+    const recordMetadata = this.recordMetadata;
     expect(recordMetadata.length).toBeLessThan(ofAPIType('js').length);
     expect(recordMetadata.length).toBeGreaterThan(ofAPIType('js').length / 2);
   });
