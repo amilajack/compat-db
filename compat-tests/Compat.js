@@ -4,9 +4,7 @@ import bluebird from 'bluebird';
 import dotenv from 'dotenv';
 import webdriver from 'selenium-webdriver';
 import AssertionFormatter from '../src/assertions/AssertionFormatter';
-import {
-  insertBulkRecords,
-  findSameVersionCompatRecord } from '../src/database/TmpRecordDatabase';
+import TmpRecordDatabase from '../src/database/TmpRecordDatabase';
 import { getVersionsToMark } from '../src/helpers/GenerateVersions';
 import JobQueueDatabase from '../src/database/JobQueueDatabase';
 import setup from './setup';
@@ -14,6 +12,9 @@ import type { RecordType } from '../src/providers/RecordType';
 import type { JobQueueType } from '../src/database/JobQueueDatabase';
 import type { browserCapabilityType } from './setup';
 
+
+// Replace native Promise implementation with bluebird for better stack
+// traces from Promises
 global.Promise = bluebird;
 
 global.Promise.config({
@@ -125,11 +126,12 @@ function log(browserName, version, platform, record: Object, isSupported: bool) 
  * Handle the respective results
  */
 export async function handleFinishedTest(finishedTest: finishedTestType) {
+  const tmpRecordDatabase = new TmpRecordDatabase();
   const { job, record, isSupported } = finishedTest;
   const { caniuseId, browserName, platform, version } = job;
 
   const existingRecordTargetVersions =
-    await findSameVersionCompatRecord(record, caniuseId);
+    await tmpRecordDatabase.findSameVersionCompatRecord(record, caniuseId);
 
   // If newer version does not support API, current browser version doesn't support it
   // If older version does support API, current browser version does support it
@@ -142,7 +144,7 @@ export async function handleFinishedTest(finishedTest: finishedTestType) {
 
   // If middle is supported, mark all right as supported. Otherwise, mark
   // all left as unsupported
-  await insertBulkRecords(
+  await tmpRecordDatabase.insertBulkRecords(
     record,
     caniuseId,
     [
@@ -156,7 +158,7 @@ export async function handleFinishedTest(finishedTest: finishedTestType) {
 
   // Fetch the updated records from the TmpRecordDatabase
   const newExistingRecordTargetVersions =
-    await findSameVersionCompatRecord(record, caniuseId);
+    await tmpRecordDatabase.findSameVersionCompatRecord(record, caniuseId);
 
   // Create new jobs if there are more versions of the target to test
   const newVersions = getVersionsToMark(

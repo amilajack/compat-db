@@ -75,6 +75,12 @@ export default class AbstractDatabase {
     return { knex, Database, Bookshelf };
   }
 
+  where(whereClause: Object): Array<Object> {
+    return this.connection
+      .Database
+      .where(whereClause);
+  }
+
   /**
    * Get all records in the database
    */

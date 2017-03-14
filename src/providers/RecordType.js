@@ -14,7 +14,12 @@ export type RecordType = {
   /**
    * The unique id that is used to search for the property
    */
-  id?: string,
+  id: string,
+
+  /**
+   * The name of the WebIDL definition file
+   */
+  webidlId: string,
 
   /**
    * An object containing information about the spec. This information is not

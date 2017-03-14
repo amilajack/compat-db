@@ -1,4 +1,4 @@
-import * as TmpRecordDatabase from '../src/database/TmpRecordDatabase';
+import TmpRecordDatabase from '../src/database/TmpRecordDatabase';
 import PostChecks from '../compat-tests/PostChecks';
 import RecordMetadataDatabase from '../src/database/RecordMetadataDatabase';
 
@@ -13,19 +13,20 @@ describe('PostChecks', () => {
     };
 
     const recordMetadataDatabase = new RecordMetadataDatabase('test-post-checks-record-metadata');
+    const tmpRecordDatabase = new TmpRecordDatabase('tmp-record-database-post-checks');
 
-    await TmpRecordDatabase.migrate();
+    await tmpRecordDatabase.migrate();
     await recordMetadataDatabase.migrate();
 
     // Simulate duplicate TmpRecordDatabase insertions
-    await TmpRecordDatabase.insertBulkRecords(
+    await tmpRecordDatabase.insertBulkRecords(
       record,
       'safari',
       ['6.0', '7.0', '8.0', '9.0'],
       true
     );
 
-    await TmpRecordDatabase.insertBulkRecords(
+    await tmpRecordDatabase.insertBulkRecords(
       record,
       'safari',
       ['10.0'],
@@ -43,7 +44,7 @@ describe('PostChecks', () => {
       }
     ]);
 
-    expect(await TmpRecordDatabase.count()).toEqual(2);
+    expect(await tmpRecordDatabase.count()).toEqual(2);
     expect(await recordMetadataDatabase.count()).toEqual(1);
 
     const finalRecords = await PostChecks('test-post-checks-record-metadata');

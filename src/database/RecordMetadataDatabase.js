@@ -13,7 +13,6 @@ type RecordMetadataType = {
   type: 'js-api' | 'css-api' | 'html-api'
 };
 
-
 export default class RecordMetabaseDatabase extends AbstractDatabase {
   constructor(name: string = 'record-metadata') {
     super(name);
@@ -35,6 +34,7 @@ export default class RecordMetabaseDatabase extends AbstractDatabase {
       .forge()
       .fetchAll()
       .then(records => records.toJSON())
+      // @HACK: Find a proper way to cast `isStatic` to a boolean
       .then(records => records.map(each => ({
         ...each,
         isStatic: Boolean(each.isStatic)

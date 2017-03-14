@@ -5,7 +5,7 @@
  */
 import { join } from 'path';
 import { writeFileSync } from 'fs';
-import * as TmpRecordDatabase from '../src/database/TmpRecordDatabase';
+import TmpRecordDatabase from '../src/database/TmpRecordDatabase';
 import RecordMetadataDatabase from '../src/database/RecordMetadataDatabase';
 import type { DatabaseRecordType } from '../src/database/DatabaseRecordType';
 import { caniuseBrowsers } from '../src/helpers/Constants';
@@ -21,8 +21,9 @@ type targetsType = {
 
 export default async function PostChecks(rMTableName?: string): Promise<DatabaseRecordType> {
   const recordMetadataDatabase = new RecordMetadataDatabase(rMTableName);
+  const tmpRecordDatabase = new TmpRecordDatabase();
 
-  const tmpRecords = await TmpRecordDatabase.getAll();
+  const tmpRecords = await tmpRecordDatabase.getAll();
   const recordMetadata = await recordMetadataDatabase.getAll();
   const dedupedRecordsMap: Map<string, targetsType> = new Map();
 
