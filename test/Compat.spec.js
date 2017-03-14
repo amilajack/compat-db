@@ -96,13 +96,18 @@ describe('Comapt', () => {
     await jobQueue.migrate();
     await tmpRecordDatabase.migrate();
 
+    expect(await jobQueue.count()).toEqual(0);
+    expect(await tmpRecordDatabase.count()).toEqual(0);
+
     const [finishedTest] = await executeTests(capability, jobs);
-    await handleFinishedTest(finishedTest);
+    await handleFinishedTest(finishedTest, 'tmp-record-database-compat-1');
+
+    console.log(await tmpRecordDatabase.getAll());
 
     // There should be one newly created record
     expect(await tmpRecordDatabase.count()).toEqual(1);
 
-    const items = await tmpRecordDatabase.fetchAll();
+    const items = await tmpRecordDatabase.getAll();
 
     const result = [{
       id: 1,
@@ -156,7 +161,7 @@ describe('Comapt', () => {
   });
 
   it.skip('should persist job on failure', async () => {
-    const jobQueue = new JobQueueDatabase();
+    const jobQueue = new JobQueueDatabase('job-queue-should-persist');
     expect(await jobQueue.count()).toEqual(0);
 
     await jobQueue.insertBulk([

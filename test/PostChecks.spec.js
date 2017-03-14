@@ -46,6 +46,7 @@ describe('PostChecks', () => {
     expect(await tmpRecordDatabase.count()).toEqual(2);
     expect(await recordMetadataDatabase.count()).toEqual(1);
 
+    process.env.TMP_RECORD_DB_NAME = 'tmp-record-database-post-checks';
     const finalRecords = await PostChecks('test-post-checks-record-metadata');
 
     // expect the result to be deduped and of correct format

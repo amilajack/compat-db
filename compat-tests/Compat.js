@@ -125,8 +125,8 @@ function log(browserName, version, platform, record: Object, isSupported: bool) 
 /**
  * Handle the respective results
  */
-export async function handleFinishedTest(finishedTest: finishedTestType) {
-  const tmpRecordDatabase = new TmpRecordDatabase();
+export async function handleFinishedTest(finishedTest: finishedTestType, tableName: string = 'tmp-records') {
+  const tmpRecordDatabase = new TmpRecordDatabase(tableName);
   const { job, record, isSupported } = finishedTest;
   const { caniuseId, browserName, platform, version } = job;
 
