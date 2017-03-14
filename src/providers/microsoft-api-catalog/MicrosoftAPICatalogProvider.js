@@ -14,6 +14,13 @@ type MicrosoftAPICatalogProviderType = Array<{
   }>
 }>;
 
+/**
+ * Map webidl definition names to prototype chain parent
+ * ex. Console -> console
+ *
+ * This helps generate protoChain's and protoChainId's
+ * ex. Console.log -> console.log
+ */
 export function interceptAndFormat(parentObjectId: string): string {
   const APIsToLowercase = new Set([
     'Console', 'Window', 'Document', 'External', 'History', 'Location', 'Navigator', 'Performance',
@@ -55,10 +62,11 @@ export default function MicrosoftAPICatalogProvider(): Array<RecordType> {
     .forEach(record => {
       formattedRecords.push({
         ...record,
-        spec: record.spec || false,
+        parentName: record.name,
         protoChain: [interceptAndFormat(record.name)],
         protoChainId: interceptAndFormat(record.name),
-        parentName: record.name
+        spec: record.spec || false,
+        webidlId: record.name
       });
 
       record.apis.forEach(api =>

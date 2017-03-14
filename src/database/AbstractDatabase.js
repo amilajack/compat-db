@@ -44,9 +44,9 @@ export default class AbstractDatabase {
       client: 'mysql',
       connection: {
         host: process.env.MYSQL_IP_ADDRESS || '127.0.0.1',
-        user: 'username',
-        password: 'secret',
-        database: 'compat-db',
+        user: process.env.MYSQL_USERNAME || 'username',
+        password: process.env.MYSQL_PASSWORD || 'secret',
+        database: process.env.MYSQL_DB || 'compat-db',
         charset: 'utf8'
       },
       pool: {
@@ -73,6 +73,12 @@ export default class AbstractDatabase {
     const Database = Bookshelf.Model.extend({ tableName: this.tableName });
 
     return { knex, Database, Bookshelf };
+  }
+
+  where(whereClause: Object): Array<Object> {
+    return this.connection
+      .Database
+      .where(whereClause);
   }
 
   /**

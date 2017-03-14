@@ -5,13 +5,15 @@
   ],
   "plugins": [
     "syntax-flow",
+    /*
     ["flow-runtime", {
       "assert": true,
       "annotate": true
     }],
-    "transform-flow-strip-types",
-		"transform-runtime",
+    */
+    "transform-decorators-legacy",
+    "transform-runtime",
     "add-module-exports",
-    "transform-es2015-modules-umd"
-	]
+    "transform-flow-strip-types"
+  ]
 }

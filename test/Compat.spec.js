@@ -1,3 +1,4 @@
+// @flow
 import JobQueueDatabase from '../src/database/JobQueueDatabase';
 import Compat, {
   executeTests,
@@ -5,7 +6,7 @@ import Compat, {
   handleFinishedTest,
   handleCapability } from '../compat-tests/Compat';
 import setup from '../compat-tests/setup';
-import * as TmpRecordDatabase from '../src/database/TmpRecordDatabase';
+import TmpRecordDatabase from '../src/database/TmpRecordDatabase';
 import { baseRecord } from './JobQueueDatabase.spec';
 
 
@@ -90,17 +91,23 @@ describe('Comapt', () => {
 
   it('should handle finished tests', async () => {
     const jobQueue = new JobQueueDatabase('compat-test-1');
+    const tmpRecordDatabase = new TmpRecordDatabase('tmp-record-database-compat-1');
+
     await jobQueue.migrate();
+    await tmpRecordDatabase.migrate();
+
+    expect(await jobQueue.count()).toEqual(0);
+    expect(await tmpRecordDatabase.count()).toEqual(0);
 
     const [finishedTest] = await executeTests(capability, jobs);
-    await handleFinishedTest(finishedTest);
+    await handleFinishedTest(finishedTest, 'tmp-record-database-compat-1');
+
+    console.log(await tmpRecordDatabase.getAll());
 
     // There should be one newly created record
-    expect(await TmpRecordDatabase.Database.count()).toEqual(1);
+    expect(await tmpRecordDatabase.count()).toEqual(1);
 
-    const items = await TmpRecordDatabase.Database
-      .fetchAll()
-      .then(res => res.toJSON());
+    const items = await tmpRecordDatabase.getAll();
 
     const result = [{
       id: 1,
@@ -127,11 +134,13 @@ describe('Comapt', () => {
 
   it.skip('should run e2e', async () => {
     const jobQueue = new JobQueueDatabase('compat-test-e2e');
-    jobQueue.migrate();
+    const tmpRecordDatabase = new TmpRecordDatabase('tmp-record-database-compat-2');
+
+    await jobQueue.migrate();
 
     // Initially, JobQueue should have no records
     expect(await jobQueue.count()).toEqual(0);
-    expect(await TmpRecordDatabase.Database.count()).toEqual(0);
+    expect(await tmpRecordDatabase.count()).toEqual(0);
     const firstRun = await jobQueue.getAll();
 
     await setup();
@@ -139,12 +148,12 @@ describe('Comapt', () => {
     // When running the jobs again, the jobs should not be the same
     await Compat();
     expect(await jobQueue.count()).toEqual(1);
-    expect(await TmpRecordDatabase.Database.count()).toEqual(1);
+    expect(await tmpRecordDatabase.count()).toEqual(1);
     const secondRun = await jobQueue.getAll();
 
     await Compat();
     expect(await jobQueue.count()).toEqual(1);
-    expect(await TmpRecordDatabase.Database.count()).toEqual(1);
+    expect(await tmpRecordDatabase.count()).toEqual(1);
     const thirdRun = await jobQueue.getAll();
 
     expect(firstRun).not.toEqual(secondRun);
@@ -152,7 +161,7 @@ describe('Comapt', () => {
   });
 
   it.skip('should persist job on failure', async () => {
-    const jobQueue = new JobQueueDatabase();
+    const jobQueue = new JobQueueDatabase('job-queue-should-persist');
     expect(await jobQueue.count()).toEqual(0);
 
     await jobQueue.insertBulk([

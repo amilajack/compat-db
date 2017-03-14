@@ -1,6 +1,6 @@
 // @flow
 import { expect } from 'chai';
-import * as TmpRecordDatabase from '../database/TmpRecordDatabase';
+import TmpRecordDatabase from '../database/TmpRecordDatabase';
 import { caniuseToSeleniumMappings } from './Constants';
 import { allTargets } from './GenerateVersions';
 
@@ -78,9 +78,11 @@ export function checkBrowserMissing(tmpRecords: Array<tmpRecordType>) {
 }
 
 export async function RecordsValidator(defaultTmpRecordDatabaseRecords?: Array<tmpRecordType>) {
+  const tmpRecordDatabase = new TmpRecordDatabase();
+
   const TmpRecordDatabaseRecords =
     defaultTmpRecordDatabaseRecords ||
-    await TmpRecordDatabase.getAll();
+    await tmpRecordDatabase.getAll();
 
   expect(TmpRecordDatabaseRecords).to.have.length.above(0);
   console.log(`Testing ${TmpRecordDatabaseRecords.length} temporary database records`);

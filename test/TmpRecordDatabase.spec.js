@@ -1,50 +1,52 @@
-import {
-  insertBulkRecords,
-  findSameVersionCompatRecord,
-  initializeDatabaseConnection,
-  migrate } from '../src/database/TmpRecordDatabase';
+import TmpRecordDatabase from '../src/database/TmpRecordDatabase';
 
 
 describe('TmpRecordDatabase', () => {
-  beforeEach(async () => {
-    await migrate();
-  });
-
-  afterEach(async () => {
-    await migrate();
-  });
-
   it('should migrate database', async () => {
-    const Database = await migrate();
-    expect(await Database.count()).toEqual(0);
+    const tmpRecordDatabase = new TmpRecordDatabase('tmp-record-test-1');
+    await tmpRecordDatabase.migrate();
+    expect(await tmpRecordDatabase.count()).toEqual(0);
   });
 
   it('should find same record versions', async () => {
-    const { Database } = initializeDatabaseConnection();
-    expect(await Database.count()).toEqual(0);
+    const tmpRecordDatabase = new TmpRecordDatabase('tmp-record-test-2');
+    await tmpRecordDatabase.migrate();
 
-    await new Database({
-      protoChainId: 'some',
-      caniuseId: 'chrome',
-      type: 'js-api',
-      name: 'chrome',
-      versions: JSON.stringify({
-        50: 'y',
-        49: 'y'
-      })
-    })
-    .save();
+    expect(await tmpRecordDatabase.count()).toEqual(0);
 
-    expect(await Database.count()).toEqual(1);
+    await tmpRecordDatabase.insertBulkRecords(
+      {
+        protoChainId: 'some-protochain-id',
+        caniuseId: 'chrome',
+        type: 'js-api',
+        name: 'chrome',
+        versions: JSON.stringify({
+          50: 'y',
+          49: 'y'
+        })
+      },
+      'chrome',
+      ['49', '50'],
+      true
+    );
+
+    expect(await tmpRecordDatabase.count()).toEqual(1);
 
     expect(
-      await findSameVersionCompatRecord({
-        protoChainId: 'some-protochain-id',
-        type: 'js-api'
-      }, 'chrome')
+      await tmpRecordDatabase.findSameVersionCompatRecord(
+        {
+          protoChainId: 'some-protochain-id',
+          type: 'js-api'
+        },
+        'chrome',
+        ['49', '50'],
+        true
+      )
     )
     .toEqual({
       protoChainId: 'some-protochain-id',
+      name: 'chrome',
+      caniuseId: 'chrome',
       type: 'js-api',
       id: 1,
       versions: {
@@ -55,10 +57,12 @@ describe('TmpRecordDatabase', () => {
   });
 
   it('should insert bulk version records', async () => {
-    const { Database } = initializeDatabaseConnection();
-    expect(await Database.count()).toEqual(0);
+    const tmpRecordDatabase = new TmpRecordDatabase('tmp-record-test-3');
+    await tmpRecordDatabase.migrate();
 
-    await insertBulkRecords(
+    expect(await tmpRecordDatabase.count()).toEqual(0);
+
+    await tmpRecordDatabase.insertBulkRecords(
       {
         protoChainId: 'alert',
         type: 'js-api'
@@ -68,10 +72,10 @@ describe('TmpRecordDatabase', () => {
       false
     );
 
-    expect(await Database.count()).toEqual(1);
+    expect(await tmpRecordDatabase.count()).toEqual(1);
 
     expect(
-      await findSameVersionCompatRecord({
+      await tmpRecordDatabase.findSameVersionCompatRecord({
         protoChainId: 'alert',
         type: 'js-api'
       },
@@ -92,10 +96,12 @@ describe('TmpRecordDatabase', () => {
   });
 
   it('should handle multiple bulk version inserts', async () => {
-    const { Database } = initializeDatabaseConnection();
-    expect(await Database.count()).toEqual(0);
+    const tmpRecordDatabase = new TmpRecordDatabase('tmp-record-test-4');
+    await tmpRecordDatabase.migrate();
 
-    await insertBulkRecords(
+    expect(await tmpRecordDatabase.count()).toEqual(0);
+
+    await tmpRecordDatabase.insertBulkRecords(
       {
         protoChainId: 'alert',
         type: 'js-api'
@@ -105,7 +111,7 @@ describe('TmpRecordDatabase', () => {
       false
     );
 
-    await insertBulkRecords(
+    await tmpRecordDatabase.insertBulkRecords(
       {
         protoChainId: 'foo()',
         type: 'js-api'
@@ -115,14 +121,14 @@ describe('TmpRecordDatabase', () => {
       true
     );
 
-    expect(await Database.count()).toEqual(2);
+    expect(await tmpRecordDatabase.count()).toEqual(2);
 
     const items = (await Promise.all([
-      findSameVersionCompatRecord({
+      tmpRecordDatabase.findSameVersionCompatRecord({
         protoChainId: 'alert',
         type: 'js-api'
       }, 'chrome'),
-      findSameVersionCompatRecord({
+      tmpRecordDatabase.findSameVersionCompatRecord({
         protoChainId: 'foo()',
         type: 'js-api'
       }, 'chrome')

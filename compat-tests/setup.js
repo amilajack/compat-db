@@ -2,7 +2,7 @@
 import { ofAPIType } from '../src/providers/Providers';
 import JobQueueDatabase from '../src/database/JobQueueDatabase';
 import RecordMetadataDatabase from '../src/database/RecordMetadataDatabase';
-import * as TmpRecordDatabase from '../src/database/TmpRecordDatabase';
+import TmpRecordDatabase from '../src/database/TmpRecordDatabase';
 import { writeRecordMetadataToDB } from '../compat-tests/RecordMetadata';
 import { browserNameToCaniuseMappings } from '../src/helpers/Constants';
 import {
@@ -21,6 +21,7 @@ export type browserCapabilityType = {
 export default async function createJobsFromRecords(): Promise<Array<browserCapabilityType>> {
   const queue = new JobQueueDatabase();
   const recordMetadata = new RecordMetadataDatabase();
+  const tmpRecordDatabase = new TmpRecordDatabase();
   const records = ofAPIType('js');
 
   if (await recordMetadata.count() === 0) {
@@ -35,11 +36,11 @@ export default async function createJobsFromRecords(): Promise<Array<browserCapa
       .getAll()
       .then(res => new Set(res.map(each => each.protoChainId)));
 
-    const existingRecords = new Set((await TmpRecordDatabase.getAll()).map(JSON.stringify));
+    const existingRecords = new Set((await tmpRecordDatabase.getAll()).map(JSON.stringify));
 
     // Make sure not to make jobs for records that are already in the database
     records
-      // Keep only the records that have not had their compatability determined yet
+      // Keep only the records that have not had their compatibility determined yet
       // and whose metadata we have determined
       .filter(record =>
         !existingRecords.has(JSON.stringify(record)) &&
