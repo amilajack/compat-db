@@ -25,7 +25,6 @@ describe('PostChecks', () => {
       ['6.0', '7.0', '8.0', '9.0'],
       true
     );
-
     await tmpRecordDatabase.insertBulkRecords(
       record,
       'safari',

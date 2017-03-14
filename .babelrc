@@ -12,8 +12,8 @@
     }],
     */
     "transform-decorators-legacy",
-		"transform-runtime",
+    "transform-runtime",
     "add-module-exports",
     "transform-flow-strip-types"
-	]
+  ]
 }

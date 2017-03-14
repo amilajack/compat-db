@@ -213,9 +213,13 @@ export async function handleCapability(capability: browserCapabilityType): handl
   }))
   .filter(each => each.browserName !== 'safari');
 
+  const jobsEndIndex = process.env.NODE_ENV === 'test'
+    ? 10
+    : process.env.JOBS_INDEX_END;
+
   const jobs = allJobs.slice(
     parseInt(process.env.JOBS_INDEX_START, 10) || 0,
-    parseInt(process.env.JOBS_INDEX_END, 10) || allJobs.length
+    parseInt(jobsEndIndex, 10) || allJobs.length
   );
 
   await Promise.all(jobs.map(job => jobQueue.markJobsStatus(job, 'running'))); // eslint-disable-line

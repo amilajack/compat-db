@@ -92,7 +92,9 @@ describe('Comapt', () => {
   it('should handle finished tests', async () => {
     const jobQueue = new JobQueueDatabase('compat-test-1');
     const tmpRecordDatabase = new TmpRecordDatabase('tmp-record-database-compat-1');
+
     await jobQueue.migrate();
+    await tmpRecordDatabase.migrate();
 
     const [finishedTest] = await executeTests(capability, jobs);
     await handleFinishedTest(finishedTest);
@@ -100,9 +102,7 @@ describe('Comapt', () => {
     // There should be one newly created record
     expect(await tmpRecordDatabase.count()).toEqual(1);
 
-    const items = await tmpRecordDatabase
-      .fetchAll()
-      .then(res => res.toJSON());
+    const items = await tmpRecordDatabase.fetchAll();
 
     const result = [{
       id: 1,
@@ -130,7 +130,8 @@ describe('Comapt', () => {
   it.skip('should run e2e', async () => {
     const jobQueue = new JobQueueDatabase('compat-test-e2e');
     const tmpRecordDatabase = new TmpRecordDatabase('tmp-record-database-compat-2');
-    jobQueue.migrate();
+
+    await jobQueue.migrate();
 
     // Initially, JobQueue should have no records
     expect(await jobQueue.count()).toEqual(0);
