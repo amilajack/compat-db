@@ -10,7 +10,7 @@ import type { RecordType } from '../providers/RecordType';
 
 /* eslint fp/no-throw: 0 */
 
-type AssertionFormatterType = {
+export type AssertionFormatterType = {
   apiIsSupported: string
 }
 & ({
@@ -37,9 +37,15 @@ function formatJSAssertion(record: RecordType): string {
 
   const exceptions = new Set(['crypto', 'Crypto']);
 
+  const lowercaseTestCondition = String(
+    lowercaseParentObject !== 'function' &&
+    !exceptions.has(record.protoChain[0])
+  );
+
   const lowercaseSupportTest = `
-    if (${String(lowercaseParentObject !== 'function' && !exceptions.has(record.protoChain[0]))}) {
-      ${lowercaseParentObject === 'function' || lowercaseParentObject === record.protoChain[0]
+    if (${lowercaseTestCondition}) {
+      ${lowercaseParentObject === 'function' ||
+      lowercaseParentObject === record.protoChain[0]
         ? ''
         : `if (typeof ${lowercaseParentObject} !== 'undefined') {
           throw new Error('${record.protoChain[0]} is not supported but ${lowercaseParentObject} is supported')

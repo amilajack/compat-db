@@ -3,6 +3,7 @@ import CSSProperties from './CSSProperties.json';
 import AssertionFormatter, {
   determineASTNodeType,
   getAllSupportCSSProperties } from '../src/assertions/AssertionFormatter';
+import { formatJSAssertion } from '../src/assertions/MultipleAssertionFormatter';
 
 
 /* eslint no-await-in-loop: 0 */
@@ -151,7 +152,10 @@ describe('AssertionFormatter', () => {
       ...record,
       assertion: Nightmare()
         .goto('https://example.com')
-        .evaluate((compatTest) => eval(compatTest), AssertionFormatter(record).determineIsStatic)
+        .evaluate(
+          (compatTest) => eval(compatTest),
+          AssertionFormatter(record).determineIsStatic
+        )
         .end()
     }));
 
@@ -159,20 +163,42 @@ describe('AssertionFormatter', () => {
       ...record,
       assertion: Nightmare()
         .goto('https://example.com')
-        .evaluate((compatTest) => eval(compatTest), AssertionFormatter(record).apiIsSupported)
+        .evaluate(
+          (compatTest) => eval(compatTest),
+          AssertionFormatter(record).apiIsSupported
+        )
         .end()
     }));
 
+    const multipleAssertionFormatterTests =
+      Nightmare()
+        .goto('https://example.com')
+        .evaluate(
+          (compatTest) => eval(compatTest),
+          formatJSAssertion(isStaticTests.filter(record => record.type === 'js-api'))
+        )
+        .end();
+
     for (const assertion of isStaticTests.filter(test => test.type === 'js-api')) {
-      it(`should determine ${assertion.protoChain.join('.')} is static or non-static`, async () => {
+      it(`should determine "${assertion.protoChain.join('.')}" is static or non-static`, async () => {
         expect(await assertion.assertion).toEqual(assertion.isStatic);
       });
     }
 
     for (const assertion of isSupportedTests) {
-      it(`should determine ${assertion.protoChain.join('.')} is support or not`, async () => {
+      it(`should determine "${assertion.protoChain.join('.')}" is support or not`, async () => {
         expect(await assertion.assertion).toEqual(assertion.isSupported);
       });
     }
+
+
+    it('should have MultipleAssertionFormatter determine is support or not', async () => {
+      expect((await multipleAssertionFormatterTests))
+        .toEqual(
+          isStaticTests
+            .filter(record => record.type === 'js-api')
+            .map(test => test.isSupported)
+        );
+    });
   });
 });
