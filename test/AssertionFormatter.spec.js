@@ -127,7 +127,7 @@ describe('AssertionFormatter', () => {
       type: string
     };
 
-    const isStaticTests: Array<assertionType> = [
+    const records = [
       { protoChain: ['document', 'querySelector'], isStatic: true, isSupported: true, type: 'js-api' },
       { protoChain: ['document', 'currentScript'], isStatic: true, isSupported: true, type: 'js-api' },
       { protoChain: ['alert'], isStatic: true, isSupported: true, type: 'js-api' },
@@ -147,8 +147,9 @@ describe('AssertionFormatter', () => {
       { protoChain: ['CSSStyleDeclaration', 'borderWidth'], isStatic: true, isSupported: true, type: 'css-api' },
       { protoChain: ['document', 'querySelector'], isStatic: true, isSupported: true, type: 'js-api' },
       { protoChain: ['Array', 'push'], isStatic: false, isSupported: true, type: 'js-api' }
-    ]
-    .map(record => ({
+    ];
+
+    const isStaticTests: Array<assertionType> = records.map(record => ({
       ...record,
       assertion: Nightmare()
         .goto('https://example.com')
@@ -199,6 +200,13 @@ describe('AssertionFormatter', () => {
             .filter(record => record.type === 'js-api')
             .map(test => test.isSupported)
         );
+    });
+
+    describe('MultipleAssertionFormatter', () => {
+      it('should not have more than expected char count', async () => {
+        expect(formatJSAssertion(records).length).toBeGreaterThan(0);
+        expect(formatJSAssertion(records).length).toBeLessThan(2000);
+      });
     });
   });
 });
