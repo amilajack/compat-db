@@ -4,6 +4,7 @@ import bluebird from 'bluebird';
 import dotenv from 'dotenv';
 import webdriver from 'selenium-webdriver';
 import AssertionFormatter from '../src/assertions/AssertionFormatter';
+import { formatJSAssertion } from '../src/assertions/MultipleAssertionFormatter';
 import TmpRecordDatabase from '../src/database/TmpRecordDatabase';
 import { getVersionsToMark } from '../src/helpers/GenerateVersions';
 import JobQueueDatabase from '../src/database/JobQueueDatabase';
@@ -91,7 +92,7 @@ export async function executeTests(capability: capabilityType, jobs: JobQueueTyp
 
   return executeTestsParallel(
     capability,
-    jobs.map(job => AssertionFormatter(JSON.parse(job.record)).apiIsSupported)
+    formatJSAssertion(jobs.map(job => JSON.parse(job.record)))
   )
   .then((testResults: Array<bool>) => testResults.map((isSupported, index) => {
     const job = jobs[index];
