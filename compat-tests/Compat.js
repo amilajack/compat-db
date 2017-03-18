@@ -4,7 +4,7 @@ import bluebird from 'bluebird';
 import dotenv from 'dotenv';
 import webdriver from 'selenium-webdriver';
 import AssertionFormatter from '../src/assertions/AssertionFormatter';
-import { formatJSAssertion } from '../src/assertions/MultipleAssertionFormatter';
+// import { formatJSAssertion } from '../src/assertions/MultipleAssertionFormatter';
 import TmpRecordDatabase from '../src/database/TmpRecordDatabase';
 import { getVersionsToMark } from '../src/helpers/GenerateVersions';
 import JobQueueDatabase from '../src/database/JobQueueDatabase';
@@ -70,7 +70,7 @@ export async function executeTestsParallel(capability: capabilityType, tests: Ar
 
   const items = await driver.executeScript(
     `return (function() {
-      return [${tests.join(',')}];
+      return [${tests.join(',')}]
     })()`
   );
 
@@ -86,13 +86,15 @@ export async function executeTestsParallel(capability: capabilityType, tests: Ar
 export async function executeTests(capability: capabilityType, jobs: JobQueueType[]): exTestType {
   const { browserName, platform, version } = capability;
 
+  console.warn('Skipping css-api tests for now. @TODO: Implement batch method for css apis');
+
   const logMessage = `Executing ${jobs.length} tests in parallel on ${platform} ${browserName} ${version}`;
   console.log(logMessage);
   console.log(logMessage.split('').map(() => '-').join(''));
 
   return executeTestsParallel(
     capability,
-    formatJSAssertion(jobs.map(job => JSON.parse(job.record)))
+    jobs.map(job => AssertionFormatter(JSON.parse(job.record)).apiIsSupported)
   )
   .then((testResults: Array<bool>) => testResults.map((isSupported, index) => {
     const job = jobs[index];
@@ -211,8 +213,7 @@ export async function handleCapability(capability: browserCapabilityType): handl
     // status: 'queued',
     browserName,
     version
-  }))
-  .filter(each => each.browserName !== 'safari');
+  }));
 
   const jobsEndIndex = process.env.NODE_ENV === 'test'
     ? 10

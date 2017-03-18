@@ -10,6 +10,8 @@
       "assert": true,
       "annotate": true
     }],
+    "transform-async-to-bluebird",
+    "transform-promise-to-bluebird",
     */
     "transform-decorators-legacy",
     "transform-runtime",

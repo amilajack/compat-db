@@ -192,7 +192,6 @@ describe('AssertionFormatter', () => {
       });
     }
 
-
     it('should have MultipleAssertionFormatter determine is support or not', async () => {
       expect((await multipleAssertionFormatterTests))
         .toEqual(
