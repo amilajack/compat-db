@@ -5,6 +5,7 @@
   ],
   "plugins": [
     "syntax-flow",
+    "fail-explicit",
     /*
     ["flow-runtime", {
       "assert": true,
