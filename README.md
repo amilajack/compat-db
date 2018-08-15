@@ -3,7 +3,7 @@ compat-db
 [![Build Status](https://travis-ci.org/amilajack/compat-db.svg?branch=master&maxAge=2592)](https://travis-ci.org/amilajack/compat-db)
 [![NPM version](https://badge.fury.io/js/compat-db.svg?maxAge=2592)](http://badge.fury.io/js/compat-db)
 [![Dependency Status](https://img.shields.io/david/amilajack/compat-db.svg?maxAge=2592)](https://david-dm.org/amilajack/compat-db)
-[![npm](https://img.shields.io/npm/dm/compat-db.svg?maxAge=2592)](https://npm-stat.com/charts.html?package=compat-db)
+[![npm](https://img.shields.io/npm/dm/compat-db.svg?maxAge=2592)](https://npm-stat.com/charts.html?package=compat-db) [![Greenkeeper badge](https://badges.greenkeeper.io/amilajack/compat-db.svg)](https://greenkeeper.io/)
 
 A central and scalable browser API compatibility database
 
