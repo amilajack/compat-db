@@ -4,11 +4,8 @@
     "stage-0"
   ],
   "plugins": [
+    "transform-decorators-legacy",
     "syntax-flow",
-    ["flow-runtime", {
-      "assert": true,
-      "annotate": true
-    }],
     "transform-flow-strip-types",
 		"transform-runtime",
     "add-module-exports",
