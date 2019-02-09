@@ -70,7 +70,7 @@
     "chromedriver": "^2.28.0",
     "cross-env": "^3.2.4",
     "dotenv": "^4.0.0",
-    "download-cli": "^1.0.1",
+    "download-cli": "^1.1.1",
     "eslint": "^3.18.0",
     "eslint-config-bliss": "^1.0.2",
     "eslint-formatter-pretty": "^1.1.0",
