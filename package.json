@@ -72,7 +72,7 @@
     "dotenv": "^4.0.0",
     "download-cli": "^1.0.1",
     "eslint": "^3.18.0",
-    "eslint-config-bliss": "^1.0.2",
+    "eslint-config-bliss": "^1.0.21",
     "eslint-formatter-pretty": "^1.1.0",
     "flow-bin": "^0.42.0",
     "flow-runtime": "^0.10.0",
