@@ -301,6 +301,15 @@ babel-eslint@^7.1.1:
     babylon "^6.13.0"
     lodash.pickby "^4.6.0"
 
+babel-eslint@^7.2.1:
+  version "7.2.3"
+  resolved "https://registry.yarnpkg.com/babel-eslint/-/babel-eslint-7.2.3.tgz#b2fe2d80126470f5c19442dc757253a897710827"
+  dependencies:
+    babel-code-frame "^6.22.0"
+    babel-traverse "^6.23.1"
+    babel-types "^6.23.0"
+    babylon "^6.17.0"
+
 babel-generator@^6.18.0, babel-generator@^6.21.0, babel-generator@^6.24.0:
   version "6.24.0"
   resolved "https://registry.yarnpkg.com/babel-generator/-/babel-generator-6.24.0.tgz#eba270a8cc4ce6e09a61be43465d7c62c1f87c56"
@@ -465,11 +474,11 @@ babel-plugin-check-es2015-constants@^6.22.0:
   dependencies:
     babel-runtime "^6.22.0"
 
-babel-plugin-fail-explicit@^0.0.4-1:
-  version "0.0.4-1"
-  resolved "https://registry.yarnpkg.com/babel-plugin-fail-explicit/-/babel-plugin-fail-explicit-0.0.4-1.tgz#dcdab8ad857bd822db1fb3db8df0ab4ca4ac16ff"
+babel-plugin-fail-explicit@^0.0.4:
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/babel-plugin-fail-explicit/-/babel-plugin-fail-explicit-0.0.4.tgz#4a6e9adcc3756a6f02c12bf3ef5d3f31039beeea"
   dependencies:
-    safe-access-check "^0.0.5"
+    safe-access-check "^0.0.7"
 
 babel-plugin-flow-runtime@^0.10.0:
   version "0.10.0"
@@ -554,9 +563,9 @@ babel-plugin-transform-async-generator-functions@^6.22.0:
     babel-plugin-syntax-async-generators "^6.5.0"
     babel-runtime "^6.22.0"
 
-babel-plugin-transform-async-to-bluebird@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/babel-plugin-transform-async-to-bluebird/-/babel-plugin-transform-async-to-bluebird-1.0.1.tgz#fdd012eb69fc0e118190b27da45b1e77a4568906"
+babel-plugin-transform-async-to-bluebird@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/babel-plugin-transform-async-to-bluebird/-/babel-plugin-transform-async-to-bluebird-1.1.1.tgz#46ea3e7c5af629782ac9f1ed1b7cd38f8425afd4"
   dependencies:
     babel-helper-function-name "^6.8.0"
     babel-plugin-syntax-async-functions "^6.8.0"
@@ -1019,6 +1028,10 @@ babylon@^6.11.0, babylon@^6.13.0, babylon@^6.15.0, babylon@^6.16.1:
   version "6.16.1"
   resolved "https://registry.yarnpkg.com/babylon/-/babylon-6.16.1.tgz#30c5a22f481978a9e7f8cdfdf496b11d94b404d3"
 
+babylon@^6.17.0:
+  version "6.18.0"
+  resolved "https://registry.yarnpkg.com/babylon/-/babylon-6.18.0.tgz#af2f3b88fa6f5c1e4c634d1a0f8eac4f55b395e3"
+
 balanced-match@^0.4.1:
   version "0.4.2"
   resolved "https://registry.yarnpkg.com/balanced-match/-/balanced-match-0.4.2.tgz#cb3f3e3c732dc0f01ee70b403f302e61d7709838"
@@ -1188,7 +1201,11 @@ caniuse-db@1.0.30000626:
   version "1.0.30000626"
   resolved "https://registry.yarnpkg.com/caniuse-db/-/caniuse-db-1.0.30000626.tgz#44363dc86857efaf758fea9faef6a15ed93d8f33"
 
-caniuse-db@1.0.30000636, caniuse-db@^1.0.30000624, caniuse-db@^1.0.30000631:
+caniuse-db@1.0.30000640:
+  version "1.0.30000640"
+  resolved "https://registry.yarnpkg.com/caniuse-db/-/caniuse-db-1.0.30000640.tgz#7b7fd3cf13c0d9d41f8754b577b202113e2be7ca"
+
+caniuse-db@^1.0.30000624, caniuse-db@^1.0.30000631:
   version "1.0.30000636"
   resolved "https://registry.yarnpkg.com/caniuse-db/-/caniuse-db-1.0.30000636.tgz#08230e9dd26632193f29c9d935185c6f6f9fd9ef"
 
@@ -3451,9 +3468,9 @@ klaw@^1.0.0:
   optionalDependencies:
     graceful-fs "^4.1.9"
 
-knex@^0.12.8:
-  version "0.12.8"
-  resolved "https://registry.yarnpkg.com/knex/-/knex-0.12.8.tgz#77374309ede1f0a238c9f9312694968bfec2e7d4"
+knex@^0.12.9:
+  version "0.12.9"
+  resolved "https://registry.yarnpkg.com/knex/-/knex-0.12.9.tgz#aa852138c09ed46181e890fd698270bbe7761124"
   dependencies:
     babel-runtime "^6.11.6"
     bluebird "^3.4.6"
@@ -4620,9 +4637,9 @@ rx@^4.1.0:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/rx/-/rx-4.1.0.tgz#a5f13ff79ef3b740fe30aa803fb09f98805d4782"
 
-safe-access-check@^0.0.5:
-  version "0.0.5"
-  resolved "https://registry.yarnpkg.com/safe-access-check/-/safe-access-check-0.0.5.tgz#9e407df1ee534252c5e6ee17b30994313dc48f0c"
+safe-access-check@^0.0.7:
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/safe-access-check/-/safe-access-check-0.0.7.tgz#9cf275171a5520de6bbbd89d002710a0416f8282"
 
 safe-buffer@^5.0.1:
   version "5.0.1"
