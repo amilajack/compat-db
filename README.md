@@ -58,3 +58,8 @@ npm run view-compat-db
 
 ## Roadmap
 See [the roadmap wiki](https://github.com/amilajack/compat-db/wiki/Roadmap)
+
+## Related
+
+* [eslint-plugin-compat](https://github.com/amilajack/eslint-plugin-compat)
+* [ast-metadata-inferer](https://github.com/amilajack/ast-metadata-inferer)
