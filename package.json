@@ -50,7 +50,7 @@
     "babel-eslint": "^7.2.1",
     "babel-loader": "^6.4.1",
     "babel-plugin-add-module-exports": "^0.2.1",
-    "babel-plugin-fail-explicit": "^0.0.4",
+    "babel-plugin-fail-explicit": "^0.0.6",
     "babel-plugin-flow-runtime": "^0.10.0",
     "babel-plugin-transform-async-to-bluebird": "^1.0.1",
     "babel-plugin-transform-decorators-legacy": "^1.3.4",
