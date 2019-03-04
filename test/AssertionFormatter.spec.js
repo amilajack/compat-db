@@ -7,7 +7,7 @@ import AssertionFormatter, {
 
 /* eslint no-await-in-loop: 0 */
 
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 200000;
+jest.setTimeout(200000);
 
 async function testDetermineASTNodeType(protoChain: Array<string>) {
   const determineNodeTest = determineASTNodeType({ protoChain });

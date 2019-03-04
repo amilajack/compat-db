@@ -3,7 +3,7 @@ import { ofAPIType } from '../src/providers/Providers';
 import JobQueueDatabase from '../src/database/JobQueueDatabase';
 import RecordMetadataDatabase from '../src/database/RecordMetadataDatabase';
 import TmpRecordDatabase from '../src/database/TmpRecordDatabase';
-import { writeRecordMetadataToDB } from '../compat-tests/RecordMetadata';
+import { writeRecordMetadataToDB } from './RecordMetadata';
 import { browserNameToCaniuseMappings } from '../src/helpers/Constants';
 import {
   convertCaniuseToBrowserName,

@@ -1,14 +1,13 @@
 import TmpRecordDatabase from '../src/database/TmpRecordDatabase';
 
-
 describe('TmpRecordDatabase', () => {
-  it('should migrate database', async () => {
+  it.concurrent('should migrate database', async () => {
     const tmpRecordDatabase = new TmpRecordDatabase('tmp-record-test-1');
     await tmpRecordDatabase.migrate();
     expect(await tmpRecordDatabase.count()).toEqual(0);
   });
 
-  it('should find same record versions', async () => {
+  it.concurrent('should find same record versions', async () => {
     const tmpRecordDatabase = new TmpRecordDatabase('tmp-record-test-2');
     await tmpRecordDatabase.migrate();
 
@@ -56,7 +55,7 @@ describe('TmpRecordDatabase', () => {
     });
   });
 
-  it('should insert bulk version records', async () => {
+  it.concurrent('should insert bulk version records', async () => {
     const tmpRecordDatabase = new TmpRecordDatabase('tmp-record-test-3');
     await tmpRecordDatabase.migrate();
 
@@ -95,7 +94,7 @@ describe('TmpRecordDatabase', () => {
     });
   });
 
-  it('should handle multiple bulk version inserts', async () => {
+  it.concurrent('should handle multiple bulk version inserts', async () => {
     const tmpRecordDatabase = new TmpRecordDatabase('tmp-record-test-4');
     await tmpRecordDatabase.migrate();
 

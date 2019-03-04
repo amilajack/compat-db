@@ -1,8 +1,7 @@
 // @flow
 import TmpRecordDatabase from './TmpRecordDatabase';
-import JobQueueDatabase from '../../src/database/JobQueueDatabase';
-import RecordMetadataDatabase from '../../src/database/RecordMetadataDatabase';
-
+import JobQueueDatabase from './JobQueueDatabase';
+import RecordMetadataDatabase from './RecordMetadataDatabase';
 
 const tmpRecordDatabase = new TmpRecordDatabase();
 const jobQueue = new JobQueueDatabase();

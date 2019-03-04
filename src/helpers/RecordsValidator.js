@@ -1,9 +1,8 @@
 // @flow
-import { expect } from 'chai';
+import { expect as chaiExpect } from 'chai';
 import TmpRecordDatabase from '../database/TmpRecordDatabase';
 import { caniuseToSeleniumMappings } from './Constants';
 import { allTargets } from './GenerateVersions';
-
 
 /* eslint no-unused-expressions: 0, fp/no-let: 0 */
 
@@ -18,13 +17,12 @@ type tmpRecordType = {
 export function validateRecordTypes(tmpRecords: Array<tmpRecordType>) {
   tmpRecords.forEach((record) => {
     try {
-      expect(record.name).to.be.a('string');
-      expect(record.caniuseId).to.be.a('string');
-      expect(JSON.parse(record.versions)).to.be.an('object');
-      expect(record.protoChainId).to.be.a('string');
-      expect(record.type).to.exist;
+      chaiExpect(record.name).to.be.a('string');
+      chaiExpect(record.caniuseId).to.be.a('string');
+      chaiExpect(JSON.parse(record.versions)).to.be.an('object');
+      chaiExpect(record.protoChainId).to.be.a('string');
+      chaiExpect(record.type).to.exist;
     } catch (error) {
-      console.log(error);
       throw new Error(`Invalid record "${record.protoChainId}" in "${record.caniuseId}", ${error}`);
     }
   });
@@ -84,7 +82,7 @@ export async function RecordsValidator(defaultTmpRecordDatabaseRecords?: Array<t
     defaultTmpRecordDatabaseRecords ||
     await tmpRecordDatabase.getAll();
 
-  expect(TmpRecordDatabaseRecords).to.have.length.above(0);
+  chaiExpect(TmpRecordDatabaseRecords).to.have.length.above(0);
   console.log(`Testing ${TmpRecordDatabaseRecords.length} temporary database records`);
 
   validateRecordTypes(TmpRecordDatabaseRecords);

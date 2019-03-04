@@ -1,6 +1,7 @@
 /* eslint import/prefer-default-export: 0 */
 import JobQueueDatabase from '../src/database/JobQueueDatabase';
 
+export const baseRecord = {};
 
 export const baseJob = {
   name: 'chrome',
@@ -17,7 +18,7 @@ export const baseJob = {
 };
 
 describe('JobQueueDatabase', () => {
-  it('should insert bulk and get all records', async () => {
+  it.concurrent('should insert bulk and get all records', async () => {
     const jobQueue = new JobQueueDatabase('job-queue-test-3');
     await jobQueue.migrate();
 
@@ -87,7 +88,7 @@ describe('JobQueueDatabase', () => {
     ]);
   });
 
-  it('should mark jobs as running', async () => {
+  it.concurrent('should mark jobs as running', async () => {
     const jobQueue = new JobQueueDatabase('job-queue-test-4');
     await jobQueue.migrate();
 
@@ -114,7 +115,7 @@ describe('JobQueueDatabase', () => {
     expect(allJobs.map((job) => job.status)).toEqual(['running', 'running']);
   });
 
-  it('should remove job', async () => {
+  it.concurrent('should remove job', async () => {
     const jobQueue = new JobQueueDatabase('job-queue-test-5');
     await jobQueue.migrate();
 

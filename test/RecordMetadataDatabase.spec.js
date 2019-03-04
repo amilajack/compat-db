@@ -5,15 +5,14 @@ import RecordMetadata, {
 import { ofAPIType } from '../src/providers/Providers';
 import RecordMetadataDatabase from '../src/database/RecordMetadataDatabase';
 
-
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 2000000; // eslint-disable-line
+jest.setTimeout(2000000);
 
 const experimentalAPIsToSupport = [
   'VRDisplay', 'Atomics', 'WebAssembly', 'SharedArrayBuffer', 'WebGL2RenderingContext'
 ];
 
 describe('RecordMetadataDatabase', () => {
-  it('should have objects with the expected properties', async () => {
+  it.concurrent('should have objects with the expected properties', async () => {
     const recordMetadata = await RecordMetadata();
 
     recordMetadata.forEach(({ record, isStatic, astNodeType }) => {
@@ -26,13 +25,13 @@ describe('RecordMetadataDatabase', () => {
   /**
    * @TODO: Check that we have at least a certain amount of record metadata
    */
-  it('should have expected length', async () => {
+  it.concurrent('should have expected length', async () => {
     const recordMetadata = await RecordMetadata();
     expect(recordMetadata.length).toBeLessThan(ofAPIType('js').length);
     expect(recordMetadata.length).toBeGreaterThan(ofAPIType('js').length / 2);
   });
 
-  it('should write metadata records to database', async () => {
+  it.concurrent('should write metadata records to database', async () => {
     const recordMetadataDatabase = new RecordMetadataDatabase('test-record-metadata-1');
     await recordMetadataDatabase.migrate();
 
@@ -45,7 +44,7 @@ describe('RecordMetadataDatabase', () => {
     expect(await recordMetadataDatabase.count()).toEqual(metadata.length);
   });
 
-  it('should parallelize tests across browsers and retain order of test results', async () => {
+  it.concurrent('should parallelize tests across browsers and retain order of test results', async () => {
     // If not running in CI, run against local chrome installation
     if (!process.env.CI) {
       expect(await parallelizeBrowserTests([
@@ -59,15 +58,14 @@ describe('RecordMetadataDatabase', () => {
     expect(
       await parallelizeBrowserTests([
         true, false, false, true, false, true, false, false
-      ]),
-      true
+      ])
     )
     .toEqual([
       true, false, false, true, false, true, false, false
     ]);
   });
 
-  it('should have exact match', async () => {
+  it.concurrent('should have exact match', async () => {
     const testExperimentalAPIs = false;
     const recordMetadataDatabase = new RecordMetadataDatabase('test-record-metadata-2');
     await recordMetadataDatabase.migrate();

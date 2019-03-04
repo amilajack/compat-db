@@ -1,19 +1,10 @@
 {
   "presets": [
-    "es2015",
-    "stage-0"
+    ["@babel/preset-env", { "targets": { "node": 10 } }],
+    "@babel/preset-flow"
   ],
   "plugins": [
-    "syntax-flow",
-    /*
-    ["flow-runtime", {
-      "assert": true,
-      "annotate": true
-    }],
-    */
-    "transform-decorators-legacy",
-    "transform-runtime",
-    "add-module-exports",
-    "transform-flow-strip-types"
+    "@babel/plugin-syntax-flow",
+    "@babel/plugin-proposal-class-properties"
   ]
 }

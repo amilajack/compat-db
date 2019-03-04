@@ -47,7 +47,8 @@ export default class AbstractDatabase {
         user: process.env.MYSQL_USERNAME || 'username',
         password: process.env.MYSQL_PASSWORD || 'secret',
         database: process.env.MYSQL_DB || 'compat-db',
-        charset: 'utf8'
+        charset: 'utf8',
+        insecureAuth: true
       },
       pool: {
         min: 0,

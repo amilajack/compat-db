@@ -2,11 +2,10 @@ import TmpRecordDatabase from '../src/database/TmpRecordDatabase';
 import PostChecks from '../compat-tests/PostChecks';
 import RecordMetadataDatabase from '../src/database/RecordMetadataDatabase';
 
-
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 200000;
+jest.setTimeout(200000);
 
 describe('PostChecks', () => {
-  it('should take records and return deduped results', async () => {
+  it.concurrent('should take records and return deduped results', async () => {
     const record = {
       type: 'js-api',
       protoChainId: 'Array.push'
