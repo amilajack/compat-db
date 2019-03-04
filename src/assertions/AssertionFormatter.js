@@ -7,22 +7,22 @@
  */
 import type { RecordType } from '../providers/RecordType';
 
-
 /* eslint fp/no-throw: 0 */
 
 type AssertionFormatterType = {
   apiIsSupported: string
-}
-& ({
-  // Only used for CSS API's
-  allCSSProperties: string,
-  allCSSValues: string,
-}
-| {
-  // Only used for JS API's
-  determineASTNodeType: string,
-  determineIsStatic: string
-});
+} & (
+  | {
+      // Only used for CSS API's
+      allCSSProperties: string,
+      allCSSValues: string
+    }
+  | {
+      // Only used for JS API's
+      determineASTNodeType: string,
+      determineIsStatic: string
+    }
+);
 
 /**
  * Check if the JS API is defined
@@ -38,12 +38,20 @@ function formatJSAssertion(record: RecordType): string {
   const exceptions = new Set(['crypto', 'Crypto']);
 
   const lowercaseSupportTest = `
-    if (${String(lowercaseParentObject !== 'function' && !exceptions.has(record.protoChain[0]))}) {
-      ${lowercaseParentObject === 'function' || lowercaseParentObject === record.protoChain[0]
-        ? ''
-        : `if (typeof ${lowercaseParentObject} !== 'undefined') {
-          throw new Error('${record.protoChain[0]} is not supported but ${lowercaseParentObject} is supported')
-        }`}
+    if (${String(
+      lowercaseParentObject !== 'function' &&
+        !exceptions.has(record.protoChain[0])
+    )}) {
+      ${
+        lowercaseParentObject === 'function' ||
+        lowercaseParentObject === record.protoChain[0]
+          ? ''
+          : `if (typeof ${lowercaseParentObject} !== 'undefined') {
+          throw new Error('${
+            record.protoChain[0]
+          } is not supported but ${lowercaseParentObject} is supported')
+        }`
+      }
     }
   `;
 
@@ -60,7 +68,9 @@ function formatJSAssertion(record: RecordType): string {
         // a.prototype.b
         if (typeof ${record.protoChain[0]}.prototype !== 'undefined') {
           if (${remainingProtoObject.length} === 0) { return false }
-          return typeof ${[record.protoChain[0], 'prototype'].concat(remainingProtoObject).join('.')} !== 'undefined'
+          return typeof ${[record.protoChain[0], 'prototype']
+            .concat(remainingProtoObject)
+            .join('.')} !== 'undefined'
         }
         return false
       } catch (e) {
@@ -185,7 +195,9 @@ export function getAllSupportCSSProperties(): string {
 /**
  * Create a list of browser API assertions to check if an API is supported
  */
-export default function AssertionFormatter(record: RecordType): AssertionFormatterType {
+export default function AssertionFormatter(
+  record: RecordType
+): AssertionFormatterType {
   switch (record.type) {
     case 'css-api':
       return {

@@ -11,9 +11,9 @@
     "build": "cross-env NODE_ENV=production rm -rf lib && mkdir lib && babel src/index.js --out-file lib/index.js",
     "build-compat-db": "node -r babel-register compat-tests/setup.js && node -r babel-register compat-tests/Compat.js",
     "dir-remove": "rm src/database/database.sqlite || true && touch src/database/database.sqlite",
-    "flow": "flow check",
+    "flow": "glow",
     "flow-typed": "flow-typed install",
-    "lint": "eslint --cache --format=node_modules/eslint-formatter-pretty .",
+    "lint": "eslint --cache .",
     "migrate": "npm run dir-remove && babel-node ./src/database/Migrate",
     "view-compat-db": "http-server site",
     "spec": "cross-env NODE_ENV=test npm run migrate && jest",
@@ -68,6 +68,7 @@
     "@babel/plugin-transform-runtime": "^7.3.4",
     "@babel/polyfill": "^7.2.5",
     "@babel/preset-env": "^7.3.4",
+    "@babel/preset-flow": "^7.0.0",
     "@babel/register": "^7.0.0",
     "babel-core": "^7.0.0-bridge.0",
     "babel-eslint": "^10.0.1",
@@ -84,11 +85,11 @@
     "download-cli": "^1.1.1",
     "eslint": "^5.15.0",
     "eslint-config-bliss": "^3.3.0",
-    "eslint-formatter-pretty": "^2.1.1",
     "eslint-plugin-flowtype-errors": "^4.0.0",
     "flow-bin": "^0.94.0",
     "flow-runtime": "^0.17.0",
     "flow-typed": "^2.5.1",
+    "glow": "^1.2.2",
     "http-server": "^0.11.1",
     "jest-cli": "^24.1.0",
     "knex": "^0.16.3",
@@ -101,8 +102,7 @@
     "wdio-mocha-framework": "^0.6.4",
     "wdio-sauce-service": "^0.4.14",
     "wdio-selenium-standalone-service": "^0.0.12",
-    "webdriverio": "^5.6.6",
-    "@babel/preset-flow": "^7.0.0"
+    "webdriverio": "^5.6.6"
   },
   "engines": {
     "node": ">=4.x",
@@ -114,5 +114,34 @@
   },
   "dependencies": {
     "chromedriver": "^2.46.0"
+  },
+  "eslintConfig": {
+    "extends": "bliss",
+    "rules": {
+      "import/no-extraneous-dependencies": "off",
+      "no-console": "off",
+      "flowtype-errors/show-errors": "off"
+    }
+  },
+  "babel": {
+    "presets": [
+      [
+        "@babel/preset-env",
+        {
+          "targets": {
+            "node": 10
+          }
+        }
+      ],
+      "@babel/preset-flow"
+    ],
+    "plugins": [
+      "@babel/plugin-proposal-class-properties"
+    ]
+  },
+  "renovate": {
+    "extends": [
+      "bliss"
+    ]
   }
 }

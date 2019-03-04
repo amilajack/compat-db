@@ -5,7 +5,6 @@
 import { writeFileSync, readFileSync } from 'fs';
 import { join } from 'path';
 
-
 /* eslint no-undef: 0 */
 
 describe('Foo', () => {

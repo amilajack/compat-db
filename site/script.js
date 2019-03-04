@@ -6,11 +6,11 @@ function mapItems(record) {
 
   browsers.forEach(browser => {
     listElementArray.push(`<b>${browser}: </b>`);
-    // eslint-disable-next-line
-    for (const version in record.targets[browser]) {
-      listElementArray
-        .push(`${version} ${record.targets[browser][version] === 'y' ? '✅' : '❌'}`);
-    }
+    Object.keys(record.targets[browser]).forEach(version => {
+      listElementArray.push(
+        `${version} ${record.targets[browser][version] === 'y' ? '✅' : '❌'}`
+      );
+    });
     listElementArray.push('<br>');
   });
 
@@ -28,9 +28,7 @@ function mapItems(record) {
 fetch('/all.json')
   .then(res => res.json())
   .then(res => {
-    const renderedHTML = res.records
-      .map(mapItems)
-      .join('');
+    const renderedHTML = res.records.map(mapItems).join('');
 
     const div = document.createElement('div');
     div.innerHTML = `<ul>${renderedHTML}</ul>`;

@@ -41,8 +41,7 @@ describe('TmpRecordDatabase', () => {
         ['49', '50'],
         true
       )
-    )
-    .toEqual({
+    ).toEqual({
       protoChainId: 'some-protochain-id',
       name: 'chrome',
       caniuseId: 'chrome',
@@ -74,13 +73,14 @@ describe('TmpRecordDatabase', () => {
     expect(await tmpRecordDatabase.count()).toEqual(1);
 
     expect(
-      await tmpRecordDatabase.findSameVersionCompatRecord({
-        protoChainId: 'alert',
-        type: 'js-api'
-      },
-      'chrome')
-    )
-    .toEqual({
+      await tmpRecordDatabase.findSameVersionCompatRecord(
+        {
+          protoChainId: 'alert',
+          type: 'js-api'
+        },
+        'chrome'
+      )
+    ).toEqual({
       protoChainId: 'alert',
       caniuseId: 'chrome',
       name: 'chrome',
@@ -123,16 +123,21 @@ describe('TmpRecordDatabase', () => {
     expect(await tmpRecordDatabase.count()).toEqual(2);
 
     const items = (await Promise.all([
-      tmpRecordDatabase.findSameVersionCompatRecord({
-        protoChainId: 'alert',
-        type: 'js-api'
-      }, 'chrome'),
-      tmpRecordDatabase.findSameVersionCompatRecord({
-        protoChainId: 'foo()',
-        type: 'js-api'
-      }, 'chrome')
-    ]))
-    .map(e => ({ protoChainId: e.protoChainId, versions: e.versions }));
+      tmpRecordDatabase.findSameVersionCompatRecord(
+        {
+          protoChainId: 'alert',
+          type: 'js-api'
+        },
+        'chrome'
+      ),
+      tmpRecordDatabase.findSameVersionCompatRecord(
+        {
+          protoChainId: 'foo()',
+          type: 'js-api'
+        },
+        'chrome'
+      )
+    ])).map(e => ({ protoChainId: e.protoChainId, versions: e.versions }));
 
     expect(items).toEqual([
       {

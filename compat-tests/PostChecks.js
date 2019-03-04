@@ -10,7 +10,6 @@ import RecordMetadataDatabase from '../src/database/RecordMetadataDatabase';
 import type { DatabaseRecordType } from '../src/database/DatabaseRecordType';
 import { caniuseBrowsers } from '../src/helpers/Constants';
 
-
 type targetsType = {
   targets: {
     [name: string]: {
@@ -19,9 +18,13 @@ type targetsType = {
   }
 };
 
-export default async function PostChecks(rMTableName?: string): Promise<DatabaseRecordType> {
+export default async function PostChecks(
+  rMTableName?: string
+): Promise<DatabaseRecordType> {
   const recordMetadataDatabase = new RecordMetadataDatabase(rMTableName);
-  const tmpRecordDatabase = new TmpRecordDatabase(process.env.TMP_RECORD_DB_NAME);
+  const tmpRecordDatabase = new TmpRecordDatabase(
+    process.env.TMP_RECORD_DB_NAME
+  );
 
   const tmpRecords = await tmpRecordDatabase.getAll();
   const recordMetadata = await recordMetadataDatabase.getAll();
@@ -35,12 +38,13 @@ export default async function PostChecks(rMTableName?: string): Promise<Database
   // Merge all the duplicated records
   // For every record in RecordMetadata and for each caniuse database
   // in TmpRecordDatabase and compile them into a single record
-  recordMetadata.forEach((record) => {
-    caniuseBrowsers.forEach((caniuseBrowser) => {
-      const compiledVersions: {[version: string]: string} = tmpRecords
-        .filter(tmpRecord =>
-          tmpRecord.protoChainId === record.protoChainId &&
-          tmpRecord.caniuseId === caniuseBrowser
+  recordMetadata.forEach(record => {
+    caniuseBrowsers.forEach(caniuseBrowser => {
+      const compiledVersions: { [version: string]: string } = tmpRecords
+        .filter(
+          tmpRecord =>
+            tmpRecord.protoChainId === record.protoChainId &&
+            tmpRecord.caniuseId === caniuseBrowser
         )
         .map(tmpRecord => JSON.parse(tmpRecord.versions))
         .reduce((p, c) => ({ ...p, ...c }), {});

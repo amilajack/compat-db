@@ -5,7 +5,6 @@ import bookshelf from 'bookshelf';
 import dotenv from 'dotenv';
 import type { RecordType as RType } from '../providers/RecordType';
 
-
 dotenv.config();
 
 type str = string;
@@ -18,14 +17,13 @@ export type AbstractDatabaseRecordType = {
 };
 
 export default class AbstractDatabase {
-
-  tableName: str
+  tableName: str;
 
   connection: {
     knex: Object,
-    Database: Class, // eslint-disable-line
+    Database: Object,
     Bookshelf: Object
-  }
+  };
 
   constructor(tableName: string) {
     this.tableName = tableName;
@@ -66,9 +64,7 @@ export default class AbstractDatabase {
     };
 
     const knex = Knex(
-      process.env.USE_SQLITE === 'false'
-        ? mysqlConfig
-        : sqliteConfig
+      process.env.USE_SQLITE === 'false' ? mysqlConfig : sqliteConfig
     );
     const Bookshelf = bookshelf(knex);
     const Database = Bookshelf.Model.extend({ tableName: this.tableName });
@@ -77,17 +73,14 @@ export default class AbstractDatabase {
   }
 
   where(whereClause: Object): Array<Object> {
-    return this.connection
-      .Database
-      .where(whereClause);
+    return this.connection.Database.where(whereClause);
   }
 
   /**
    * Get all records in the database
    */
   getAll(): Promise<Array<Object>> {
-    return this.connection.Database
-      .forge()
+    return this.connection.Database.forge()
       .fetchAll()
       .then(records => records.toJSON());
   }
@@ -107,7 +100,9 @@ export default class AbstractDatabase {
    * Drop the databases and re-migrate them
    */
   async migrate(createTable: (table: Object) => void) {
-    const { knex, Database } = this.initializeDatabaseConnection(this.tableName);
+    const { knex, Database } = this.initializeDatabaseConnection(
+      this.tableName
+    );
 
     await knex.schema.dropTableIfExists(this.tableName);
     await knex.schema.createTable(this.tableName, createTable);
@@ -118,15 +113,18 @@ export default class AbstractDatabase {
   /**
    * Find all the compatibility records for every version of the same browser
    */
-  findSameVersionCompatRecord(record: RType, caniuseId: str): Promise<AbstractDatabaseRecordType> {
+  findSameVersionCompatRecord(
+    record: RType,
+    caniuseId: str
+  ): Promise<AbstractDatabaseRecordType> {
     return this.connection.Database.where({
       name: caniuseId,
       type: record.type,
       protoChainId: record.protoChainId,
       caniuseId
     })
-    .fetchAll()
-    .then(records => records.toJSON());
+      .fetchAll()
+      .then(records => records.toJSON());
   }
 
   /**
@@ -135,6 +133,7 @@ export default class AbstractDatabase {
    */
   insertBulk(recordsToInsert: Array<Object>) {
     return this.connection.knex
-      .batchInsert(this.tableName, recordsToInsert).returning('id');
+      .batchInsert(this.tableName, recordsToInsert)
+      .returning('id');
   }
 }

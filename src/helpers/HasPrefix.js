@@ -3,7 +3,6 @@
  * @flow
  */
 
-
 /* eslint flowtype-errors/show-errors: 0 */
 
 export const vendorPrefixMappings = {
@@ -21,7 +20,7 @@ export const prefixes = Object.values(vendorPrefixMappings);
  * ex. HasPrefix('document.mozOffscreenWidth()') => true
  * ex. HasPrefix('document.offscreenWidth()') => false
  */
-export default function HasPrefix(property: string): bool {
+export default function HasPrefix(property: string): boolean {
   const lowerCaseProperty = property.toLowerCase();
   // $FlowFixMe: Waiting on github.com/facebook/flow/issues/2174
   return prefixes.some(prefix => lowerCaseProperty.includes(prefix));

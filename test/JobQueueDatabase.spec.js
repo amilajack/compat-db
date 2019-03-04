@@ -94,10 +94,7 @@ describe('JobQueueDatabase', () => {
 
     expect(await jobQueue.count()).toEqual(0);
 
-    await jobQueue.insertBulk([
-      baseJob,
-      baseJob
-    ]);
+    await jobQueue.insertBulk([baseJob, baseJob]);
 
     expect(await jobQueue.count()).toEqual(2);
 
@@ -112,7 +109,7 @@ describe('JobQueueDatabase', () => {
 
     const allJobs = await jobQueue.getAll();
     expect(await jobQueue.count()).toEqual(2);
-    expect(allJobs.map((job) => job.status)).toEqual(['running', 'running']);
+    expect(allJobs.map(job => job.status)).toEqual(['running', 'running']);
   });
 
   it.concurrent('should remove job', async () => {

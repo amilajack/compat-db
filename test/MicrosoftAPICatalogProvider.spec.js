@@ -1,7 +1,7 @@
 import {
   camelCaseToHyphen,
-  interceptAndFormat } from '../src/providers/microsoft-api-catalog/MicrosoftAPICatalogProvider';
-
+  interceptAndFormat
+} from '../src/providers/microsoft-api-catalog/MicrosoftAPICatalogProvider';
 
 describe('APICatalog', () => {
   describe('Helpers', () => {

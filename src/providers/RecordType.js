@@ -48,7 +48,7 @@ export type RecordType = {
    * Determine if the spec has finished being written
    * @TODO
    */
-  specIsFinished?: bool,
+  specIsFinished?: boolean,
 
   /**
    * Prototype chain/method list
@@ -74,5 +74,5 @@ export type RecordType = {
    * cannot be determined, (ex. block) then create two responses with different
    * `type`'s
    */
-  type: 'js-api' | 'css-api' | 'html-api',
+  type: 'js-api' | 'css-api' | 'html-api'
 };

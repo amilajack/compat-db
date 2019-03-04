@@ -11,8 +11,12 @@ describe('PostChecks', () => {
       protoChainId: 'Array.push'
     };
 
-    const recordMetadataDatabase = new RecordMetadataDatabase('test-post-checks-record-metadata');
-    const tmpRecordDatabase = new TmpRecordDatabase('tmp-record-database-post-checks');
+    const recordMetadataDatabase = new RecordMetadataDatabase(
+      'test-post-checks-record-metadata'
+    );
+    const tmpRecordDatabase = new TmpRecordDatabase(
+      'tmp-record-database-post-checks'
+    );
 
     await tmpRecordDatabase.migrate();
     await recordMetadataDatabase.migrate();
@@ -24,12 +28,7 @@ describe('PostChecks', () => {
       ['6.0', '7.0', '8.0', '9.0'],
       true
     );
-    await tmpRecordDatabase.insertBulkRecords(
-      record,
-      'safari',
-      ['10.0'],
-      true
-    );
+    await tmpRecordDatabase.insertBulkRecords(record, 'safari', ['10.0'], true);
 
     await recordMetadataDatabase.insertBulk([
       {
@@ -61,7 +60,13 @@ describe('PostChecks', () => {
           targets: {
             'internet explorer': {},
             MicrosoftEdge: {},
-            safari: { '6.0': 'y', '7.0': 'y', '8.0': 'y', '9.0': 'y', '10.0': 'y' },
+            safari: {
+              '6.0': 'y',
+              '7.0': 'y',
+              '8.0': 'y',
+              '9.0': 'y',
+              '10.0': 'y'
+            },
             opera: {},
             firefox: {},
             chrome: {}

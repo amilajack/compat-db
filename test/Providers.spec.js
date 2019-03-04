@@ -3,7 +3,6 @@ import { join } from 'path';
 import { writeFileSync } from 'fs';
 import Providers, { find, ofAPIType } from '../src/providers/Providers';
 
-
 describe('Providers', () => {
   const providers = Providers();
 
@@ -110,16 +109,18 @@ describe('Providers', () => {
         });
 
         it('should contain PaymentRequest record', () => {
-          const [record] = records
-            .filter(e => e.protoChain.includes('PaymentRequest'));
+          const [record] = records.filter(e =>
+            e.protoChain.includes('PaymentRequest')
+          );
 
           expect(record).toBeDefined();
           expect(record.protoChain).toContain('PaymentRequest');
         });
 
         it.skip('should contain WebAssembly record', () => {
-          const [record] = records
-            .filter(e => e.protoChain.includes('WebAssembly'));
+          const [record] = records.filter(e =>
+            e.protoChain.includes('WebAssembly')
+          );
 
           expect(record).toBeDefined();
           expect(record.protoChain).toContain('WebAssembly');
@@ -146,8 +147,7 @@ describe('Providers', () => {
         });
 
         it('should contain fetch record', () => {
-          const [record] = records
-            .filter(e => e.protoChain.includes('fetch'));
+          const [record] = records.filter(e => e.protoChain.includes('fetch'));
 
           expect(record).toBeDefined();
           expect(record.protoChain).toContain('fetch');
@@ -188,34 +188,51 @@ describe('Providers', () => {
         });
 
         it('should contain navigator.serviceWorker record', () => {
-          expect(records.find(record =>
-            record.protoChain.includes('navigator') &&
-            record.protoChain.includes('serviceWorker')
-          )).toBeDefined();
+          expect(
+            records.find(
+              record =>
+                record.protoChain.includes('navigator') &&
+                record.protoChain.includes('serviceWorker')
+            )
+          ).toBeDefined();
 
-          expect(records.find(record =>
-            record.protoChain.includes('requestAnimationFrame')
-          )).toBeDefined();
+          expect(
+            records.find(record =>
+              record.protoChain.includes('requestAnimationFrame')
+            )
+          ).toBeDefined();
 
-          expect(records.find(record =>
-            record.protoChain.includes('ServiceWorkerRegistration') &&
-            record.protoChain.includes('getNotifications')
-          )).toBeDefined();
+          expect(
+            records.find(
+              record =>
+                record.protoChain.includes('ServiceWorkerRegistration') &&
+                record.protoChain.includes('getNotifications')
+            )
+          ).toBeDefined();
 
-          expect(records.find(record =>
-            record.protoChain.includes('ServiceWorkerRegistration') &&
-            record.protoChain.includes('getNotifications')
-          )).toBeDefined();
+          expect(
+            records.find(
+              record =>
+                record.protoChain.includes('ServiceWorkerRegistration') &&
+                record.protoChain.includes('getNotifications')
+            )
+          ).toBeDefined();
 
-          expect(records.find(record =>
-            record.protoChain.includes('ServiceWorkerMessageEvent') &&
-            record.protoChain.includes('ports')
-          )).toBeDefined();
+          expect(
+            records.find(
+              record =>
+                record.protoChain.includes('ServiceWorkerMessageEvent') &&
+                record.protoChain.includes('ports')
+            )
+          ).toBeDefined();
 
-          expect(records.find(record =>
-            record.protoChain.includes('ServiceWorkerMessageEvent') &&
-            record.protoChain.includes('source')
-          )).toBeDefined();
+          expect(
+            records.find(
+              record =>
+                record.protoChain.includes('ServiceWorkerMessageEvent') &&
+                record.protoChain.includes('source')
+            )
+          ).toBeDefined();
         });
       });
 

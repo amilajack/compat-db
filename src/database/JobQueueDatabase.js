@@ -4,7 +4,6 @@
  */
 import AbstractDatabase from './AbstractDatabase';
 
-
 export type JobQueueType = {
   name: string,
   browserName: string,
@@ -13,17 +12,13 @@ export type JobQueueType = {
   version: string,
   record: string,
   type: 'js-api' | 'css-api' | 'html-api',
-  caniuseId: string,
+  caniuseId: string
 };
 
 type whereClauseType = {
   browserName: string,
   protoChainId?: string
-}
-& (
-  { caniuseId: string }
-  | { browserName: string }
-);
+} & ({ caniuseId: string } | { browserName: string });
 
 export default class JobQueue extends AbstractDatabase {
   constructor(tableName: string = 'jobs') {
@@ -31,7 +26,7 @@ export default class JobQueue extends AbstractDatabase {
   }
 
   migrate() {
-    return super.migrate((table) => {
+    return super.migrate(table => {
       table.increments('id');
       table.string('name');
       table.string('browserName');
@@ -46,10 +41,10 @@ export default class JobQueue extends AbstractDatabase {
   }
 
   markJobsStatus(whereClause: whereClauseType, status: 'running' | 'queued') {
-    return this.connection
-      .Database
-      .where(whereClause)
-      .save({ status }, { method: 'update', patch: true });
+    return this.connection.Database.where(whereClause).save(
+      { status },
+      { method: 'update', patch: true }
+    );
   }
 
   /**

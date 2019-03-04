@@ -12,5 +12,5 @@ Promise.all([
   jobQueue.migrate(),
   recordMetadata.migrate()
 ])
-.then(() => process.exit(0))
-.catch(console.log);
+  .then(() => process.exit(0))
+  .catch(console.log);

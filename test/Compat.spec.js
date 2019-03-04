@@ -4,7 +4,8 @@ import Compat, {
   executeTests,
   executeTestsParallel,
   handleFinishedTest,
-  handleCapability } from '../compat-tests/Compat';
+  handleCapability
+} from '../compat-tests/Compat';
 import setup from '../compat-tests/setup';
 import TmpRecordDatabase from '../src/database/TmpRecordDatabase';
 import { baseRecord } from './JobQueueDatabase.spec';
@@ -63,34 +64,45 @@ describe('Comapt', () => {
   });
 
   it.concurrent('should execute tests in parallel', async () => {
-    expect(await executeTestsParallel(
-      {
-        browserName: 'chrome',
-        version: '48.0',
-        platform: 'Windows 10'
-      },
-      [true, false, true, true, false, true]
-    ))
-    .toEqual([true, false, true, true, false, true]);
+    expect(
+      await executeTestsParallel(
+        {
+          browserName: 'chrome',
+          version: '48.0',
+          platform: 'Windows 10'
+        },
+        [true, false, true, true, false, true]
+      )
+    ).toEqual([true, false, true, true, false, true]);
 
     const exampleTest = `(function exampleTest() {
       return 'some';
     })()`;
 
-    expect(await executeTestsParallel(
-      {
-        browserName: 'firefox',
-        version: '42.0',
-        platform: 'Windows 10'
-      },
-      [exampleTest, exampleTest, exampleTest, exampleTest, exampleTest, exampleTest]
-    ))
-    .toEqual(['some', 'some', 'some', 'some', 'some', 'some']);
+    expect(
+      await executeTestsParallel(
+        {
+          browserName: 'firefox',
+          version: '42.0',
+          platform: 'Windows 10'
+        },
+        [
+          exampleTest,
+          exampleTest,
+          exampleTest,
+          exampleTest,
+          exampleTest,
+          exampleTest
+        ]
+      )
+    ).toEqual(['some', 'some', 'some', 'some', 'some', 'some']);
   });
 
   it.concurrent('should handle finished tests', async () => {
     const jobQueue = new JobQueueDatabase('compat-test-1');
-    const tmpRecordDatabase = new TmpRecordDatabase('tmp-record-database-compat-1');
+    const tmpRecordDatabase = new TmpRecordDatabase(
+      'tmp-record-database-compat-1'
+    );
 
     await jobQueue.migrate();
     await tmpRecordDatabase.migrate();
@@ -108,14 +120,17 @@ describe('Comapt', () => {
 
     const items = await tmpRecordDatabase.getAll();
 
-    const result = [{
-      id: 1,
-      name: 'chrome',
-      protoChainId: 'document.querySelector',
-      versions: '{"41.0":"y","42.0":"y","43.0":"y","44.0":"y","45.0":"y","46.0":"y","47.0":"y","48.0":"y","49.0":"y","50.0":"y","51.0":"y","52.0":"y","53.0":"y","54.0":"y","55.0":"y","56.0":"y"}',
-      type: 'js-api',
-      caniuseId: 'chrome'
-    }];
+    const result = [
+      {
+        id: 1,
+        name: 'chrome',
+        protoChainId: 'document.querySelector',
+        versions:
+          '{"41.0":"y","42.0":"y","43.0":"y","44.0":"y","45.0":"y","46.0":"y","47.0":"y","48.0":"y","49.0":"y","50.0":"y","51.0":"y","52.0":"y","53.0":"y","54.0":"y","55.0":"y","56.0":"y"}',
+        type: 'js-api',
+        caniuseId: 'chrome'
+      }
+    ];
 
     expect(result).toEqual(items);
   });
@@ -133,7 +148,9 @@ describe('Comapt', () => {
 
   it.skip('should run e2e', async () => {
     const jobQueue = new JobQueueDatabase('compat-test-e2e');
-    const tmpRecordDatabase = new TmpRecordDatabase('tmp-record-database-compat-2');
+    const tmpRecordDatabase = new TmpRecordDatabase(
+      'tmp-record-database-compat-2'
+    );
 
     await jobQueue.migrate();
 
@@ -177,18 +194,21 @@ describe('Comapt', () => {
       }
     ]);
 
-    expect(await jobQueue.getAll()).toEqual([{
-      id: 1,
-      name: 'chrome',
-      browserName: 'chrome',
-      platform: 'Windows 10',
-      protoChainId: 'document.write',
-      version: '35.0',
-      type: 'js-api',
-      record: '{"protoChain":["document","write"],"protoChainId":"document.write","type":"js-api"}',
-      caniuseId: 'chrome',
-      status: 'queued'
-    }]);
+    expect(await jobQueue.getAll()).toEqual([
+      {
+        id: 1,
+        name: 'chrome',
+        browserName: 'chrome',
+        platform: 'Windows 10',
+        protoChainId: 'document.write',
+        version: '35.0',
+        type: 'js-api',
+        record:
+          '{"protoChain":["document","write"],"protoChainId":"document.write","type":"js-api"}',
+        caniuseId: 'chrome',
+        status: 'queued'
+      }
+    ]);
 
     expect(await jobQueue.count()).toEqual(1);
 

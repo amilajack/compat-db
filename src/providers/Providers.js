@@ -14,23 +14,23 @@
 import MicrosoftAPICatalogProvider from './microsoft-api-catalog/MicrosoftAPICatalogProvider';
 import type { RecordType } from './RecordType';
 
-
 export default MicrosoftAPICatalogProvider;
 
 export function find(id: string): RecordType {
-  const foundRecord = MicrosoftAPICatalogProvider().find(record => record.id === id);
+  const foundRecord = MicrosoftAPICatalogProvider().find(
+    record => record.id === id
+  );
 
   if (foundRecord) return foundRecord;
 
   throw new Error(`API by id of '${id}' cannot be found`);
 }
 
-
 // @TODO
 // export function filterByProtoChain(chain: Array<string>): RecordType {}
 
 export function ofAPIType(type: 'css' | 'js' | 'html'): Array<RecordType> {
-  return MicrosoftAPICatalogProvider().filter(record =>
-    record.type === `${type}-api`
+  return MicrosoftAPICatalogProvider().filter(
+    record => record.type === `${type}-api`
   );
 }
