@@ -64,7 +64,7 @@
     "babel-preset-stage-0": "^6.22.0",
     "babel-register": "^6.24.0",
     "bluebird": "^3.5.0",
-    "bookshelf": "^0.10.3",
+    "bookshelf": "^0.10.4",
     "caniuse-db": "1.0.30000640",
     "chai": "^3.5.0",
     "chromedriver": "^2.28.0",
