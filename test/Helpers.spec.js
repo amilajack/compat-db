@@ -1,4 +1,3 @@
-import { expect as chaiExpect } from 'chai';
 import HasPrefix from '../src/helpers/HasPrefix';
 import {
   getAllVersionsOfTarget,
@@ -6,24 +5,28 @@ import {
   convertCaniuseToBrowserName,
   convertBrowserNametoCaniuse,
   filterDuplicateTargets,
-  getVersionsToMark } from '../src/helpers/GenerateVersions';
+  getVersionsToMark
+} from '../src/helpers/GenerateVersions';
 import {
   validateRecordTypes,
   checkHasDuplicates,
   checkBrowserMissing,
-  RecordsValidator } from '../src/helpers/RecordsValidator';
+  RecordsValidator
+} from '../src/helpers/RecordsValidator';
 import {
   browserNameToCaniuseMappings,
   caniuseBrowsers,
-  caniuseToSeleniumMappings } from '../src/helpers/Constants';
-
+  caniuseToSeleniumMappings
+} from '../src/helpers/Constants';
 
 describe('HasPrefix', () => {
   it('should have mappings of the same length', () => {
-    expect(Object.keys(browserNameToCaniuseMappings).length)
-      .toEqual(Object.keys(caniuseToSeleniumMappings).length);
-    expect(caniuseBrowsers.length)
-      .toEqual(Object.keys(caniuseToSeleniumMappings).length);
+    expect(Object.keys(browserNameToCaniuseMappings).length).toEqual(
+      Object.keys(caniuseToSeleniumMappings).length
+    );
+    expect(caniuseBrowsers.length).toEqual(
+      Object.keys(caniuseToSeleniumMappings).length
+    );
   });
 
   it('should check vendor prefixes for JS APIs', () => {
@@ -61,20 +64,25 @@ describe('HasPrefix', () => {
     expect(HasPrefix('-moz-user-select: none;')).toEqual(true);
     expect(HasPrefix('-ms-user-select: none;')).toEqual(true);
     expect(HasPrefix('user-select: none;')).toEqual(false);
-    expect(HasPrefix('background: -webkit-linear-gradient(top, white, black);')).toEqual(true);
-    expect(HasPrefix('background: linear-gradient(to bottom, white, black);')).toEqual(false);
+    expect(
+      HasPrefix('background: -webkit-linear-gradient(top, white, black);')
+    ).toEqual(true);
+    expect(
+      HasPrefix('background: linear-gradient(to bottom, white, black);')
+    ).toEqual(false);
   });
 });
 
 describe('GenerateVersions', () => {
   it('should filter duplicate targets with filterDuplicateTargets()', () => {
-    expect(filterDuplicateTargets([
-      { browserName: 'chrome', version: '48.0', platform: 'Windows 10' },
-      { browserName: 'chrome', version: '30.0', platform: 'Windows 10' },
-      { browserName: 'chrome', version: '48.0', platform: 'Windows 10' },
-      { browserName: 'chrome', version: '47.0', platform: 'Windows 10' }
-    ]))
-    .toEqual([
+    expect(
+      filterDuplicateTargets([
+        { browserName: 'chrome', version: '48.0', platform: 'Windows 10' },
+        { browserName: 'chrome', version: '30.0', platform: 'Windows 10' },
+        { browserName: 'chrome', version: '48.0', platform: 'Windows 10' },
+        { browserName: 'chrome', version: '47.0', platform: 'Windows 10' }
+      ])
+    ).toEqual([
       { browserName: 'chrome', version: '48.0', platform: 'Windows 10' },
       { browserName: 'chrome', version: '30.0', platform: 'Windows 10' },
       { browserName: 'chrome', version: '47.0', platform: 'Windows 10' }
@@ -82,12 +90,13 @@ describe('GenerateVersions', () => {
   });
 
   it('should get capabilities', () => {
-    expect(getCapabilities({
-      browserName: 'firefox',
-      minVersion: 50.0,
-      maxVersion: 51.0
-    }))
-    .toEqual([
+    expect(
+      getCapabilities({
+        browserName: 'firefox',
+        minVersion: 50.0,
+        maxVersion: 51.0
+      })
+    ).toEqual([
       {
         browserName: 'firefox',
         version: '50.0',
@@ -123,7 +132,9 @@ describe('GenerateVersions', () => {
       right: ['8.0'],
       middle: '8.0'
     });
-    expect(getVersionsToMark(['6.0', '7.0', '8.0', '9.0', '10.0'], 'safari')).toEqual({
+    expect(
+      getVersionsToMark(['6.0', '7.0', '8.0', '9.0', '10.0'], 'safari')
+    ).toEqual({
       left: [],
       right: [],
       middle: undefined
@@ -137,8 +148,13 @@ describe('GenerateVersions', () => {
   });
 
   it('should should get all target versions: getAllVersionsOfTarget()', () => {
-    expect(getAllVersionsOfTarget('safari'))
-      .toEqual(['6.0', '7.0', '8.0', '9.0', '10.0']);
+    expect(getAllVersionsOfTarget('safari')).toEqual([
+      '6.0',
+      '7.0',
+      '8.0',
+      '9.0',
+      '10.0'
+    ]);
   });
 });
 
@@ -148,56 +164,93 @@ describe('RecordsValidator', () => {
     type: 'js-api'
   };
   const brokenRecords = [
-    { name: 13, caniuseId: 2, versions: '{ "11.64": "n", "12.12": "n"}', ...protoChainId },
-    { name: 'chrome', caniuseId: 'chrome', versions: '{"11.64":"n","12.12":"n"}', ...protoChainId },
-    { name: 'chrome', caniuseId: 'chrome', versions: '{"11.64":"n","12.12":"n"}', ...protoChainId },
-    { name: 'safari', caniuseId: 'safari', versions: '{"9.0":"n","10.0":"n"}', ...protoChainId },
-    { name: 'firefox', caniuseId: 'firefox', versions: '{"11.64":"n","12.12":"n"}', ...protoChainId },
-    { name: 'opera', caniuseId: 'opera', versions: '{"11.64":"n","12.12":"n"}', ...protoChainId },
-    { name: 'ie', caniuseId: 'ie', versions: '{"11.64":"n","12.12":"n"}', ...protoChainId }
+    {
+      name: 13,
+      caniuseId: 2,
+      versions: '{ "11.64": "n", "12.12": "n"}',
+      ...protoChainId
+    },
+    {
+      name: 'chrome',
+      caniuseId: 'chrome',
+      versions: '{"11.64":"n","12.12":"n"}',
+      ...protoChainId
+    },
+    {
+      name: 'chrome',
+      caniuseId: 'chrome',
+      versions: '{"11.64":"n","12.12":"n"}',
+      ...protoChainId
+    },
+    {
+      name: 'safari',
+      caniuseId: 'safari',
+      versions: '{"9.0":"n","10.0":"n"}',
+      ...protoChainId
+    },
+    {
+      name: 'firefox',
+      caniuseId: 'firefox',
+      versions: '{"11.64":"n","12.12":"n"}',
+      ...protoChainId
+    },
+    {
+      name: 'ie',
+      caniuseId: 'ie',
+      versions: '{"11.64":"n","12.12":"n"}',
+      ...protoChainId
+    }
   ];
 
   describe('validateRecordTypes', () => {
     it('should throw if record is missing property', () => {
-      chaiExpect(() => validateRecordTypes(brokenRecords)).to.throw(
-        Error,
+      expect(() => validateRecordTypes(brokenRecords)).toThrow(
         'Invalid record "AmbientLightSensorReading.illuminance" in "2", AssertionError: expected 13 to be a string'
       );
-      chaiExpect(() => validateRecordTypes(brokenRecords.slice(1)))
-        .to.not.throw();
+      expect(() => validateRecordTypes(brokenRecords.slice(1))).not.toThrow();
     });
   });
 
   describe('checkHasDuplicates', () => {
     it('should throw if there are duplicated records', () => {
-      chaiExpect(() => checkHasDuplicates(brokenRecords))
-        .to.throw(Error, 'Duplicate records found');
-      chaiExpect(() => checkHasDuplicates(brokenRecords.filter(e => e.name !== 'chrome')))
-        .to.not.throw();
+      expect(() => checkHasDuplicates(brokenRecords)).toThrow(
+        Error,
+        'Duplicate records found'
+      );
+      expect(() =>
+        checkHasDuplicates(brokenRecords.filter(e => e.name !== 'chrome'))
+      ).not.toThrow();
     });
   });
 
   describe('checkBrowserMissing', () => {
     it('should throw if browser is missing', () => {
-      chaiExpect(() => checkBrowserMissing(brokenRecords.filter(e => e.name === 'safari')))
-        .to.throw(Error, 'Record "AmbientLightSensorReading.illuminance" missing in safari@8.0');
-      chaiExpect(() => checkBrowserMissing(brokenRecords))
-        .to.throw(Error, 'Record "AmbientLightSensorReading.illuminance" missing in chrome@26.0');
-      chaiExpect(() => checkBrowserMissing([{
-        name: 'safari',
-        caniuseId: 'safari',
-        versions: '{"6.0":"n","7.0":"n","8.0":"n","9.0":"n","10.0":"n"}',
-        ...protoChainId
-      }]))
-      .to.not.throw();
+      expect(() =>
+        checkBrowserMissing(brokenRecords.filter(e => e.name === 'safari'))
+      ).toThrow(
+        Error,
+        'Record "AmbientLightSensorReading.illuminance" missing in safari@8.0'
+      );
+      expect(() => checkBrowserMissing(brokenRecords)).toThrow(
+        Error,
+        'Record "AmbientLightSensorReading.illuminance" missing in chrome@26.0'
+      );
+      expect(() =>
+        checkBrowserMissing([
+          {
+            name: 'safari',
+            caniuseId: 'safari',
+            versions: '{"6.0":"n","7.0":"n","8.0":"n","9.0":"n","10.0":"n"}',
+            ...protoChainId
+          }
+        ])
+      ).not.toThrow();
     });
   });
 
   describe('RecordsValidator', () => {
     it('should throw if there are any any invalid records', async () => {
-      chaiExpect(async () => {
-        (await RecordsValidator(brokenRecords)).to.throw(Error);
-      });
+      expect(RecordsValidator(brokenRecords)).rejects.toThrow();
     });
   });
 });

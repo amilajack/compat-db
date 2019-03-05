@@ -4,12 +4,11 @@
  */
 import AbstractDatabase from './AbstractDatabase';
 
-
 type RecordMetadataType = {
   protoChainId: string,
   astNodeType: string,
-  isStatic: bool,
-  polyfillable: bool,
+  isStatic: boolean,
+  polyfillable: boolean,
   type: 'js-api' | 'css-api' | 'html-api'
 };
 
@@ -19,7 +18,7 @@ export default class RecordMetabaseDatabase extends AbstractDatabase {
   }
 
   migrate() {
-    return super.migrate((table) => {
+    return super.migrate(table => {
       table.increments('id');
       table.string('protoChainId');
       table.string('astNodeType');
@@ -30,14 +29,17 @@ export default class RecordMetabaseDatabase extends AbstractDatabase {
   }
 
   getAll(): Promise<Array<RecordMetadataType>> {
-    return this.connection.Database
-      .forge()
-      .fetchAll()
-      .then(records => records.toJSON())
-      // @HACK: Find a proper way to cast `isStatic` to a boolean
-      .then(records => records.map(each => ({
-        ...each,
-        isStatic: Boolean(each.isStatic)
-      })));
+    return (
+      this.connection.Database.forge()
+        .fetchAll()
+        .then(records => records.toJSON())
+        // @HACK: Find a proper way to cast `isStatic` to a boolean
+        .then(records =>
+          records.map(each => ({
+            ...each,
+            isStatic: Boolean(each.isStatic)
+          }))
+        )
+    );
   }
 }

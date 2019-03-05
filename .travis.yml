@@ -1,9 +1,7 @@
-sudo: false
-
 language: node_js
 
 node_js:
-  - 7
+  - 10
 
 cache: yarn
 
@@ -13,6 +11,11 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - g++-4.8
+      - docker-ce
+
+before_install:
+  - sudo service mysql stop
+  - docker-compose up -d
 
 install:
   - export CXX="g++-4.8"
@@ -24,6 +27,3 @@ before_script:
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start &
   - sleep 3
-
-script:
-  - npm run test-ci

@@ -5,8 +5,11 @@
 import { writeFileSync, readFileSync } from 'fs';
 import { join } from 'path';
 
+process.on('uncaughtException', err => {
+  throw err;
+});
 
-/* eslint no-undef: 0 */
+/* eslint no-undef: off */
 
 describe('Foo', () => {
   it('should foo', async () => {

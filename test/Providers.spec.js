@@ -1,8 +1,11 @@
-import { expect as chaiExpect } from 'chai';
+/* eslint no-restricted-syntax: off */
 import { join } from 'path';
 import { writeFileSync } from 'fs';
 import Providers, { find, ofAPIType } from '../src/providers/Providers';
 
+process.on('uncaughtException', err => {
+  throw err;
+});
 
 describe('Providers', () => {
   const providers = Providers();
@@ -29,9 +32,9 @@ describe('Providers', () => {
       const properties = ['protoChainId', 'id', 'name'];
       providers.forEach(rule => {
         properties.forEach(property => {
-          chaiExpect(rule[property]).to.not.contain('moz');
-          chaiExpect(rule[property]).to.not.contain('webkit');
-          chaiExpect(rule[property]).to.not.contain('moz');
+          expect(rule[property]).not.toContain('moz');
+          expect(rule[property]).not.toContain('webkit');
+          expect(rule[property]).not.toContain('moz');
         });
       });
     });
@@ -42,9 +45,7 @@ describe('Providers', () => {
       const filteredAPIs = ofAPIType('css');
 
       for (const api of filteredAPIs) {
-        chaiExpect(api)
-          .to.have.property('type')
-          .that.equals('css-api');
+        expect(api).toHaveProperty('type', 'css-api');
       }
     });
 
@@ -52,9 +53,7 @@ describe('Providers', () => {
       const filteredAPIs = ofAPIType('js');
 
       for (const api of filteredAPIs) {
-        chaiExpect(api)
-          .to.have.property('type')
-          .that.equals('js-api');
+        expect(api).toHaveProperty('type', 'js-api');
       }
     });
 
@@ -62,9 +61,7 @@ describe('Providers', () => {
       const filteredAPIs = ofAPIType('html');
 
       for (const api of filteredAPIs) {
-        chaiExpect(api)
-          .to.have.property('type')
-          .that.equals('html-api');
+        expect(api).toHaveProperty('type', 'html-api');
       }
     });
   });
@@ -79,12 +76,8 @@ describe('Providers', () => {
       for (const api of ['width', 'display', 'flex', 'grid', 'font-size']) {
         const resolved = find(api);
 
-        chaiExpect(resolved)
-          .to.have.property('type')
-          .that.equals('css-api');
-        chaiExpect(resolved)
-          .to.have.property('type')
-          .that.equals('css-api');
+        expect(resolved).toHaveProperty('type', 'css-api');
+        expect(resolved).toHaveProperty('type', 'css-api');
       }
     });
 
@@ -110,16 +103,18 @@ describe('Providers', () => {
         });
 
         it('should contain PaymentRequest record', () => {
-          const [record] = records
-            .filter(e => e.protoChain.includes('PaymentRequest'));
+          const [record] = records.filter(e =>
+            e.protoChain.includes('PaymentRequest')
+          );
 
           expect(record).toBeDefined();
           expect(record.protoChain).toContain('PaymentRequest');
         });
 
         it.skip('should contain WebAssembly record', () => {
-          const [record] = records
-            .filter(e => e.protoChain.includes('WebAssembly'));
+          const [record] = records.filter(e =>
+            e.protoChain.includes('WebAssembly')
+          );
 
           expect(record).toBeDefined();
           expect(record.protoChain).toContain('WebAssembly');
@@ -146,8 +141,7 @@ describe('Providers', () => {
         });
 
         it('should contain fetch record', () => {
-          const [record] = records
-            .filter(e => e.protoChain.includes('fetch'));
+          const [record] = records.filter(e => e.protoChain.includes('fetch'));
 
           expect(record).toBeDefined();
           expect(record.protoChain).toContain('fetch');
@@ -188,34 +182,51 @@ describe('Providers', () => {
         });
 
         it('should contain navigator.serviceWorker record', () => {
-          expect(records.find(record =>
-            record.protoChain.includes('navigator') &&
-            record.protoChain.includes('serviceWorker')
-          )).toBeDefined();
+          expect(
+            records.find(
+              record =>
+                record.protoChain.includes('navigator') &&
+                record.protoChain.includes('serviceWorker')
+            )
+          ).toBeDefined();
 
-          expect(records.find(record =>
-            record.protoChain.includes('requestAnimationFrame')
-          )).toBeDefined();
+          expect(
+            records.find(record =>
+              record.protoChain.includes('requestAnimationFrame')
+            )
+          ).toBeDefined();
 
-          expect(records.find(record =>
-            record.protoChain.includes('ServiceWorkerRegistration') &&
-            record.protoChain.includes('getNotifications')
-          )).toBeDefined();
+          expect(
+            records.find(
+              record =>
+                record.protoChain.includes('ServiceWorkerRegistration') &&
+                record.protoChain.includes('getNotifications')
+            )
+          ).toBeDefined();
 
-          expect(records.find(record =>
-            record.protoChain.includes('ServiceWorkerRegistration') &&
-            record.protoChain.includes('getNotifications')
-          )).toBeDefined();
+          expect(
+            records.find(
+              record =>
+                record.protoChain.includes('ServiceWorkerRegistration') &&
+                record.protoChain.includes('getNotifications')
+            )
+          ).toBeDefined();
 
-          expect(records.find(record =>
-            record.protoChain.includes('ServiceWorkerMessageEvent') &&
-            record.protoChain.includes('ports')
-          )).toBeDefined();
+          expect(
+            records.find(
+              record =>
+                record.protoChain.includes('ServiceWorkerMessageEvent') &&
+                record.protoChain.includes('ports')
+            )
+          ).toBeDefined();
 
-          expect(records.find(record =>
-            record.protoChain.includes('ServiceWorkerMessageEvent') &&
-            record.protoChain.includes('source')
-          )).toBeDefined();
+          expect(
+            records.find(
+              record =>
+                record.protoChain.includes('ServiceWorkerMessageEvent') &&
+                record.protoChain.includes('source')
+            )
+          ).toBeDefined();
         });
       });
 

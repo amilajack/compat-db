@@ -3,14 +3,18 @@ import { ofAPIType } from '../src/providers/Providers';
 import JobQueueDatabase from '../src/database/JobQueueDatabase';
 import RecordMetadataDatabase from '../src/database/RecordMetadataDatabase';
 import TmpRecordDatabase from '../src/database/TmpRecordDatabase';
-import { writeRecordMetadataToDB } from '../compat-tests/RecordMetadata';
+import { writeRecordMetadataToDB } from './RecordMetadata';
 import { browserNameToCaniuseMappings } from '../src/helpers/Constants';
 import {
   convertCaniuseToBrowserName,
   filterDuplicateTargets,
   allTargets,
-  getVersionsToMark } from '../src/helpers/GenerateVersions';
+  getVersionsToMark
+} from '../src/helpers/GenerateVersions';
 
+process.on('uncaughtException', err => {
+  throw err;
+});
 
 export type browserCapabilityType = {
   browserName: string,
@@ -18,33 +22,40 @@ export type browserCapabilityType = {
   platform: string
 };
 
-export default async function createJobsFromRecords(): Promise<Array<browserCapabilityType>> {
+export default async function createJobsFromRecords(): Promise<
+  Array<browserCapabilityType>
+> {
   const queue = new JobQueueDatabase();
   const recordMetadata = new RecordMetadataDatabase();
   const tmpRecordDatabase = new TmpRecordDatabase();
   const records = ofAPIType('js');
 
-  if (await recordMetadata.count() === 0) {
+  if ((await recordMetadata.count()) === 0) {
     await writeRecordMetadataToDB();
   }
 
   // If there are jobs in the queue already, skip the following steps
   if ((await queue.count()) === 0) {
-    const caniuseIds: Array<string> = Object.values(browserNameToCaniuseMappings); // eslint-disable-line
+    const caniuseIds: Array<string> = Object.values(
+      browserNameToCaniuseMappings
+    );
     const jobs = [];
     const metadata: Set<string> = await recordMetadata
       .getAll()
       .then(res => new Set(res.map(each => each.protoChainId)));
 
-    const existingRecords = new Set((await tmpRecordDatabase.getAll()).map(JSON.stringify));
+    const existingRecords = new Set(
+      (await tmpRecordDatabase.getAll()).map(JSON.stringify)
+    );
 
     // Make sure not to make jobs for records that are already in the database
     records
       // Keep only the records that have not had their compatibility determined yet
       // and whose metadata we have determined
-      .filter(record =>
-        !existingRecords.has(JSON.stringify(record)) &&
-        metadata.has(record.protoChainId)
+      .filter(
+        record =>
+          !existingRecords.has(JSON.stringify(record)) &&
+          metadata.has(record.protoChainId)
       )
       // Limit the amount of records we we create jobs from
       .slice(
@@ -54,12 +65,11 @@ export default async function createJobsFromRecords(): Promise<Array<browserCapa
       // For each record and for each caniuseId, create a job with the 'middle' version
       // number (the 'binary search' method)
       .forEach(record => {
-        caniuseIds.forEach((caniuseId) => {
+        caniuseIds.forEach(caniuseId => {
           const version = getVersionsToMark([], caniuseId).middle;
           const browserName = convertCaniuseToBrowserName(caniuseId);
-          const { platform } = allTargets.find(e => // eslint-disable-line
-            e.browserName === browserName &&
-            e.version === version
+          const { platform } = allTargets.find(
+            e => e.browserName === browserName && e.version === version
           );
 
           jobs.push({
@@ -81,17 +91,13 @@ export default async function createJobsFromRecords(): Promise<Array<browserCapa
   // Take all the targets in JobQueue. Filter duplicates
   const targets = filterDuplicateTargets(
     (await queue.getAll())
-      .filter(e =>
-        !!e.browserName &&
-        !!e.version
-      )
+      .filter(e => !!e.browserName && !!e.version)
       .map(job => ({
         browserName: job.browserName,
         version: job.version,
-        platform: allTargets.find(e =>
-          e.browserName === job.browserName &&
-          e.version === job.version
-        ).platform  // eslint-disable-line
+        platform: allTargets.find(
+          e => e.browserName === job.browserName && e.version === job.version
+        ).platform
       }))
   );
 

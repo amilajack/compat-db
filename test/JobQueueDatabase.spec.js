@@ -1,6 +1,7 @@
-/* eslint import/prefer-default-export: 0 */
+/* eslint import/prefer-default-export: off */
 import JobQueueDatabase from '../src/database/JobQueueDatabase';
 
+export const baseRecord = {};
 
 export const baseJob = {
   name: 'chrome',
@@ -17,7 +18,7 @@ export const baseJob = {
 };
 
 describe('JobQueueDatabase', () => {
-  it('should insert bulk and get all records', async () => {
+  it.concurrent('should insert bulk and get all records', async () => {
     const jobQueue = new JobQueueDatabase('job-queue-test-3');
     await jobQueue.migrate();
 
@@ -87,16 +88,13 @@ describe('JobQueueDatabase', () => {
     ]);
   });
 
-  it('should mark jobs as running', async () => {
+  it.concurrent('should mark jobs as running', async () => {
     const jobQueue = new JobQueueDatabase('job-queue-test-4');
     await jobQueue.migrate();
 
     expect(await jobQueue.count()).toEqual(0);
 
-    await jobQueue.insertBulk([
-      baseJob,
-      baseJob
-    ]);
+    await jobQueue.insertBulk([baseJob, baseJob]);
 
     expect(await jobQueue.count()).toEqual(2);
 
@@ -111,10 +109,10 @@ describe('JobQueueDatabase', () => {
 
     const allJobs = await jobQueue.getAll();
     expect(await jobQueue.count()).toEqual(2);
-    expect(allJobs.map((job) => job.status)).toEqual(['running', 'running']);
+    expect(allJobs.map(job => job.status)).toEqual(['running', 'running']);
   });
 
-  it('should remove job', async () => {
+  it.concurrent('should remove job', async () => {
     const jobQueue = new JobQueueDatabase('job-queue-test-5');
     await jobQueue.migrate();
 

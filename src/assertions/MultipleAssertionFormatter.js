@@ -7,7 +7,6 @@
  */
 import type { RecordType } from '../providers/RecordType';
 
-
 /* eslint import/prefer-default-export: 0 */
 
 // @TODO: determineASTNodeType
@@ -19,7 +18,9 @@ import type { RecordType } from '../providers/RecordType';
  */
 export function formatJSAssertion(records: Array<RecordType>): string {
   // Create a string of array protoChain's
-  const protoChains: Array<Array<string>> = records.map(record => record.protoChain);
+  const protoChains: Array<Array<string>> = records.map(
+    record => record.protoChain
+  );
 
   // Stringify the `protoChains` to allow for concatenation
   const stringifiedProtoChains = JSON.stringify(protoChains);

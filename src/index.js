@@ -1,4 +1,4 @@
-/* eslint import/no-unresolved: 0 */
+/* eslint import/no-unresolved: off */
 import All from './all.json';
 
 export default All;

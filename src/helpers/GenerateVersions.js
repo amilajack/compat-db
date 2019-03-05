@@ -1,8 +1,10 @@
 // @flow
-import { browserNameToCaniuseMappings, fixedBrowserVersions } from './Constants';
+import {
+  browserNameToCaniuseMappings,
+  fixedBrowserVersions
+} from './Constants';
 
-
-/* eslint no-mixed-operators: 0, max-len: ['error', 120], no-restricted-syntax: 0, fp/no-loops: 0 */
+/* eslint no-mixed-operators: off, no-restricted-syntax: off */
 
 type targetType = {
   browserName: string,
@@ -18,11 +20,13 @@ type capabilityType = {
 
 export function getCapabilities(object: capabilityType): Array<targetType> {
   const numberOfVersions = object.maxVersion - object.minVersion + 1;
-  return Array(numberOfVersions).fill({}).map((each, i) => ({
-    browserName: object.browserName,
-    platform: 'Windows 10',
-    version: `${i + object.minVersion}.0`
-  }));
+  return Array(numberOfVersions)
+    .fill({})
+    .map((each, i) => ({
+      browserName: object.browserName,
+      platform: 'Windows 10',
+      version: `${i + object.minVersion}.0`
+    }));
 }
 
 export function filterDuplicateTargets(targets: Array<Object>): Array<Object> {
@@ -36,7 +40,9 @@ export function convertCaniuseToBrowserName(caniuseId: string): string {
       return browserName;
     }
   }
-  throw new Error(`"${caniuseId}" is not a valid caniuseId. Cannot find corresponding browserName`);
+  throw new Error(
+    `"${caniuseId}" is not a valid caniuseId. Cannot find corresponding browserName`
+  );
 }
 
 export function convertBrowserNametoCaniuse(caniuseId: string): string {
@@ -64,13 +70,15 @@ export const allTargets: Array<targetType> = [
  * ex. 'safari' => ['6.0', '7.0', ...etc]
  */
 export function getAllVersionsOfTarget(caniuseId: string): Array<string> {
-  return allTargets
-    .filter(target =>
-      browserNameToCaniuseMappings[target.browserName] === caniuseId
-    )
-    .map(target => String(target.version))
-    // $FlowFixMe: Requires type cast
-    .sort((a, b) => a - b); // eslint-disable-line
+  return (
+    allTargets
+      .filter(
+        target => browserNameToCaniuseMappings[target.browserName] === caniuseId
+      )
+      .map(target => String(target.version))
+      // $FlowFixMe: Requires type cast
+      .sort((a, b) => a - b)
+  );
 }
 
 type versionsToMarkType = {
@@ -84,13 +92,16 @@ type versionsToMarkType = {
  * yet and find the 'povit'. If middle is supported, mark 'right' elements as supported.
  * Otherwise, mark 'left' as unsupported.
  */
-export function getVersionsToMark(markedVersions: Array<string>, caniuseId: string): versionsToMarkType {
+export function getVersionsToMark(
+  markedVersions: Array<string>,
+  caniuseId: string
+): versionsToMarkType {
   const markedVersionsSet = new Set(markedVersions);
   const allVersionsSet = getAllVersionsOfTarget(caniuseId);
   const versionsToMark = allVersionsSet
     .filter(e => !markedVersionsSet.has(e))
     // $FlowFixMe: Requires type cast
-    .sort((a, b) => a - b); // eslint-disable-line
+    .sort((a, b) => a - b);
 
   const middle = Math.floor(versionsToMark.length / 2);
   const left = versionsToMark.slice(0, middle);
