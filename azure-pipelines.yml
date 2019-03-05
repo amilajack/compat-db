@@ -11,4 +11,4 @@ steps:
   inputs:
     versionSpec: '10.x'
 
-- script: yarn && yarn test
+- script: docker-compose up -d && yarn && yarn test
