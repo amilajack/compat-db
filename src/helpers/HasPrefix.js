@@ -3,7 +3,7 @@
  * @flow
  */
 
-/* eslint flowtype-errors/show-errors: 0 */
+/* eslint flowtype-errors/show-errors: off */
 
 export const vendorPrefixMappings = {
   chrome: 'webkit',

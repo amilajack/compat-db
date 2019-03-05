@@ -7,8 +7,6 @@
  */
 import type { RecordType } from '../providers/RecordType';
 
-/* eslint fp/no-throw: 0 */
-
 type AssertionFormatterType = {
   apiIsSupported: string
 } & (

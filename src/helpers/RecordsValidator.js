@@ -4,7 +4,7 @@ import TmpRecordDatabase from '../database/TmpRecordDatabase';
 import { caniuseToSeleniumMappings } from './Constants';
 import { allTargets } from './GenerateVersions';
 
-/* eslint no-unused-expressions: 0, fp/no-let: 0 */
+/* eslint no-unused-expressions: off */
 
 type tmpRecordType = {
   name: string,

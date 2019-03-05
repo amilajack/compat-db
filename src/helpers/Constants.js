@@ -1,11 +1,10 @@
 // @flow
 
-/* eslint import/prefer-default-export: 0 */
+/* eslint import/prefer-default-export: off */
 
 export const browserNameToCaniuseMappings = {
   chrome: 'chrome',
   firefox: 'firefox',
-  opera: 'opera',
   safari: 'safari',
   MicrosoftEdge: 'edge',
   'internet explorer': 'ie'
@@ -25,7 +24,6 @@ export const browserNameToCaniuseMappings = {
 export const caniuseToSeleniumMappings = {
   chrome: 'chrome',
   firefox: 'firefox',
-  opera: 'opera',
   safari: 'safari',
   ie: 'internet explorer',
   edge: 'MicrosoftEdge'
@@ -34,9 +32,6 @@ export const caniuseToSeleniumMappings = {
 export const caniuseBrowsers = Object.keys(browserNameToCaniuseMappings);
 
 export const fixedBrowserVersions = [
-  // Opera: 2 versions
-  { browserName: 'opera', platform: 'Windows 7', version: '12.12' },
-  { browserName: 'opera', platform: 'Windows 7', version: '11.64' },
   // Edge: 2 versions
   { browserName: 'MicrosoftEdge', platform: 'Windows 10', version: '14.14393' },
   { browserName: 'MicrosoftEdge', platform: 'Windows 10', version: '13.10586' },

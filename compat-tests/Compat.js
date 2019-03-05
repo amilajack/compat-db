@@ -1,5 +1,4 @@
 // @flow
-import bluebird from 'bluebird';
 import dotenv from 'dotenv';
 import webdriver from 'selenium-webdriver';
 import AssertionFormatter from '../src/assertions/AssertionFormatter';
@@ -11,15 +10,11 @@ import type { RecordType } from '../src/providers/RecordType';
 import type { JobQueueType } from '../src/database/JobQueueDatabase';
 import type { browserCapabilityType } from './setup';
 
-// Replace native Promise implementation with bluebird for better stack
-// traces from Promises
-global.Promise = bluebird;
-
-global.Promise.config({
-  longStackTraces: true
+process.on('uncaughtException', err => {
+  throw err;
 });
 
-/* eslint no-console: 0 */
+/* eslint no-console: off */
 
 const jobQueue = new JobQueueDatabase();
 
@@ -42,7 +37,7 @@ type exTestType = Promise<Array<finishedTestType>>;
 export async function executeTestsParallel(
   capability: capabilityType,
   tests: Array<string>
-) {
+): Promise<Array<Object>> {
   const { browserName, platform, version } = capability;
   const username = process.env.SAUCE_USERNAME;
   const accessKey = process.env.SAUCE_ACCESS_KEY;
@@ -102,24 +97,22 @@ export async function executeTests(
   return executeTestsParallel(
     capability,
     jobs.map(job => AssertionFormatter(JSON.parse(job.record)).apiIsSupported)
-  )
-    .then((testResults: Array<boolean>) =>
-      testResults.map((isSupported, index) => {
-        const job = jobs[index];
-        const record: RecordType = JSON.parse(job.record);
+  ).then((testResults: Array<boolean>) =>
+    testResults.map((isSupported, index) => {
+      const job = jobs[index];
+      const record: RecordType = JSON.parse(job.record);
 
-        if (typeof isSupported !== 'boolean') {
-          throw new Error(
-            [
-              'Invalid JS execution value returned from Sauce Labs.',
-              `Received ${isSupported} and expected boolean`
-            ].join(' ')
-          );
-        }
-        return { record, isSupported, job };
-      })
-    )
-    .catch(console.log);
+      if (typeof isSupported !== 'boolean') {
+        throw new Error(
+          [
+            'Invalid JS execution value returned from Sauce Labs.',
+            `Received ${isSupported} and expected boolean`
+          ].join(' ')
+        );
+      }
+      return { record, isSupported, job };
+    })
+  );
 }
 
 function log(
@@ -195,7 +188,7 @@ export async function handleFinishedTest(
       {
         name: caniuseId,
         record: JSON.stringify(record),
-        version: newVersions.middle,
+        version: String(newVersions.middle),
         protoChainId: record.protoChainId,
         type: record.type,
         platform,
@@ -251,7 +244,9 @@ export async function handleCapability(
 
   await Promise.all(jobs.map(job => jobQueue.markJobsStatus(job, 'running')));
 
-  return (await executeTests(capability, jobs)).map(handleFinishedTest);
+  return (await executeTests(capability, jobs)).map(e =>
+    handleFinishedTest(e, 'tmp-records')
+  );
 }
 
 /**

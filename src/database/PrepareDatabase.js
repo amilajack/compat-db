@@ -23,7 +23,6 @@ export default function PrepareDatabase(
       targets: {
         chrome: {},
         firefox: {},
-        opera: {},
         safari: {},
         ie: {},
         edge: {}

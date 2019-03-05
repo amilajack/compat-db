@@ -7,6 +7,10 @@ import type { RecordType as RType } from '../providers/RecordType';
 
 dotenv.config();
 
+process.on('uncaughtException', err => {
+  throw err;
+});
+
 type str = string;
 
 export type AbstractDatabaseRecordType = {

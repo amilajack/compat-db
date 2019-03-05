@@ -12,6 +12,10 @@ import {
   getVersionsToMark
 } from '../src/helpers/GenerateVersions';
 
+process.on('uncaughtException', err => {
+  throw err;
+});
+
 export type browserCapabilityType = {
   browserName: string,
   version: string,

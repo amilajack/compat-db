@@ -1,3 +1,4 @@
+/* eslint no-restricted-syntax: off */
 import { expect as chaiExpect } from 'chai';
 import RecordMetadata, {
   writeRecordMetadataToDB,

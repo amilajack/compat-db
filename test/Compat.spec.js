@@ -12,6 +12,10 @@ import { baseRecord } from './JobQueueDatabase.spec';
 
 jest.setTimeout(100000);
 
+process.on('uncaughtException', err => {
+  throw err;
+});
+
 const capability = {
   browserName: 'chrome',
   version: '48.0',
@@ -48,7 +52,11 @@ const jobs = [
 const [querySelectorJob, borderWidthJob] = jobs;
 
 describe('Comapt', () => {
-  it.concurrent('should execute tests', async () => {
+  beforeAll(() => {
+    jest.spyOn(process, 'exit').mockImplementation(() => {});
+  });
+
+  it('should execute tests', async () => {
     expect(await executeTests(capability, jobs)).toEqual([
       {
         job: querySelectorJob,
@@ -63,7 +71,7 @@ describe('Comapt', () => {
     ]);
   });
 
-  it.concurrent('should execute tests in parallel', async () => {
+  it('should execute tests in parallel', async () => {
     expect(
       await executeTestsParallel(
         {
@@ -98,7 +106,7 @@ describe('Comapt', () => {
     ).toEqual(['some', 'some', 'some', 'some', 'some', 'some']);
   });
 
-  it.concurrent('should handle finished tests', async () => {
+  it('should handle finished tests', async () => {
     const jobQueue = new JobQueueDatabase('compat-test-1');
     const tmpRecordDatabase = new TmpRecordDatabase(
       'tmp-record-database-compat-1'
@@ -135,7 +143,7 @@ describe('Comapt', () => {
     expect(result).toEqual(items);
   });
 
-  it.concurrent('should handle capability', async () => {
+  it('should handle capability', async () => {
     const result = await handleCapability({
       browserName: 'chrome',
       version: '48.0',

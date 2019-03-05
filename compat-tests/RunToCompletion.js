@@ -2,7 +2,7 @@
 import { execSync } from 'child_process';
 import JobQueueDatabase from '../src/database/JobQueueDatabase';
 
-/* eslint no-await-in-loop: 0, prefer-const: 0, fp/no-let: 0, fp/no-loops: 0 */
+/* eslint no-await-in-loop: off, prefer-const: off */
 
 const jobQueueDatabase = new JobQueueDatabase();
 

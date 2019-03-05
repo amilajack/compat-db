@@ -1,4 +1,4 @@
-/* eslint import/prefer-default-export: 0 */
+/* eslint import/prefer-default-export: off */
 import JobQueueDatabase from '../src/database/JobQueueDatabase';
 
 export const baseRecord = {};

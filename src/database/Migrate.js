@@ -7,10 +7,16 @@ const tmpRecordDatabase = new TmpRecordDatabase();
 const jobQueue = new JobQueueDatabase();
 const recordMetadata = new RecordMetadataDatabase();
 
+process.on('uncaughtException', err => {
+  throw err;
+});
+
 Promise.all([
   tmpRecordDatabase.migrate(),
   jobQueue.migrate(),
   recordMetadata.migrate()
 ])
   .then(() => process.exit(0))
-  .catch(console.log);
+  .catch(e => {
+    throw new Error(e);
+  });

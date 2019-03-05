@@ -5,7 +5,7 @@
 import { writeFileSync, readFileSync } from 'fs';
 import { join } from 'path';
 
-/* eslint no-undef: 0 */
+/* eslint no-undef: off */
 
 describe('Foo', () => {
   it('should foo', async () => {

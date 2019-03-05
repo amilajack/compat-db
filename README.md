@@ -1,5 +1,9 @@
 compat-db
 =========
+
+> ## 🛠 Status: In Development
+> compat-db is currently in development. It's on the fast track to a 1.0 release, so we encourage you to use it and give us your feedback, but there are things that haven't been finalized yet and you can expect some changes.
+
 [![Build Status](https://travis-ci.org/amilajack/compat-db.svg?branch=master&maxAge=2592)](https://travis-ci.org/amilajack/compat-db)
 [![NPM version](https://badge.fury.io/js/compat-db.svg?maxAge=2592)](http://badge.fury.io/js/compat-db)
 [![Dependency Status](https://img.shields.io/david/amilajack/compat-db.svg?maxAge=2592)](https://david-dm.org/amilajack/compat-db)
@@ -10,50 +14,49 @@ A central and scalable browser API compatibility database
 **❌ WORK IN PROGRESS. DO NOT USE ❌**
 
 ## Goals
-- [ ] Be a (almost) drop-in replacement for caniuse-db
+- [ ] Be a drop-in replacement for [caniuse-db](https://github.com/Fyrd/caniuse)
 - [ ] Provide a compiled list of compatibility records
 - [ ] Provide an API for traversing/filtering the records and finding supported features
 - [ ] Collect all CSS properties and their corresponding values
 
 ## Installation
 ```bash
-npm install --save compat-db
+npm install compat-db
 ```
 
 ## Development Setup
 ```bash
-# Clone and install
 git clone https://github.com/amilajack/compat-db.git
 cd compat-db
-yarn # or npm install
+yarn
 
 # Create your `.env` file
 # ⚠️  Make sure to add your saucelabs keys to your `.env` file ⚠️
 cp .env.example .env
 
 # Migrate the sqlite (default) or mysql database
-npm run migrate
+yarn migrate
 
 # Build the compatibility database to ./lib/all.json
 # 💡 You can limit the amount of tests that you run by setting the following ENV's
 # PROVIDERS_INDEX_START=0 PROVIDERS_INDEX_END=10 in your `.env` to run the first
 # 10 tests
-npm run build-compat-db
+yarn build-compat-db
 
 # Run specs
-npm run spec
+yarn spec
 
 # Run all tests
-npm test
+yarn test
 
 # If you want to run tests on your local chrome canary installation, install
-# and start selenium server
-npm install -g selenium-standalone@latest
+# and start selenium server. Note that you will need Java to run this 😢
+yarn global add selenium-standalone@latest
 selenium-standalone install
 selenium-standalone start
 
 # Serve the front-end browser UI for compat-db
-npm run view-compat-db
+yarn view-compat-db
 ```
 
 ## Roadmap

@@ -11,6 +11,10 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - g++-4.8
+      - docker-ce
+
+before_install:
+  - docker-compose up -d
 
 install:
   - export CXX="g++-4.8"

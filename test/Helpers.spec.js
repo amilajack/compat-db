@@ -196,12 +196,6 @@ describe('RecordsValidator', () => {
       ...protoChainId
     },
     {
-      name: 'opera',
-      caniuseId: 'opera',
-      versions: '{"11.64":"n","12.12":"n"}',
-      ...protoChainId
-    },
-    {
       name: 'ie',
       caniuseId: 'ie',
       versions: '{"11.64":"n","12.12":"n"}',

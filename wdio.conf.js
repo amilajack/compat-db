@@ -1,5 +1,3 @@
-/* eslint fp/no-mutation: 0 */
-
 // @TODO: Add Safari Tech Preview support
 exports.config = {
   specs: ['./compat-tests/CanaryTestRunner.js'],

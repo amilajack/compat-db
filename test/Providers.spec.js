@@ -1,7 +1,12 @@
+/* eslint no-restricted-syntax: off */
 import { expect as chaiExpect } from 'chai';
 import { join } from 'path';
 import { writeFileSync } from 'fs';
 import Providers, { find, ofAPIType } from '../src/providers/Providers';
+
+process.on('uncaughtException', err => {
+  throw err;
+});
 
 describe('Providers', () => {
   const providers = Providers();

@@ -9,7 +9,7 @@ import AssertionFormatter from '../src/assertions/AssertionFormatter';
 import RecordMetadataDatabase from '../src/database/RecordMetadataDatabase';
 import type { RecordType } from '../src/providers/RecordType';
 
-/* eslint no-eval: 0, max-len: ['error', 120] */
+/* eslint no-eval: off, max-len: ['error', 120] */
 
 type RecordMetadataType = Promise<
   Array<{

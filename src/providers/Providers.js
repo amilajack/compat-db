@@ -9,8 +9,6 @@
  * @flow
  */
 
-/* eslint fp/no-throw: 0 */
-
 import MicrosoftAPICatalogProvider from './microsoft-api-catalog/MicrosoftAPICatalogProvider';
 import type { RecordType } from './RecordType';
 

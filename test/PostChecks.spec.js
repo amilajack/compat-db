@@ -67,7 +67,6 @@ describe('PostChecks', () => {
               '9.0': 'y',
               '10.0': 'y'
             },
-            opera: {},
             firefox: {},
             chrome: {}
           }

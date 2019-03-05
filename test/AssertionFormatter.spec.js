@@ -1,3 +1,4 @@
+/* eslint no-eval: off, no-restricted-syntax: off */
 import Nightmare from 'nightmare';
 import CSSProperties from './CSSProperties.json';
 import AssertionFormatter, {
@@ -5,7 +6,7 @@ import AssertionFormatter, {
   getAllSupportCSSProperties
 } from '../src/assertions/AssertionFormatter';
 
-/* eslint no-await-in-loop: 0 */
+/* eslint no-await-in-loop: off */
 
 jest.setTimeout(200000);
 
