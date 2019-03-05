@@ -16,7 +16,7 @@
     "lint": "eslint --cache .",
     "migrate": "yarn dir-remove && babel-node ./src/database/Migrate",
     "view-compat-db": "http-server site",
-    "spec": "cross-env NODE_ENV=test yarn migrate && jest --runInBand --detectOpenHandles",
+    "spec": "cross-env NODE_ENV=test yarn migrate && jest --detectOpenHandles",
     "test": "cross-env NODE_ENV=test yarn lint && yarn spec",
     "update-microsoft-catalog-api-db": "download https://raw.githubusercontent.com/MicrosoftEdge/APICatalogData/master/apicatalogdata.json && mkdir -p src/providers/api-catalog && mv apicatalogdata.json src/providers/microsoft-api-catalog/microsoft-api-catalog-data.json",
     "validate-tmp-records": "node -r babel-register compat-tests/PostChecks.js",

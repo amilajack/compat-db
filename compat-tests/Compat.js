@@ -4,8 +4,8 @@ import webdriver from 'selenium-webdriver';
 import AssertionFormatter from '../src/assertions/AssertionFormatter';
 import TmpRecordDatabase from '../src/database/TmpRecordDatabase';
 import { getVersionsToMark } from '../src/helpers/GenerateVersions';
-import JobQueueDatabase from '../src/database/JobQueueDatabase';
 import setup from './setup';
+import JobQueueDatabase from '../src/database/JobQueueDatabase';
 import type { RecordType } from '../src/providers/RecordType';
 import type { JobQueueType } from '../src/database/JobQueueDatabase';
 import type { browserCapabilityType } from './setup';
@@ -15,8 +15,6 @@ process.on('uncaughtException', err => {
 });
 
 /* eslint no-console: off */
-
-const jobQueue = new JobQueueDatabase();
 
 dotenv.config();
 
@@ -141,7 +139,8 @@ function log(
  */
 export async function handleFinishedTest(
   finishedTest: finishedTestType,
-  tableName: string = 'tmp-records'
+  tableName: string = 'tmp-records',
+  jobQueue: JobQueueDatabase
 ) {
   const tmpRecordDatabase = new TmpRecordDatabase(tableName);
   const { job, record, isSupported } = finishedTest;
@@ -200,14 +199,11 @@ export async function handleFinishedTest(
 
   // Remove the finished job from the JobQueue
   return jobQueue.remove({
-    name: caniuseId,
     protoChainId: record.protoChainId,
     type: record.type,
-    record: JSON.stringify(record),
     version: String(version),
     platform,
-    browserName,
-    caniuseId
+    browserName
   });
 }
 
@@ -219,17 +215,18 @@ type handleCapabilityType = Promise<Array<Promise<any>>>;
  *            database. JSON.parse/stringify are expensive
  */
 export async function handleCapability(
-  capability: browserCapabilityType
+  capability: browserCapabilityType,
+  jobQueue: JobQueueDatabase
 ): handleCapabilityType {
   const { browserName, version } = capability;
 
   // Find all the jobs that match the current capability's browserName, version,
   // and platform
+  // @TODO @HACK: Jobs that fail do not change their status back to 'queued'
+  //              For the timebeing, lets ignore the status when querying
+  //              the job queue
+  // status: 'queued',
   const allJobs: Array<JobQueueType> = (await jobQueue.find({
-    // @TODO @HACK: Jobs that fail do not change their status back to 'queued'
-    //              For the timebeing, lets ignore the status when querying
-    //              the job queue
-    // status: 'queued',
     browserName,
     version
   })).filter(each => each.browserName !== 'safari');
@@ -245,7 +242,7 @@ export async function handleCapability(
   await Promise.all(jobs.map(job => jobQueue.markJobsStatus(job, 'running')));
 
   return (await executeTests(capability, jobs)).map(e =>
-    handleFinishedTest(e, 'tmp-records')
+    handleFinishedTest(e, 'tmp-records', jobQueue)
   );
 }
 
@@ -258,20 +255,19 @@ export async function handleCapability(
  *
  * @TODO: Throttle promise
  */
-async function Compat() {
+export default async function Compat() {
   const browserCapabilities: browserCapabilityType[] = await setup();
 
   if (typeof browserCapabilities === 'boolean') {
     console.log('Jobs already exist in queue. No need to generate more');
-    return process.exit(0);
+    return;
   }
 
+  const jobQueue = new JobQueueDatabase();
+  await jobQueue.migrate();
+
   // Dynamically generate compat-tests for each record and each browser
-  await Promise.all(browserCapabilities.map(handleCapability));
-
-  return process.exit(0);
+  await Promise.all(
+    browserCapabilities.map(e => handleCapability(e, jobQueue))
+  );
 }
-
-export default Compat;
-
-Compat();

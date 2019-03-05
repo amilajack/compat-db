@@ -9,6 +9,10 @@ import AssertionFormatter from '../src/assertions/AssertionFormatter';
 import RecordMetadataDatabase from '../src/database/RecordMetadataDatabase';
 import type { RecordType } from '../src/providers/RecordType';
 
+process.on('uncaughtException', err => {
+  throw err;
+});
+
 /* eslint no-eval: off, max-len: ['error', 120] */
 
 type RecordMetadataType = Promise<

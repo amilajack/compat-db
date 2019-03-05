@@ -4,7 +4,7 @@ import {
   fixedBrowserVersions
 } from './Constants';
 
-/* eslint no-mixed-operators: off, max-len: ['error', 120], no-restricted-syntax: off */
+/* eslint no-mixed-operators: off, no-restricted-syntax: off */
 
 type targetType = {
   browserName: string,

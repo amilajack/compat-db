@@ -6,18 +6,14 @@ compat-db
 
 [![Build Status](https://travis-ci.org/amilajack/compat-db.svg?branch=master&maxAge=2592)](https://travis-ci.org/amilajack/compat-db)
 [![NPM version](https://badge.fury.io/js/compat-db.svg?maxAge=2592)](http://badge.fury.io/js/compat-db)
-[![Dependency Status](https://img.shields.io/david/amilajack/compat-db.svg?maxAge=2592)](https://david-dm.org/amilajack/compat-db)
 [![npm](https://img.shields.io/npm/dm/compat-db.svg?maxAge=2592)](https://npm-stat.com/charts.html?package=compat-db)
 
-A central and scalable browser API compatibility database
-
-**❌ WORK IN PROGRESS. DO NOT USE ❌**
+A browser API compatibility database
 
 ## Goals
-- [ ] Be a drop-in replacement for [caniuse-db](https://github.com/Fyrd/caniuse)
-- [ ] Provide a compiled list of compatibility records
-- [ ] Provide an API for traversing/filtering the records and finding supported features
-- [ ] Collect all CSS properties and their corresponding values
+* Automate browser compatibility testing of APIs
+* Be a drop-in replacement for [caniuse-db](https://github.com/Fyrd/caniuse)
+* Provide a node API for finding compatibility records
 
 ## Installation
 ```bash
@@ -34,7 +30,7 @@ yarn
 # ⚠️  Make sure to add your saucelabs keys to your `.env` file ⚠️
 cp .env.example .env
 
-# Migrate the sqlite (default) or mysql database
+# Migrate the sqlite (the default) or mysql database
 yarn migrate
 
 # Build the compatibility database to ./lib/all.json
@@ -42,9 +38,6 @@ yarn migrate
 # PROVIDERS_INDEX_START=0 PROVIDERS_INDEX_END=10 in your `.env` to run the first
 # 10 tests
 yarn build-compat-db
-
-# Run specs
-yarn spec
 
 # Run all tests
 yarn test

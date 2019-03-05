@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Comapt should handle finished tests 1`] = `
+Array [
+  Object {
+    "caniuseId": "query-selector",
+    "id": 1,
+    "name": "query-selector",
+    "protoChainId": "document.querySelector",
+    "type": "js-api",
+    "versions": "{\\"48.0\\":\\"y\\"}",
+  },
+]
+`;
+
+exports[`Comapt should handle finished tests 2`] = `
+Array [
+  Object {
+    "caniuseId": "query-selector",
+    "id": 1,
+    "name": "query-selector",
+    "protoChainId": "document.querySelector",
+    "type": "js-api",
+    "versions": "{\\"48.0\\":\\"y\\"}",
+  },
+]
+`;

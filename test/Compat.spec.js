@@ -16,12 +16,13 @@ process.on('uncaughtException', err => {
   throw err;
 });
 
-const capability = {
+const BROWSER_CAPABILITY = {
   browserName: 'chrome',
   version: '48.0',
   platform: 'Windows 10'
 };
-const records = [
+
+const TEST_RECORDS = [
   {
     protoChain: ['document', 'querySelector'],
     protoChainId: 'document.querySelector',
@@ -36,20 +37,24 @@ const records = [
   }
 ];
 
-const [querySelectorRecord, borderWidthRecord] = records;
+const [querySelectorRecord, borderWidthRecord] = TEST_RECORDS;
 
-const jobs = [
-  Object.assign({}, capability, {
+const TEST_JOBS = [
+  {
+    ...BROWSER_CAPABILITY,
+    ...querySelectorRecord,
     record: JSON.stringify(querySelectorRecord),
-    caniuseId: 'chrome'
-  }),
-  Object.assign({}, capability, {
+    caniuseId: 'query-selector'
+  },
+  {
+    ...BROWSER_CAPABILITY,
+    ...borderWidthRecord,
     record: JSON.stringify(borderWidthRecord),
-    caniuseId: 'chrome'
-  })
+    caniuseId: 'border-width'
+  }
 ];
 
-const [querySelectorJob, borderWidthJob] = jobs;
+const [querySelectorJob, borderWidthJob] = TEST_JOBS;
 
 describe('Comapt', () => {
   beforeAll(() => {
@@ -57,7 +62,7 @@ describe('Comapt', () => {
   });
 
   it('should execute tests', async () => {
-    expect(await executeTests(capability, jobs)).toEqual([
+    expect(await executeTests(BROWSER_CAPABILITY, TEST_JOBS)).toEqual([
       {
         job: querySelectorJob,
         record: querySelectorRecord,
@@ -111,46 +116,52 @@ describe('Comapt', () => {
     const tmpRecordDatabase = new TmpRecordDatabase(
       'tmp-record-database-compat-1'
     );
-
     await jobQueue.migrate();
     await tmpRecordDatabase.migrate();
 
+    // There should be no rows initially
     expect(await jobQueue.count()).toEqual(0);
     expect(await tmpRecordDatabase.count()).toEqual(0);
 
-    const [finishedTest] = await executeTests(capability, jobs);
-    await handleFinishedTest(finishedTest, 'tmp-record-database-compat-1');
+    // Manually insert initial jobs into job queue
+    await jobQueue.connection.knex('compat-test-1').insert(
+      TEST_JOBS.map(e => {
+        delete e.protoChain;
+        return e;
+      })
+    );
+    expect(await jobQueue.count()).not.toEqual(0);
 
-    console.log(await tmpRecordDatabase.getAll());
+    const [finishedTest] = await executeTests(BROWSER_CAPABILITY, TEST_JOBS);
+    expect(await jobQueue.count()).not.toEqual(0);
+    await handleFinishedTest(
+      finishedTest,
+      'tmp-record-database-compat-1',
+      jobQueue
+    );
+    expect(await jobQueue.count()).not.toEqual(0);
 
     // There should be one newly created record
     expect(await tmpRecordDatabase.count()).toEqual(1);
+    await expect(tmpRecordDatabase.getAll()).resolves.toMatchSnapshot();
 
-    const items = await tmpRecordDatabase.getAll();
-
-    const result = [
-      {
-        id: 1,
-        name: 'chrome',
-        protoChainId: 'document.querySelector',
-        versions:
-          '{"41.0":"y","42.0":"y","43.0":"y","44.0":"y","45.0":"y","46.0":"y","47.0":"y","48.0":"y","49.0":"y","50.0":"y","51.0":"y","52.0":"y","53.0":"y","54.0":"y","55.0":"y","56.0":"y"}',
-        type: 'js-api',
-        caniuseId: 'chrome'
-      }
-    ];
-
-    expect(result).toEqual(items);
+    // There should be one job left (because we created two jobs)
+    expect(await jobQueue.count()).toEqual(1);
+    await expect(tmpRecordDatabase.getAll()).resolves.toMatchSnapshot();
   });
 
   it('should handle capability', async () => {
-    const result = await handleCapability({
-      browserName: 'chrome',
-      version: '48.0',
-      caniuseId: 'chrome',
-      platform: 'Windows 10'
-    });
-
+    const jobQueue = new JobQueueDatabase('job-queue-test-handle-capability');
+    await jobQueue.migrate();
+    const result = await handleCapability(
+      {
+        browserName: 'chrome',
+        version: '48.0',
+        caniuseId: 'chrome',
+        platform: 'Windows 10'
+      },
+      jobQueue
+    );
     expect(result).toEqual([]);
   });
 

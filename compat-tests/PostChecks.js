@@ -3,12 +3,16 @@
  * Autocorrect the records if any errors are found
  * @flow
  */
-import { join } from 'path';
-import { writeFileSync } from 'fs';
+import path, { join } from 'path';
+import fs, { writeFileSync } from 'fs';
 import TmpRecordDatabase from '../src/database/TmpRecordDatabase';
 import RecordMetadataDatabase from '../src/database/RecordMetadataDatabase';
 import type { DatabaseRecordType } from '../src/database/DatabaseRecordType';
 import { caniuseBrowsers } from '../src/helpers/Constants';
+
+process.on('uncaughtException', err => {
+  throw err;
+});
 
 type targetsType = {
   targets: {
@@ -78,10 +82,12 @@ export default async function PostChecks(
     records: Array.from(dedupedRecordsMap.values())
   };
 
-  writeFileSync(
-    join(__dirname, '..', 'lib', 'all.json'),
-    JSON.stringify(finalRecords)
-  );
+  const libPath = path.join((__dirname, '..', 'lib'));
+  if (!fs.existsSync(libPath)) {
+    fs.mkdirSync(libPath);
+  }
+
+  writeFileSync(join(libPath, 'all.json'), JSON.stringify(finalRecords));
 
   return finalRecords;
 }

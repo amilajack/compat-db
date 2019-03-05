@@ -2,11 +2,14 @@
 import { execSync } from 'child_process';
 import JobQueueDatabase from '../src/database/JobQueueDatabase';
 
-/* eslint no-await-in-loop: off, prefer-const: off */
+process.on('uncaughtException', err => {
+  throw err;
+});
 
-const jobQueueDatabase = new JobQueueDatabase();
+/* eslint no-await-in-loop: off */
 
 (async function RunToCompletion() {
+  const jobQueueDatabase = new JobQueueDatabase();
   let iteration = 0;
 
   while ((await jobQueueDatabase.count()) > 0) {
