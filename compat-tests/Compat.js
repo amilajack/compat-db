@@ -274,3 +274,7 @@ export default async function Compat() {
     browserCapabilities.map(e => handleCapability(e, jobQueue))
   );
 }
+
+if (require.main === module) {
+  Compat();
+}

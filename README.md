@@ -39,14 +39,8 @@ yarn migrate
 # 10 tests
 yarn build-compat-db
 
-# Run all tests
+# Run tests
 yarn test
-
-# If you want to run tests on your local chrome canary installation, install
-# and start selenium server. Note that you will need Java to run this 😢
-yarn global add selenium-standalone@latest
-selenium-standalone install
-selenium-standalone start
 
 # Serve the front-end browser UI for compat-db
 yarn view-compat-db
