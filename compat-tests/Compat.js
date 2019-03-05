@@ -62,7 +62,7 @@ export async function executeTestsParallel(
 
   const items = await driver.executeScript(
     `return (function() {
-      return [${tests.join(',')}];
+      return [${tests.join(',')}]
     })()`
   );
 
@@ -84,6 +84,9 @@ export async function executeTests(
   const logMessage = `Executing ${
     jobs.length
   } tests in parallel on ${platform} ${browserName} ${version}`;
+  console.warn(
+    'Skipping css-api tests for now. @TODO: Implement batch method for css apis'
+  );
   console.log(logMessage);
   console.log(
     logMessage
@@ -226,10 +229,10 @@ export async function handleCapability(
   //              For the timebeing, lets ignore the status when querying
   //              the job queue
   // status: 'queued',
-  const allJobs: Array<JobQueueType> = (await jobQueue.find({
+  const allJobs: Array<JobQueueType> = await jobQueue.find({
     browserName,
     version
-  })).filter(each => each.browserName !== 'safari');
+  });
 
   const jobsEndIndex =
     process.env.NODE_ENV === 'test' ? 10 : process.env.JOBS_INDEX_END;

@@ -5,6 +5,7 @@ import AssertionFormatter, {
   determineASTNodeType,
   getAllSupportCSSProperties
 } from '../src/assertions/AssertionFormatter';
+import { formatJSAssertion } from '../src/assertions/MultipleAssertionFormatter';
 
 /* eslint no-await-in-loop: off */
 
@@ -281,22 +282,47 @@ describe('AssertionFormatter', () => {
         .end()
     }));
 
+    const multipleAssertionFormatterTests = Nightmare()
+      .goto('https://example.com')
+      .evaluate(
+        compatTest => eval(compatTest),
+        formatJSAssertion(
+          isStaticTests.filter(record => record.type === 'js-api')
+        )
+      )
+      .end();
+
     for (const assertion of isStaticTests.filter(
       test => test.type === 'js-api'
     )) {
-      it(`should determine ${assertion.protoChain.join(
+      it(`should determine "${assertion.protoChain.join(
         '.'
-      )} is static or non-static`, async () => {
+      )}" is static or non-static`, async () => {
         expect(await assertion.assertion).toEqual(assertion.isStatic);
       });
     }
 
     for (const assertion of isSupportedTests) {
-      it(`should determine ${assertion.protoChain.join(
+      it(`should determine "${assertion.protoChain.join(
         '.'
-      )} is support or not`, async () => {
+      )}" is support or not`, async () => {
         expect(await assertion.assertion).toEqual(assertion.isSupported);
       });
     }
+
+    it('should have MultipleAssertionFormatter determine is support or not', async () => {
+      expect(await multipleAssertionFormatterTests).toEqual(
+        isStaticTests
+          .filter(record => record.type === 'js-api')
+          .map(test => test.isSupported)
+      );
+    });
+
+    describe('MultipleAssertionFormatter', () => {
+      it('should not have more than expected char count', async () => {
+        expect(formatJSAssertion(isStaticTests).length).toBeGreaterThan(0);
+        expect(formatJSAssertion(isStaticTests).length).toBeLessThan(2000);
+      });
+    });
   });
 });

@@ -15,6 +15,7 @@
     "flow-typed": "flow-typed install",
     "lint": "eslint --cache .",
     "migrate": "yarn dir-remove && babel-node ./src/database/Migrate",
+    "run-to-completion": "node -r babel-register compat-tests/setup.js && babel-node compat-tests/RunToCompletion",
     "view-compat-db": "http-server site",
     "spec": "cross-env NODE_ENV=test yarn migrate && jest --detectOpenHandles",
     "test": "cross-env NODE_ENV=test yarn lint && yarn spec",

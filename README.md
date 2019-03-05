@@ -52,5 +52,20 @@ selenium-standalone start
 yarn view-compat-db
 ```
 
+## Support
+
+If this project is saving you (or your team) time, please consider supporting it on Patreon 👍 thank you!
+
+<p>
+  <a href="https://www.patreon.com/amilajack">
+    <img src="https://c5.patreon.com/external/logo/become_a_patron_button@2x.png" width="160">
+  </a>
+</p>
+
 ## Roadmap
 See [the roadmap wiki](https://github.com/amilajack/compat-db/wiki/Roadmap)
+
+## Related
+
+* [eslint-plugin-compat](https://github.com/amilajack/eslint-plugin-compat)
+* [ast-metadata-inferer](https://github.com/amilajack/ast-metadata-inferer)

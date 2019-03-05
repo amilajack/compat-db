@@ -17,25 +17,25 @@ const experimentalAPIsToSupport = [
   'WebGL2RenderingContext'
 ];
 
-describe('RecordMetadataDatabase', () => {
-  it.concurrent(
-    'should have objects with the expected properties',
-    async () => {
-      const recordMetadata = await RecordMetadata();
+let recordMetadata;
 
-      recordMetadata.forEach(({ record, isStatic, astNodeType }) => {
-        chaiExpect(record).to.be.an('object');
-        chaiExpect(isStatic).to.be.a('boolean');
-        chaiExpect(astNodeType).to.be.a('string');
-      });
-    }
-  );
+describe('RecordMetadataDatabase', () => {
+  beforeAll(async () => {
+    recordMetadata = await RecordMetadata();
+  });
+
+  it('should have objects with the expected properties', async () => {
+    recordMetadata.forEach(({ record, isStatic, astNodeType }) => {
+      chaiExpect(record).to.be.an('object');
+      chaiExpect(isStatic).to.be.a('boolean');
+      chaiExpect(astNodeType).to.be.a('string');
+    });
+  });
 
   /**
    * @TODO: Check that we have at least a certain amount of record metadata
    */
-  it.concurrent('should have expected length', async () => {
-    const recordMetadata = await RecordMetadata();
+  it('should have expected length', async () => {
     expect(recordMetadata.length).toBeLessThan(ofAPIType('js').length);
     expect(recordMetadata.length).toBeGreaterThan(ofAPIType('js').length / 2);
   });
