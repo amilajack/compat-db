@@ -1,5 +1,5 @@
 // @flow
-import { expect as chaiExpect } from 'chai';
+import expect from 'expect';
 import { join } from 'path';
 import { execSync } from 'child_process';
 import { writeFileSync, readFileSync } from 'fs';
@@ -143,10 +143,8 @@ async function RecordMetadata(
   );
 
   // Test length of test arrays
-  chaiExpect(determineASTNodeTypeTests.length).to.equal(
-    supportedAPITests.length
-  );
-  chaiExpect(determineIsStaticTests.length).to.equal(supportedAPITests.length);
+  expect(determineASTNodeTypeTests.length).toEqual(supportedAPITests.length);
+  expect(determineIsStaticTests.length).toEqual(supportedAPITests.length);
 
   const astNodeTypeResults = await parallelizeBrowserTests(
     determineASTNodeTypeTests
@@ -155,12 +153,10 @@ async function RecordMetadata(
   const isStaticResults = await parallelizeBrowserTests(determineIsStaticTests);
 
   // Test length of result arrays
-  chaiExpect(determineASTNodeTypeTests.length).to.equal(
-    astNodeTypeResults.length
-  );
-  chaiExpect(determineIsStaticTests.length).to.equal(isStaticResults.length);
-  chaiExpect(isStaticResults.length).to.equal(astNodeTypeResults.length);
-  chaiExpect(tests.length).to.equal(astNodeTypeResults.length);
+  expect(determineASTNodeTypeTests.length).toEqual(astNodeTypeResults.length);
+  expect(determineIsStaticTests.length).toEqual(isStaticResults.length);
+  expect(isStaticResults.length).toEqual(astNodeTypeResults.length);
+  expect(tests.length).toEqual(astNodeTypeResults.length);
 
   console.log(`${astNodeTypeResults.length} ast node types found`);
   console.log(`${isStaticResults.length} static apis`);

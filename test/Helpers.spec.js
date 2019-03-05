@@ -1,4 +1,3 @@
-import { expect as chaiExpect } from 'chai';
 import HasPrefix from '../src/helpers/HasPrefix';
 import {
   getAllVersionsOfTarget,
@@ -205,41 +204,38 @@ describe('RecordsValidator', () => {
 
   describe('validateRecordTypes', () => {
     it('should throw if record is missing property', () => {
-      chaiExpect(() => validateRecordTypes(brokenRecords)).to.throw(
-        Error,
+      expect(() => validateRecordTypes(brokenRecords)).toThrow(
         'Invalid record "AmbientLightSensorReading.illuminance" in "2", AssertionError: expected 13 to be a string'
       );
-      chaiExpect(() =>
-        validateRecordTypes(brokenRecords.slice(1))
-      ).to.not.throw();
+      expect(() => validateRecordTypes(brokenRecords.slice(1))).not.toThrow();
     });
   });
 
   describe('checkHasDuplicates', () => {
     it('should throw if there are duplicated records', () => {
-      chaiExpect(() => checkHasDuplicates(brokenRecords)).to.throw(
+      expect(() => checkHasDuplicates(brokenRecords)).toThrow(
         Error,
         'Duplicate records found'
       );
-      chaiExpect(() =>
+      expect(() =>
         checkHasDuplicates(brokenRecords.filter(e => e.name !== 'chrome'))
-      ).to.not.throw();
+      ).not.toThrow();
     });
   });
 
   describe('checkBrowserMissing', () => {
     it('should throw if browser is missing', () => {
-      chaiExpect(() =>
+      expect(() =>
         checkBrowserMissing(brokenRecords.filter(e => e.name === 'safari'))
-      ).to.throw(
+      ).toThrow(
         Error,
         'Record "AmbientLightSensorReading.illuminance" missing in safari@8.0'
       );
-      chaiExpect(() => checkBrowserMissing(brokenRecords)).to.throw(
+      expect(() => checkBrowserMissing(brokenRecords)).toThrow(
         Error,
         'Record "AmbientLightSensorReading.illuminance" missing in chrome@26.0'
       );
-      chaiExpect(() =>
+      expect(() =>
         checkBrowserMissing([
           {
             name: 'safari',
@@ -248,15 +244,13 @@ describe('RecordsValidator', () => {
             ...protoChainId
           }
         ])
-      ).to.not.throw();
+      ).not.toThrow();
     });
   });
 
   describe('RecordsValidator', () => {
     it('should throw if there are any any invalid records', async () => {
-      chaiExpect(async () => {
-        (await RecordsValidator(brokenRecords)).to.throw(Error);
-      });
+      expect(RecordsValidator(brokenRecords)).rejects.toThrow();
     });
   });
 });
