@@ -8,7 +8,7 @@ process.on('uncaughtException', err => {
 
 /* eslint no-await-in-loop: off */
 
-(async function RunToCompletion() {
+async function RunToCompletion() {
   const jobQueueDatabase = new JobQueueDatabase();
   let iteration = 0;
 
@@ -18,4 +18,8 @@ process.on('uncaughtException', err => {
     const result = execSync('npm run build-compat-db').toString();
     console.log(result);
   }
-})();
+}
+
+if (require.main === module) {
+  RunToCompletion();
+}
