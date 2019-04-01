@@ -87,7 +87,7 @@
     "eslint-config-bliss": "^3.3.0",
     "eslint-plugin-flowtype-errors": "^4.1.0",
     "expect": "^24.1.0",
-    "flow-bin": "^0.94.0",
+    "flow-bin": "^0.95.1",
     "flow-runtime": "^0.17.0",
     "flow-typed": "^2.5.1",
     "glow": "^1.2.2",
