@@ -1785,7 +1785,12 @@ camelcase@^5.0.0:
   resolved "https://registry.yarnpkg.com/camelcase/-/camelcase-5.1.0.tgz#29e83b9cfaf7ad478f401a187ae089cf83c257ea"
   integrity sha512-WP9f9OBL/TAbwOFBJL79FoS9UKUmnp82RWnhlwTgrAJeMq7lytHhe0Jzc6/P7Zq0+2oviXJuPlvkZalWUug9gg==
 
-caniuse-db@1.0.30000940, caniuse-db@^1.0.30000935:
+caniuse-db@1.0.30000956:
+  version "1.0.30000956"
+  resolved "https://registry.yarnpkg.com/caniuse-db/-/caniuse-db-1.0.30000956.tgz#af84fc7629fd32b515294cd33f4cb2c06645f866"
+  integrity sha512-qA9aAldTqeW+5HOQVIoTpYlHm4xLek9jA1Ch29ego7sZfI3gQdzZ/e4nV4eeYab2Qong6uTrydOBLaPhvYnzJA==
+
+caniuse-db@^1.0.30000935:
   version "1.0.30000940"
   resolved "https://registry.yarnpkg.com/caniuse-db/-/caniuse-db-1.0.30000940.tgz#3c000526cb5e127f93efb39e9d922c3943c7d64e"
   integrity sha512-JUnonxq+uuKoiP/p9fGSvS0PJxlTix87Uo8v+vwVtziNCneEQKaKH+n+g3TUVqakuidFVfJR/ywqyxCnMV3Y/Q==
