@@ -100,7 +100,7 @@
     "mysql": "^2.16.0",
     "nightmare": "^3.0.1",
     "selenium-webdriver": "^4.0.0-alpha.1",
-    "sequelize": "^4.43.0",
+    "sequelize": "^5.0.0",
     "sqlite3": "^4.0.6",
     "wdio-mocha-framework": "^0.6.4",
     "wdio-sauce-service": "^0.4.14",
