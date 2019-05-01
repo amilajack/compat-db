@@ -75,7 +75,7 @@
     "babel-eslint": "^10.0.1",
     "babel-jest": "^24.1.0",
     "babel-loader": "^8.0.5",
-    "babel-plugin-add-module-exports": "^1.0.0",
+    "babel-plugin-add-module-exports": "^1.0.2",
     "babel-plugin-flow-runtime": "^0.18.0",
     "bookshelf": "0.14.2",
     "caniuse-db": "1.0.30000956",
