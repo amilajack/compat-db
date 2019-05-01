@@ -84,7 +84,7 @@
     "dotenv": "^6.2.0",
     "download-cli": "^1.1.1",
     "eslint": "^5.16.0",
-    "eslint-config-bliss": "^3.3.0",
+    "eslint-config-bliss": "^3.4.0",
     "eslint-plugin-flowtype-errors": "^4.1.0",
     "expect": "^24.1.0",
     "flow-bin": "^0.95.1",
