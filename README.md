@@ -10,6 +10,10 @@ compat-db
 
 A browser API compatibility database
 
+## What is compat-db?
+
+[Understand compat-db in 5 minutes](https://amilajack.com/compat-db)
+
 ## Goals
 * Automate browser compatibility testing of APIs
 * Be a drop-in replacement for [caniuse-db](https://github.com/Fyrd/caniuse)
