@@ -1483,10 +1483,10 @@ babel-plugin-add-module-exports@^1.0.2:
   optionalDependencies:
     chokidar "^2.0.4"
 
-babel-plugin-flow-runtime@^0.18.0:
-  version "0.18.0"
-  resolved "https://registry.yarnpkg.com/babel-plugin-flow-runtime/-/babel-plugin-flow-runtime-0.18.0.tgz#09756cff0360f7c1149c4492f1f849dd98d2d552"
-  integrity sha512-KSYqXNez/fxkO6laN535u731pRVbPEZOpZkiJafURoTP8fEEqIgM82vRyT05OZtR7kYY6FaetwtFcoY2QBN3PQ==
+babel-plugin-flow-runtime@^0.19.0:
+  version "0.19.0"
+  resolved "https://registry.yarnpkg.com/babel-plugin-flow-runtime/-/babel-plugin-flow-runtime-0.19.0.tgz#f96e035a444bb042406838fed3c6b446c0e55a98"
+  integrity sha512-3kOv7UW5ojT/MfcqEjr+JOgWykLfWK7bdKozUyE6BrHNm13Auy+BviYNYW35nDWKtN6H7O5Pduxpvgl3P/UvrQ==
   dependencies:
     "@babel/generator" "^7.0.0"
     "@babel/parser" "^7.0.0"
