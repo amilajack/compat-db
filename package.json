@@ -76,7 +76,7 @@
     "babel-jest": "^24.1.0",
     "babel-loader": "^8.0.5",
     "babel-plugin-add-module-exports": "^1.0.2",
-    "babel-plugin-flow-runtime": "^0.18.0",
+    "babel-plugin-flow-runtime": "^0.19.0",
     "bookshelf": "0.14.2",
     "caniuse-db": "1.0.30000963",
     "chai": "^4.2.0",
