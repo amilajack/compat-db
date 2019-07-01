@@ -78,7 +78,7 @@
     "babel-plugin-add-module-exports": "^1.0.2",
     "babel-plugin-flow-runtime": "^0.19.0",
     "bookshelf": "0.15.1",
-    "caniuse-db": "1.0.30000971",
+    "caniuse-db": "1.0.30000979",
     "chai": "^4.2.0",
     "cross-env": "^5.2.0",
     "dotenv": "^6.2.0",
