@@ -89,7 +89,7 @@
     "expect": "^24.1.0",
     "flow-bin": "^0.98.0",
     "flow-runtime": "^0.17.0",
-    "flow-typed": "^2.5.2",
+    "flow-typed": "^2.6.2",
     "glow": "^1.2.2",
     "http-server": "^0.11.1",
     "husky": "^1.3.1",
